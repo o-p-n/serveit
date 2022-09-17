@@ -44,6 +44,14 @@ type fileServer struct {
 	root string
 }
 
+func newFileServer(root string) *fileServer {
+	fs := fileServer{
+		root: root,
+	}
+
+	return &fs
+}
+
 func (fs *fileServer) openFile(filePath string) (*fileEntry, *fileServerError) {
 	loc := path.Join(fs.root, filePath)
 
@@ -112,14 +120,6 @@ func (fs *fileServer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	})
 }
 
-func newFileServer(root string) *fileServer {
-	fs := fileServer{
-		root: root,
-	}
-
-	return &fs
-}
-
 // ##### MAIN #####
 
 type UTCFormatter struct {
@@ -150,4 +150,5 @@ func main() {
 
 	log.Infof("starting to servit from %s", root)
 	http.ListenAndServe(":4000", handler)
+	log.Info("shutting down serveit")
 }
