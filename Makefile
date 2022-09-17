@@ -1,5 +1,6 @@
 PROJECT=serveit
 DOCKER_REPO_OWNER=linuxwolf
+DOCKER_BUILDER=container-builder
 DOCKER_CACHE=${HOME}/.cache/docker-buildx
 STAMP=latest
 
