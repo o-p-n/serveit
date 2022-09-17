@@ -1,6 +1,7 @@
 PROJECT=serveit
 DOCKER_REPO_OWNER=linuxwolf
-DOCKER_CACHE=.cache/docker
+DOCKER_CACHE=${HOME}/.cache/docker-buildx
+STAMP=latest
 
 include .builder/main.mk
 

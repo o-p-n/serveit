@@ -1,0 +1,5 @@
+.builder/
+.cache/docker/
+.dockerignore
+Dockerfile
+serveit
