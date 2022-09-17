@@ -2,4 +2,6 @@
 .cache/docker/
 .dockerignore
 Dockerfile
+LICENSE
+README.md
 serveit
