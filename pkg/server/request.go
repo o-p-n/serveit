@@ -10,7 +10,7 @@ import (
 
 	mime "github.com/gabriel-vasile/mimetype"
 	"github.com/o-p-n/serveit/pkg/errs"
-	log "github.com/sirupsen/logrus"
+	"github.com/o-p-n/serveit/pkg/logger"
 )
 
 type FileServerRequest struct {
@@ -35,6 +35,8 @@ func NewRequest(srv *FileServer, req *http.Request) *FileServerRequest {
 }
 
 func (fsreq *FileServerRequest) Close(w http.ResponseWriter) {
+	log := logger.Logger()
+
 	fsreq.Stopped = time.Now()
 	if f := fsreq.File; f != nil {
 		f.Close()
@@ -52,12 +54,12 @@ func (fsreq *FileServerRequest) Close(w http.ResponseWriter) {
 
 	filePath := fsreq.Request.URL.Path
 	var msg string
-	var fields log.Fields
-	var level log.Level
+	var fields logger.Fields
+	var level logger.Level
 	if e := fsreq.Error; e != nil {
 		msg = "request failed"
-		level = log.ErrorLevel
-		fields = log.Fields{
+		level = logger.ErrorLevel
+		fields = logger.Fields{
 			"path":    filePath,
 			"status":  e.Status,
 			"error":   e,
@@ -65,8 +67,8 @@ func (fsreq *FileServerRequest) Close(w http.ResponseWriter) {
 		}
 	} else {
 		msg = "request handled"
-		level = log.InfoLevel
-		fields = log.Fields{
+		level = logger.InfoLevel
+		fields = logger.Fields{
 			"path":    filePath,
 			"status":  200,
 			"elapsed": fsreq.Stopped.Sub(fsreq.Started),
