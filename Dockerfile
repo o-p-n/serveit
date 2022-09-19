@@ -13,7 +13,8 @@ RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
   -o /usr/bin/serveit \
   -buildmode=pie \
   -ldflags='-linkmode external -extldflags "-static-pie"' \
-  ./...
+  main.go
+# RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go test -v ./...
 
 FROM linuxwolf/busybox:1.34.1.6b78e270e42100250574e9a9dbed00b44ae1d9a6 AS serveit
 
