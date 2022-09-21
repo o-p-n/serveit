@@ -14,7 +14,7 @@ import (
 )
 
 type FileServerRequest struct {
-	Server   *FileServer
+	Server   *FileServerHandler
 	Request  *http.Request
 	Path     string
 	Entry    *FileEntry
@@ -25,7 +25,7 @@ type FileServerRequest struct {
 	Stopped  time.Time
 }
 
-func NewRequest(srv *FileServer, req *http.Request) *FileServerRequest {
+func NewRequest(srv *FileServerHandler, req *http.Request) *FileServerRequest {
 	return &FileServerRequest{
 		Server:  srv,
 		Request: req,
