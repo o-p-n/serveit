@@ -9,10 +9,8 @@ ARG TARGETARCH
 ARG TARGETOS
 
 COPY . /working
-RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
   -o /usr/bin/serveit \
-  -buildmode=pie \
-  -ldflags='-linkmode external -extldflags "-static-pie"' \
   main.go
 # RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go test -v ./...
 
