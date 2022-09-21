@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"os"
+	"os/signal"
 	"path/filepath"
 
 	"github.com/o-p-n/serveit/pkg/logger"
@@ -21,9 +23,29 @@ func main() {
 	} else {
 		root, _ = os.Getwd()
 	}
-	handler := server.NewServer(root)
+	srv := server.NewServer(root)
+
+	srvClosed := make(chan struct{}, 1)
+
+	go func() {
+		sigchan := make(chan os.Signal, 1)
+		signal.Notify(sigchan, os.Interrupt)
+
+		<-sigchan
+
+		log.Info("shutting down serveit")
+		srv.Shutdown(context.Background())
+
+		close(srvClosed)
+	}()
 
 	log.Infof("starting to serveit from %s", root)
-	http.ListenAndServe(":4000", handler)
-	log.Info("shutting down serveit")
+	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+		log.WithFields(logger.Fields{
+			"error": err,
+		}).Error("server failed")
+	}
+
+	<-srvClosed
+	log.Info("serveit shut down")
 }
