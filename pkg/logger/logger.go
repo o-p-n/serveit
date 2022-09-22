@@ -26,6 +26,8 @@ func Logger() *logrus.Logger {
 			FullTimestamp: true,
 			PadLevelText:  true,
 		}})
+		// todo: make this configurable (somehow)
+		// setup.SetLevel(logrus.DebugLevel)
 
 		logger = setup
 	}
