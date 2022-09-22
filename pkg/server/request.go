@@ -1,6 +1,8 @@
 package server
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"net/http"
@@ -20,6 +22,7 @@ type FileServerRequest struct {
 	Entry    *FileEntry
 	File     *os.File
 	Error    *errs.FileServerError
+	Status   int
 	Complete bool
 	Started  time.Time
 	Stopped  time.Time
@@ -70,7 +73,7 @@ func (fsreq *FileServerRequest) Close(w http.ResponseWriter) {
 		level = logger.InfoLevel
 		fields = logger.Fields{
 			"path":    filePath,
-			"status":  200,
+			"status":  fsreq.Status,
 			"elapsed": fsreq.Stopped.Sub(fsreq.Started),
 		}
 	}
@@ -87,9 +90,22 @@ func (fsreq *FileServerRequest) Lookup() error {
 	}
 }
 
+func (fsreq *FileServerRequest) checkMatch() bool {
+	values, exists := fsreq.Request.Header["If-None-Match"]
+	logger.Logger().WithFields(logger.Fields{
+		"path":   fsreq.Entry.Path,
+		"etag":   fsreq.Entry.Tag,
+		"values": values,
+	}).Debug("checking for match")
+	if exists && len(values) > 0 {
+		return fsreq.Entry.Tag == values[0]
+	}
+	return false
+}
 func (fsreq *FileServerRequest) Pipe(w http.ResponseWriter) error {
 	entry := fsreq.Entry
-	fileRoot := fsreq.Server.Root
+	srv := fsreq.Server
+	fileRoot := srv.Root
 
 	var fd *os.File
 	if f, err := os.Open(path.Join(fileRoot, entry.Path)); err != nil {
@@ -108,16 +124,36 @@ func (fsreq *FileServerRequest) Pipe(w http.ResponseWriter) error {
 	}
 	fd.Seek(0, 0)
 
-	// Write header and contents
-	fsreq.Complete = true
-	w.Header().Set("Content-Type", fmt.Sprint(mtype))
-	w.Header().Set("Content-Length", fmt.Sprint(entry.Info.Size()))
-	w.WriteHeader(200)
-	if _, err := io.Copy(w, fd); err != nil {
-		fsreq.Error = errs.NewError("copy failed").
+	// Calculate Hash
+	hasher := sha256.New()
+	if _, err := io.Copy(hasher, fd); err != nil {
+		fsreq.Error = errs.NewError("digest failed").
 			WithPath(entry.Path).
 			WithCause(err)
 		return err
+	}
+	entry.Tag = hex.EncodeToString(hasher.Sum(nil))
+	fd.Seek(0, 0)
+
+	// Write header and contents
+	fsreq.Complete = true
+
+	if fsreq.checkMatch() {
+		fsreq.Status = 304
+		w.Header().Set("Etag", entry.Tag)
+		w.WriteHeader(fsreq.Status)
+	} else {
+		fsreq.Status = 200
+		w.Header().Set("Content-Type", fmt.Sprint(mtype))
+		w.Header().Set("Content-Length", fmt.Sprint(entry.Info.Size()))
+		w.Header().Set("Etag", entry.Tag)
+		w.WriteHeader(fsreq.Status)
+		if _, err := io.Copy(w, fd); err != nil {
+			fsreq.Error = errs.NewError("copy failed").
+				WithPath(entry.Path).
+				WithCause(err)
+			return err
+		}
 	}
 
 	return nil

@@ -10,6 +10,7 @@ import (
 type FileEntry struct {
 	Path string
 	Info os.FileInfo
+	Tag  string
 }
 
 func (e *FileEntry) Open(root string) (*os.File, *errs.FileServerError) {
