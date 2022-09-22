@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"syscall"
 
 	"github.com/o-p-n/serveit/pkg/logger"
 	"github.com/o-p-n/serveit/pkg/server"
@@ -25,16 +26,18 @@ func main() {
 	}
 	srv := server.NewServer(root)
 
-	srvClosed := make(chan struct{}, 1)
+	srvClosed := make(chan bool, 1)
 
 	go func() {
 		sigchan := make(chan os.Signal, 1)
-		signal.Notify(sigchan, os.Interrupt)
+		signal.Notify(sigchan, syscall.SIGTERM, syscall.SIGINT)
 
 		<-sigchan
 
 		log.Info("shutting down serveit")
-		srv.Shutdown(context.Background())
+		if err := srv.Shutdown(context.Background()); err != nil {
+			log.WithFields(logger.Fields{"error": err}).Warn("shutdown errors")
+		}
 
 		close(srvClosed)
 	}()
