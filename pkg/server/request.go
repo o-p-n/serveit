@@ -118,12 +118,20 @@ func (fsreq *FileServerRequest) Pipe(w http.ResponseWriter) error {
 	}
 
 	// Determine Media Type (then reset)
-	mtype, mErr := mime.DetectReader(fd)
-	if mErr != nil {
-		mtype = mime.Lookup("application/octet-stream")
-	}
-	fd.Seek(0, 0)
+	var mType string
 
+	ext := path.Ext(entry.Path)
+	if (ext == ".css") {
+		mType = "text/css"
+	} else {
+		mtypeObj, mErr := mime.DetectReader(fd)
+		if mErr != nil {
+			mtypeObj = mime.Lookup("application/octet-stream")
+		}
+		fd.Seek(0, 0)
+		mType = mtypeObj.String()
+	}
+	
 	// Calculate Hash
 	hasher := sha256.New()
 	if _, err := io.Copy(hasher, fd); err != nil {
@@ -144,7 +152,7 @@ func (fsreq *FileServerRequest) Pipe(w http.ResponseWriter) error {
 		w.WriteHeader(fsreq.Status)
 	} else {
 		fsreq.Status = 200
-		w.Header().Set("Content-Type", fmt.Sprint(mtype))
+		w.Header().Set("Content-Type", fmt.Sprint(mType))
 		w.Header().Set("Content-Length", fmt.Sprint(entry.Info.Size()))
 		w.Header().Set("Etag", entry.Tag)
 		w.WriteHeader(fsreq.Status)
