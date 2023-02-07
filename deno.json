@@ -1,5 +1,8 @@
 {
   "imports": {
     "std/": "https://deno.land/std@0.176.0/"
+  },
+  "tasks": {
+    "cov": "git clean -dfx .coverage && deno test -A --coverage=.coverage/profile && deno coverage --lcov --output=.coverage/lcov .coverage/profile"
   }
 }
