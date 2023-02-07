@@ -32,8 +32,18 @@ describe("util/hex", () => {
   ];
   describe("encode", () => {
     for (const v of vectors) {
-      it(`encodes ${v.name}`, () => {
+      it(`encodes Uint8Array of ${v.name}`, () => {
         const result = encode(v.decoded);
+        assert.assertEquals(result, v.encoded);
+      });
+      it(`encodes Uint8ClampedArray of ${v.name}`, () => {
+        const data = new Uint8ClampedArray(v.decoded);
+        const result = encode(data);
+        assert.assertEquals(result, v.encoded);
+      });
+      it(`encodes ArrayBuffer of ${v.name}`, () => {
+        const data = v.decoded.buffer;
+        const result = encode(data);
         assert.assertEquals(result, v.encoded);
       });
     }
