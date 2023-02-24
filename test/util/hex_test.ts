@@ -5,7 +5,7 @@
 import { describe, it } from "std/testing/bdd.ts";
 import { expect } from "expecto/mod/index.ts";
 
-import { decode, encode } from "./hex.ts";
+import { decode, encode } from "../../src/util/hex.ts";
 
 describe("util/hex", () => {
   const vectors = [
