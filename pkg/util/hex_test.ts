@@ -2,8 +2,8 @@
  * @copyright 2023 Matthew A. Miller
  */
 
-import * as assert from "std/testing/asserts.ts";
 import { describe, it } from "std/testing/bdd.ts";
+import { expect } from "expecto/mod/index.ts";
 
 import { decode, encode } from "./hex.ts";
 
@@ -34,17 +34,17 @@ describe("util/hex", () => {
     for (const v of vectors) {
       it(`encodes Uint8Array of ${v.name}`, () => {
         const result = encode(v.decoded);
-        assert.assertEquals(result, v.encoded);
+        expect(result).to.equal(v.encoded);
       });
       it(`encodes Uint8ClampedArray of ${v.name}`, () => {
         const data = new Uint8ClampedArray(v.decoded);
         const result = encode(data);
-        assert.assertEquals(result, v.encoded);
+        expect(result).to.equal(v.encoded);
       });
       it(`encodes ArrayBuffer of ${v.name}`, () => {
         const data = v.decoded.buffer;
         const result = encode(data);
-        assert.assertEquals(result, v.encoded);
+        expect(result).to.equal(v.encoded);
       });
     }
   });
@@ -52,17 +52,17 @@ describe("util/hex", () => {
     for (const v of vectors) {
       it(`decodes ${v.name}`, () => {
         const result = decode(v.encoded);
-        assert.assertEquals(result, v.decoded);
+        expect(result).to.deep.equal(v.decoded);
       });
     }
 
     it("throws if odd-length string", () => {
       const fn = () => decode("01020");
-      assert.assertThrows(fn, Error, "invalid input size");
+      expect(fn).to.throw(Error).with.property("message").to.equal("invalid input size");
     });
     it("throws if invalid hex values", () => {
       const fn = () => decode("oops");
-      assert.assertThrows(fn, Error, "invalid input string");
+      expect(fn).to.throw(Error).with.property("message").to.equal("invalid input string");
     });
   });
 });
