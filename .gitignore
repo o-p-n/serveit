@@ -1,4 +1,4 @@
 .builder/
 .cache/docker/
 serveit
-.coverage/
+coverage/

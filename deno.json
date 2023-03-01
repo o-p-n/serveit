@@ -1,5 +1,5 @@
 {
   "tasks": {
-    "cov": "git clean -dfx .coverage && deno test -A --coverage=.coverage/profile && deno coverage --lcov --output=.coverage/lcov .coverage/profile"
+    "cov": "git clean -dfx coverage && deno test -A --coverage=coverage/profile && deno coverage --lcov --output=coverage/lcov coverage/profile"
   }
 }
