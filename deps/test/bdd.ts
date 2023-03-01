@@ -3,7 +3,9 @@
  */
 
 export {
+  afterAll,
   afterEach,
+  beforeAll,
   beforeEach,
   describe,
   it,
