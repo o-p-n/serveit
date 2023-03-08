@@ -32,6 +32,11 @@ export class FileEntry {
     this.modifiedAt = props.modifiedAt;
     this.etag = props.etag;
   }
+
+  async open(): Promise<ReadableStream<Uint8Array>> {
+    const fs = await Deno.open(this.path, { read: true, write: false});
+    return fs.readable;
+  }
 }
 
 async function calculateETag(input: Partial<FileEntryProps>): Promise<string> {

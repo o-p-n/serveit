@@ -27,6 +27,25 @@ const FILE_INFO_DEFAULTS: Deno.FileInfo = {
   atime: null,
 };
 
+class MockFsFile extends Deno.FsFile {
+  readonly readable: ReadableStream<Uint8Array>;
+
+  constructor(readable: ReadableStream<Uint8Array>) {
+    super(0);
+    this.readable = readable;
+  }
+}
+
+function createMockFsFile(data: string): MockFsFile {
+  const bytes = new TextEncoder().encode(data);
+  const readable = new ReadableStream({
+    start(ctrl) {
+      ctrl.enqueue(bytes);
+    },
+  });
+  return new MockFsFile(readable);
+}
+
 describe("file", () => {
   const seed = new Date("2023-01-26T01:23:45.678Z");
   let clock: FakeTime;
@@ -181,6 +200,34 @@ describe("file", () => {
       }));
 
       await expect(find("somefile.txt")).to.be.rejected();
+    });
+  });
+
+  describe("FileEntry", () => {
+
+    describe(".open()", () => {
+      const entry = new FileEntry({
+        path: "sometext.txt",
+        type: "text/plain",
+        size: 25,
+        createdAt: seed,
+        modifiedAt: seed,
+        etag: "0123456789abcdef",
+      });
+      let stubOpen: mock.Stub | undefined = undefined;
+
+      afterEach(() => {
+        if (stubOpen) {
+          stubOpen.restore();
+          stubOpen = undefined;
+        }
+      });
+  
+      it("returns a readable stream", async () => {
+        stubOpen = mock.stub(Deno, "open", () => Promise.resolve(createMockFsFile("this is the file contents")));
+        const _result = await entry.open();
+        expect(stubOpen).to.have.been.deep.calledWith(["sometext.txt", { read: true, write: false }]);
+      });
     });
   });
 });
