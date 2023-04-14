@@ -3,20 +3,36 @@
  */
 
 import { join } from "../deps/src/path.ts";
-import { Status } from "../deps/src/http.ts";
+import { Status, ServeInit, serve } from "../deps/src/http.ts";
 
 import logger from "./util/log.ts";
 import { find } from "./file.ts";
 
 export const _internal = {
   find,
+  serve,
 };
+
+export const DEFAULT_SERVEINIT: ServeInit = {
+  port: 4000,
+  onListen: ({ port, hostname }) => {
+    logger.info(`listening on http://${hostname}:${port}/`);
+  }
+}
 
 export class Server {
   readonly root: string;
 
   constructor(root: string) {
     this.root = root;
+    this.handle = this.handle.bind(this);
+  }
+
+  async serve(init?: ServeInit) {
+    return await _internal.serve(this.handle, {
+      ...DEFAULT_SERVEINIT,
+      ...init,
+    });
   }
 
   async handle(req: Request): Promise<Response> {
@@ -38,7 +54,7 @@ export class Server {
       }
     }
 
-    logger.info(`${rsp.status} ${path} ${rsp.headers.get("Content-Length")}`);
+    logger.info(`${rsp.status} ${path} ${rsp.headers.get("Content-Length") || 0}`);
     return rsp;
   }
 

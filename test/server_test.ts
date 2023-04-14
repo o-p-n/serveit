@@ -8,10 +8,10 @@ import { readableStreamFromReader } from "../deps/test/streams.ts";
 import { StringReader } from "../deps/test/io.ts";
 import { expect, mock } from "../deps/test/expecto.ts";
 
-import { Status } from "../deps/src/http.ts";
+import { Handler, ServeInit, Status } from "../deps/src/http.ts";
 import { FileEntry } from "../src/file.ts";
 
-import { Server, _internal } from "../src/server.ts";
+import { Server, _internal, DEFAULT_SERVEINIT } from "../src/server.ts";
 
 describe("server", () => {
   class FakeFileEntry extends FileEntry {
@@ -162,6 +162,41 @@ describe("server", () => {
         expect(result.status).to.equal(Status.MethodNotAllowed);
 
         expect(stubLookup).to.be.called(0);
+      });
+    });
+
+    describe(".serve()", () => {
+      const server = new Server("root");
+
+      let stubServe: mock.Stub | undefined = undefined;
+
+      afterEach(() => {
+        stubServe?.restore();
+        stubServe = undefined;
+      });
+
+      beforeEach(() => {
+        stubServe = mock.stub(_internal, "serve", (_handler: Handler, options?: ServeInit) => {
+          const onListen = options?.onListen;
+          onListen && onListen({ port: options?.port ?? 4000, hostname: options?.hostname ?? "example.com"});
+          return Promise.resolve();
+        });
+      });
+
+      it("serves with default settings", () => {
+        server.serve();
+        expect(stubServe).to.have.been.deep.calledWith([server.handle, DEFAULT_SERVEINIT])
+      });
+      it("serves with an AbortController", () => {
+        const abort = new AbortController();
+        const signal = abort.signal;
+        server.serve({
+          signal,
+        });
+        expect(stubServe).to.have.been.deep.calledWith([server.handle, {
+          ...DEFAULT_SERVEINIT,
+          signal,
+        }]);
       });
     });
   });
