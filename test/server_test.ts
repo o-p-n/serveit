@@ -8,6 +8,7 @@ import { readableStreamFromReader } from "../deps/test/streams.ts";
 import { StringReader } from "../deps/test/io.ts";
 import { expect, mock } from "../deps/test/expecto.ts";
 
+import { Status } from "../deps/src/http.ts";
 import { FileEntry } from "../src/file.ts";
 
 import { Server, _internal } from "../src/server.ts";
@@ -87,6 +88,80 @@ describe("server", () => {
         expect(result.headers.get("content-type")).to.equal("text/plain");
         expect(result.headers.get("etag")).to.equal("some-fake-etag");
         expect(stubFind).to.have.been.deep.calledWith(["root/somefile.txt"]);
+      });
+    });
+
+    describe(".handle()", () => {
+      const server = new Server("root");
+
+      let stubLookup: mock.Stub | undefined = undefined;
+
+      function makeResponse(etag?: string): Response {
+        const data = "fake data";
+        const headers: Record<string, string> = {
+          "Content-Type": "text/plain",
+          "Content-Length": data.length.toString(),
+          "ETag": etag || "fake-generated-etag",
+        }
+        const rsp = new Response(data, {
+          status: Status.OK,
+          headers,
+        });
+        stubLookup = mock.stub(server, "lookup", (_src: string, _etag?: string) => Promise.resolve(rsp));
+
+        return rsp
+      }
+
+      afterEach(() => {
+        stubLookup?.restore();
+        stubLookup = undefined;
+      });
+
+      it("returns the lookup's response on GET", async () => {
+        const rsp = makeResponse("fake-etag");
+
+        const req = new Request(new URL("http://example.com/path"), {
+          headers: {
+            "ETag": "fake-etag",
+          } as Record<string, string>,
+        });
+        const result = await server.handle(req);
+        expect(result).to.deep.equal(rsp);
+
+        expect(stubLookup).to.have.been.calledWith(["/path", "fake-etag"]);
+      });
+      it("returns the lookup's response on GET, no request etag", async () => {
+        const rsp = makeResponse();
+
+        const req = new Request(new URL("http://example.com/path"));
+        const result = await server.handle(req);
+        expect(result).to.deep.equal(rsp);
+
+        expect(stubLookup).to.have.been.calledWith(["/path", undefined]);
+      });
+      it("returns NotFound on lookup error", async () => {
+        stubLookup = mock.stub(server, "lookup", (_src: string, _etag?: string) => {
+          return Promise.reject(new Error());
+        });
+
+        const req = new Request(new URL("http://example.com/path"));
+        const result = await server.handle(req);
+        expect(result.status).to.equal(Status.NotFound);
+
+        expect(stubLookup).to.have.been.calledWith(["/path", undefined]);
+      });
+      it("returns MethodNotAllowed on anything other than GET", async () => {
+        stubLookup = mock.stub(server, "lookup", (_src: string, _etag?: string) => {
+          return Promise.reject(new Error());
+        });
+
+        const req = new Request(new URL("http://example.com/path"), {
+          method: "POST",
+        });
+        const result = await server.handle(req);
+        expect(result.status).to.equal(Status.MethodNotAllowed);
+
+        expect(stubLookup).to.be.called(0);
       });
     });
   });

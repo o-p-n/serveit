@@ -19,6 +19,29 @@ export class Server {
     this.root = root;
   }
 
+  async handle(req: Request): Promise<Response> {
+    const method = req.method.toUpperCase();
+    const url = new URL(req.url);
+    const path = url.pathname;
+
+    let rsp: Response;
+    if (method !== "GET") {
+      rsp = new Response(Status[Status.MethodNotAllowed], { status: Status.MethodNotAllowed });
+    } else {
+      const etag = req.headers.get("etag") || undefined;
+
+      try {
+        rsp = await this.lookup(path, etag);
+      } catch (err) {
+        logger.error(`failed to get ${path}: ${err}`);
+        rsp = new Response(Status[Status.NotFound], { status: Status.NotFound });
+      }
+    }
+
+    logger.info(`${rsp.status} ${path} ${rsp.headers.get("Content-Length")}`);
+    return rsp;
+  }
+
   async lookup(src: string, etag?: string): Promise<Response> {
     // TODO: implement a cache
 
@@ -43,6 +66,8 @@ export class Server {
 
     logger.debug(`opening ${entry.path}...`);
     const body = await entry.open();
+
+    logger.debug(`streaming ${entry.path}`);
     return new Response(body, {
       status: Status.OK,
       headers,
