@@ -123,17 +123,17 @@ describe("file", () => {
           mtime: modifiedAt,
         }));
 
-        const result = await find("somefile");
-        const expected = new FileEntry({
-          path: "somefile",
-          type: "text/plain",
-          size: 500,
-          createdAt,
-          modifiedAt,
-          etag:
-            "W/6526a88e4a2e9d9b2122669164f2827aa2b773873dfd8fac1dac87efa7a3b830",
-          });
-        expect(result).to.deep.equal(expected);
+      const result = await find("somefile");
+      const expected = new FileEntry({
+        path: "somefile",
+        type: "text/plain",
+        size: 500,
+        createdAt,
+        modifiedAt,
+        etag:
+          "W/6526a88e4a2e9d9b2122669164f2827aa2b773873dfd8fac1dac87efa7a3b830",
+      });
+      expect(result).to.deep.equal(expected);
     });
     it("returns index.html for directory", async () => {
       const createdAt = new Date("2023-01-01T12:34:56.789Z");
@@ -171,7 +171,11 @@ describe("file", () => {
         .and.be.calledWith(["somedir/index.html"]);
     });
     it("throws an error for file not found", async () => {
-      stubStat = mock.stub(Deno, "stat", (_: string | URL) => Promise.reject(new Deno.errors.NotFound()));
+      stubStat = mock.stub(
+        Deno,
+        "stat",
+        (_: string | URL) => Promise.reject(new Deno.errors.NotFound()),
+      );
 
       await expect(find("somefile.txt")).to.be.rejected();
     });
@@ -193,18 +197,18 @@ describe("file", () => {
         .and.calledWith(["somedir/index.html"]);
     });
     it("throws an error on symlink", async () => {
-      stubStat = mock.stub(Deno, "stat", (_: string | URL) => Promise.resolve({
-        ...FILE_INFO_DEFAULTS,
-        isSymlink: true,
-        size: 500,
-      }));
+      stubStat = mock.stub(Deno, "stat", (_: string | URL) =>
+        Promise.resolve({
+          ...FILE_INFO_DEFAULTS,
+          isSymlink: true,
+          size: 500,
+        }));
 
       await expect(find("somefile.txt")).to.be.rejected();
     });
   });
 
   describe("FileEntry", () => {
-
     describe(".open()", () => {
       const entry = new FileEntry({
         path: "sometext.txt",
@@ -222,11 +226,18 @@ describe("file", () => {
           stubOpen = undefined;
         }
       });
-  
+
       it("returns a readable stream", async () => {
-        stubOpen = mock.stub(Deno, "open", () => Promise.resolve(createMockFsFile("this is the file contents")));
+        stubOpen = mock.stub(
+          Deno,
+          "open",
+          () => Promise.resolve(createMockFsFile("this is the file contents")),
+        );
         const _result = await entry.open();
-        expect(stubOpen).to.have.been.deep.calledWith(["sometext.txt", { read: true, write: false }]);
+        expect(stubOpen).to.have.been.deep.calledWith(["sometext.txt", {
+          read: true,
+          write: false,
+        }]);
       });
     });
   });

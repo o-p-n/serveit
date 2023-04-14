@@ -34,7 +34,7 @@ export class FileEntry {
   }
 
   async open(): Promise<ReadableStream<Uint8Array>> {
-    const fs = await Deno.open(this.path, { read: true, write: false});
+    const fs = await Deno.open(this.path, { read: true, write: false });
     return fs.readable;
   }
 }

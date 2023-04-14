@@ -3,7 +3,7 @@
  */
 
 import { join } from "../deps/src/path.ts";
-import { Status, ServeInit, serve } from "../deps/src/http.ts";
+import { serve, ServeInit, Status } from "../deps/src/http.ts";
 
 import logger from "./util/log.ts";
 import { find } from "./file.ts";
@@ -15,7 +15,7 @@ export const _internal = {
 
 export const DEFAULT_SERVEINIT: ServeInit = {
   port: 4000,
-}
+};
 
 export class Server {
   readonly root: string;
@@ -27,13 +27,15 @@ export class Server {
 
   async serve(init?: ServeInit): Promise<ServeInit> {
     const onListen = (info = { port: 0, hostname: "" }) => {
-      logger.info(`serving ${this.root} at http://${info.hostname}:${info.port}/`);
+      logger.info(
+        `serving ${this.root} at http://${info.hostname}:${info.port}/`,
+      );
     };
     const opts = {
       ...DEFAULT_SERVEINIT,
       onListen,
       ...init,
-    }
+    };
     await _internal.serve(this.handle, opts);
 
     return opts;
@@ -46,7 +48,9 @@ export class Server {
 
     let rsp: Response;
     if (method !== "GET") {
-      rsp = new Response(Status[Status.MethodNotAllowed], { status: Status.MethodNotAllowed });
+      rsp = new Response(Status[Status.MethodNotAllowed], {
+        status: Status.MethodNotAllowed,
+      });
     } else {
       const etag = req.headers.get("if-none-match") || undefined;
 
@@ -54,7 +58,9 @@ export class Server {
         rsp = await this.lookup(path, etag);
       } catch (err) {
         logger.error(`failed to get ${path}: ${err}`);
-        rsp = new Response(Status[Status.NotFound], { status: Status.NotFound });
+        rsp = new Response(Status[Status.NotFound], {
+          status: Status.NotFound,
+        });
       }
     }
 

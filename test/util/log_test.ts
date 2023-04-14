@@ -96,12 +96,24 @@ describe("util/log", () => {
         log.critical("critical message");
 
         expect(spyLog).to.have.been.called(6);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [TRACE] trace message`]);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [DEBUG] debug message`]);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [INFO] info message`]);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [WARNING] warning message`]);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [ERROR] error message`]);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [CRITICAL] critical message`]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [TRACE] trace message`,
+        ]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [DEBUG] debug message`,
+        ]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [INFO] info message`,
+        ]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [WARNING] warning message`,
+        ]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [ERROR] error message`,
+        ]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [CRITICAL] critical message`,
+        ]);
       });
       it("logs at or above TRACE", () => {
         log.level = logger.Level.TRACE;
@@ -113,12 +125,24 @@ describe("util/log", () => {
         log.critical("critical message");
 
         expect(spyLog).to.have.been.called(6);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [TRACE] trace message`]);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [DEBUG] debug message`]);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [INFO] info message`]);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [WARNING] warning message`]);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [ERROR] error message`]);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [CRITICAL] critical message`]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [TRACE] trace message`,
+        ]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [DEBUG] debug message`,
+        ]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [INFO] info message`,
+        ]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [WARNING] warning message`,
+        ]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [ERROR] error message`,
+        ]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [CRITICAL] critical message`,
+        ]);
       });
       it("logs at or above DEBUG", () => {
         log.level = logger.Level.DEBUG;
@@ -130,11 +154,21 @@ describe("util/log", () => {
         log.critical("critical message");
 
         expect(spyLog).to.have.been.called(5);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [DEBUG] debug message`]);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [INFO] info message`]);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [WARNING] warning message`]);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [ERROR] error message`]);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [CRITICAL] critical message`]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [DEBUG] debug message`,
+        ]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [INFO] info message`,
+        ]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [WARNING] warning message`,
+        ]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [ERROR] error message`,
+        ]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [CRITICAL] critical message`,
+        ]);
       });
       it("logs at or above INFO", () => {
         log.level = logger.Level.INFO;
@@ -146,10 +180,18 @@ describe("util/log", () => {
         log.critical("critical message");
 
         expect(spyLog).to.have.been.called(4);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [INFO] info message`]);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [WARNING] warning message`]);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [ERROR] error message`]);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [CRITICAL] critical message`]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [INFO] info message`,
+        ]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [WARNING] warning message`,
+        ]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [ERROR] error message`,
+        ]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [CRITICAL] critical message`,
+        ]);
       });
       it("logs at or above WARNING", () => {
         log.level = logger.Level.WARNING;
@@ -161,9 +203,15 @@ describe("util/log", () => {
         log.critical("critical message");
 
         expect(spyLog).to.have.been.called(3);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [WARNING] warning message`]);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [ERROR] error message`]);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [CRITICAL] critical message`]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [WARNING] warning message`,
+        ]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [ERROR] error message`,
+        ]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [CRITICAL] critical message`,
+        ]);
       });
       it("logs at or above ERROR", () => {
         log.level = logger.Level.ERROR;
@@ -175,8 +223,12 @@ describe("util/log", () => {
         log.critical("critical message");
 
         expect(spyLog).to.have.been.called(2);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [ERROR] error message`]);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [CRITICAL] critical message`]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [ERROR] error message`,
+        ]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [CRITICAL] critical message`,
+        ]);
       });
       it("logs at or above CRITICAL", () => {
         log.level = logger.Level.CRITICAL;
@@ -188,7 +240,9 @@ describe("util/log", () => {
         log.critical("critical message");
 
         expect(spyLog).to.have.been.called(1);
-        expect(spyLog).to.have.been.deep.calledWith([`${seed.toISOString()} [CRITICAL] critical message`]);
+        expect(spyLog).to.have.been.deep.calledWith([
+          `${seed.toISOString()} [CRITICAL] critical message`,
+        ]);
       });
 
       it("logs nothing at OFF", () => {

@@ -11,7 +11,7 @@ import { expect, mock } from "../deps/test/expecto.ts";
 import { Handler, ServeInit, Status } from "../deps/src/http.ts";
 import { FileEntry } from "../src/file.ts";
 
-import { Server, _internal, DEFAULT_SERVEINIT } from "../src/server.ts";
+import { _internal, DEFAULT_SERVEINIT, Server } from "../src/server.ts";
 
 describe("server", () => {
   class FakeFileEntry extends FileEntry {
@@ -102,14 +102,18 @@ describe("server", () => {
           "Content-Type": "text/plain",
           "Content-Length": data.length.toString(),
           "ETag": etag || "fake-generated-etag",
-        }
+        };
         const rsp = new Response(data, {
           status: Status.OK,
           headers,
         });
-        stubLookup = mock.stub(server, "lookup", (_src: string, _etag?: string) => Promise.resolve(rsp));
+        stubLookup = mock.stub(
+          server,
+          "lookup",
+          (_src: string, _etag?: string) => Promise.resolve(rsp),
+        );
 
-        return rsp
+        return rsp;
       }
 
       afterEach(() => {
@@ -140,9 +144,13 @@ describe("server", () => {
         expect(stubLookup).to.have.been.calledWith(["/path", undefined]);
       });
       it("returns NotFound on lookup error", async () => {
-        stubLookup = mock.stub(server, "lookup", (_src: string, _etag?: string) => {
-          return Promise.reject(new Error());
-        });
+        stubLookup = mock.stub(
+          server,
+          "lookup",
+          (_src: string, _etag?: string) => {
+            return Promise.reject(new Error());
+          },
+        );
 
         const req = new Request(new URL("http://example.com/path"));
         const result = await server.handle(req);
@@ -151,9 +159,13 @@ describe("server", () => {
         expect(stubLookup).to.have.been.calledWith(["/path", undefined]);
       });
       it("returns MethodNotAllowed on anything other than GET", async () => {
-        stubLookup = mock.stub(server, "lookup", (_src: string, _etag?: string) => {
-          return Promise.reject(new Error());
-        });
+        stubLookup = mock.stub(
+          server,
+          "lookup",
+          (_src: string, _etag?: string) => {
+            return Promise.reject(new Error());
+          },
+        );
 
         const req = new Request(new URL("http://example.com/path"), {
           method: "POST",
@@ -176,17 +188,27 @@ describe("server", () => {
       });
 
       beforeEach(() => {
-        stubServe = mock.stub(_internal, "serve", (_handler: Handler, options?: ServeInit) => {
-          const onListen = options?.onListen;
-          onListen && onListen({ port: options?.port ?? 4000, hostname: options?.hostname ?? "example.com"});
-          return Promise.resolve();
-        });
+        stubServe = mock.stub(
+          _internal,
+          "serve",
+          (_handler: Handler, options?: ServeInit) => {
+            const onListen = options?.onListen;
+            onListen &&
+              onListen({
+                port: options?.port ?? 4000,
+                hostname: options?.hostname ?? "example.com",
+              });
+            return Promise.resolve();
+          },
+        );
       });
 
       it("serves with default settings", async () => {
         const opts = await server.serve();
         expect(stubServe).to.have.been.deep.calledWith([server.handle, opts]);
-        expect(opts).to.have.members(Object.keys(DEFAULT_SERVEINIT).concat("onListen"));
+        expect(opts).to.have.members(
+          Object.keys(DEFAULT_SERVEINIT).concat("onListen"),
+        );
         expect(opts.port).to.equal(DEFAULT_SERVEINIT.port);
       });
       it("serves with an AbortController", async () => {

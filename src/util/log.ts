@@ -36,7 +36,7 @@ export class Logger {
   }
 
   #log(lvl: Level, message: string) {
-    if (this.level > lvl) { return; }
+    if (this.level > lvl) return;
 
     const timestamp = new Date().toISOString();
     const level = Level[lvl];

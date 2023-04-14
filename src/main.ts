@@ -1,6 +1,4 @@
-/**
- * 
- */
+/** */
 
 import { resolve } from "../deps/src/path.ts";
 import { Server } from "./server.ts";
@@ -29,4 +27,4 @@ const server = new Server(root);
 await server.serve({
   signal,
 });
-logger.warning("stopped")
+logger.warning("stopped");

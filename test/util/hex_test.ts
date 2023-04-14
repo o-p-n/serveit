@@ -12,12 +12,29 @@ describe("util/hex", () => {
     {
       name: "basic short data",
       encoded: "00010203",
-      decoded: new Uint8Array([ 0, 1, 2, 3 ]),
+      decoded: new Uint8Array([0, 1, 2, 3]),
     },
     {
       name: "basic long data",
       encoded: "000102030405060708090a0b0c0d0e0f",
-      decoded: new Uint8Array([ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 ]),
+      decoded: new Uint8Array([
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+      ]),
     },
     {
       name: "empty data",
@@ -58,11 +75,15 @@ describe("util/hex", () => {
 
     it("throws if odd-length string", () => {
       const fn = () => decode("01020");
-      expect(fn).to.throw(Error).with.property("message").to.equal("invalid input size");
+      expect(fn).to.throw(Error).with.property("message").to.equal(
+        "invalid input size",
+      );
     });
     it("throws if invalid hex values", () => {
       const fn = () => decode("oops");
-      expect(fn).to.throw(Error).with.property("message").to.equal("invalid input string");
+      expect(fn).to.throw(Error).with.property("message").to.equal(
+        "invalid input string",
+      );
     });
   });
 });
