@@ -22,6 +22,19 @@ export class Logger {
     this.level = level;
   }
 
+  louder(): Level {
+    if (this.level > Level.ALL) {
+      this.level = this.level - 1;
+    }
+    return this.level;
+  }
+  softer(): Level {
+    if (this.level < Level.OFF) {
+      this.level = this.level + 1;
+    }
+    return this.level;
+  }
+
   #log(lvl: Level, message: string) {
     if (this.level > lvl) { return; }
 

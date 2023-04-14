@@ -31,6 +31,49 @@ describe("util/log", () => {
       });
     });
 
+    describe("levels", () => {
+      it("gets louder", () => {
+        const log = new logger.Logger(logger.Level.INFO);
+        let result;
+
+        result = log.louder();
+        expect(result).to.equal(logger.Level.DEBUG);
+
+        result = log.louder();
+        expect(result).to.equal(logger.Level.TRACE);
+
+        result = log.louder();
+        expect(result).to.equal(logger.Level.ALL);
+      });
+      it("does not get louder than ALL", () => {
+        const log = new logger.Logger(logger.Level.ALL);
+        const result = log.louder();
+        expect(result).to.equal(logger.Level.ALL);
+      });
+
+      it("gets softer", () => {
+        const log = new logger.Logger(logger.Level.INFO);
+        let result;
+
+        result = log.softer();
+        expect(result).to.equal(logger.Level.WARNING);
+
+        result = log.softer();
+        expect(result).to.equal(logger.Level.ERROR);
+
+        result = log.softer();
+        expect(result).to.equal(logger.Level.CRITICAL);
+
+        result = log.softer();
+        expect(result).to.equal(logger.Level.OFF);
+      });
+      it("does not get softer than OFF", () => {
+        const log = new logger.Logger(logger.Level.OFF);
+        const result = log.softer();
+        expect(result).to.equal(logger.Level.OFF);
+      });
+    });
+
     describe("logging", () => {
       let log: logger.Logger;
       let spyLog: mock.Spy;
