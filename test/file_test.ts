@@ -13,7 +13,7 @@ const FILE_INFO_DEFAULTS: Deno.FileInfo = {
   isDirectory: false,
   isSymlink: false,
   size: 0,
-  dev: null,
+  dev: 0,
   ino: null,
   mode: null,
   nlink: null,
