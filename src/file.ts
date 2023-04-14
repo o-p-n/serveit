@@ -43,7 +43,7 @@ async function calculateETag(input: Partial<FileEntryProps>): Promise<string> {
   const json = JSON.stringify(input);
   const src = new TextEncoder().encode(json);
   const hash = await crypto.subtle.digest("SHA-256", src);
-  return toHex(hash);
+  return "W/" + toHex(hash);
 }
 
 export async function find(path: string): Promise<FileEntry> {

@@ -122,7 +122,7 @@ describe("server", () => {
 
         const req = new Request(new URL("http://example.com/path"), {
           headers: {
-            "ETag": "fake-etag",
+            "If-None-Match": "fake-etag",
           } as Record<string, string>,
         });
         const result = await server.handle(req);
@@ -183,20 +183,19 @@ describe("server", () => {
         });
       });
 
-      it("serves with default settings", () => {
-        server.serve();
-        expect(stubServe).to.have.been.deep.calledWith([server.handle, DEFAULT_SERVEINIT])
+      it("serves with default settings", async () => {
+        const opts = await server.serve();
+        expect(stubServe).to.have.been.deep.calledWith([server.handle, opts]);
+        expect(opts).to.have.members(Object.keys(DEFAULT_SERVEINIT).concat("onListen"));
+        expect(opts.port).to.equal(DEFAULT_SERVEINIT.port);
       });
-      it("serves with an AbortController", () => {
+      it("serves with an AbortController", async () => {
         const abort = new AbortController();
         const signal = abort.signal;
-        server.serve({
+        const opts = await server.serve({
           signal,
         });
-        expect(stubServe).to.have.been.deep.calledWith([server.handle, {
-          ...DEFAULT_SERVEINIT,
-          signal,
-        }]);
+        expect(stubServe).to.have.been.deep.calledWith([server.handle, opts]);
       });
     });
   });

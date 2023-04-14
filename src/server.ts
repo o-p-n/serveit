@@ -48,7 +48,7 @@ export class Server {
     if (method !== "GET") {
       rsp = new Response(Status[Status.MethodNotAllowed], { status: Status.MethodNotAllowed });
     } else {
-      const etag = req.headers.get("etag") || undefined;
+      const etag = req.headers.get("if-none-match") || undefined;
 
       try {
         rsp = await this.lookup(path, etag);
@@ -67,9 +67,10 @@ export class Server {
     // TODO: implement a cache
 
     src = join(this.root, src);
-    logger.debug(`finding ${src} ...`);
+    logger.debug(`finding ${src} (etag=${etag})...`);
 
     const entry = await _internal.find(src);
+    logger.debug(`found ${src} (size]${entry.size}; etag=${entry.etag})`);
     const headers = {
       "Content-Type": entry.type,
       "Content-Length": entry.size.toString(),

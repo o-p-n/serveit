@@ -85,7 +85,7 @@ describe("file", () => {
         createdAt,
         modifiedAt,
         etag:
-          "abe1e47f94c47d425120b2bca9cb3b8c8912620966cff3942585fdf45d9342ef",
+          "W/abe1e47f94c47d425120b2bca9cb3b8c8912620966cff3942585fdf45d9342ef",
       });
       expect(result).to.deep.equal(expected);
     });
@@ -107,7 +107,7 @@ describe("file", () => {
         createdAt,
         modifiedAt,
         etag:
-          "e0492a83f5c73613ad84edd3c8a1469c75d7ef4bc6cdc51a3028bc3857a0eaa6",
+          "W/e0492a83f5c73613ad84edd3c8a1469c75d7ef4bc6cdc51a3028bc3857a0eaa6",
       });
       expect(result).to.deep.equal(expected);
     });
@@ -131,7 +131,7 @@ describe("file", () => {
           createdAt,
           modifiedAt,
           etag:
-            "6526a88e4a2e9d9b2122669164f2827aa2b773873dfd8fac1dac87efa7a3b830",
+            "W/6526a88e4a2e9d9b2122669164f2827aa2b773873dfd8fac1dac87efa7a3b830",
           });
         expect(result).to.deep.equal(expected);
     });
@@ -163,7 +163,7 @@ describe("file", () => {
         createdAt,
         modifiedAt,
         etag:
-          "e0e37e2c280a813cc27b3e9d0804da1dd367e13738047baed735db359b3a0740",
+          "W/e0e37e2c280a813cc27b3e9d0804da1dd367e13738047baed735db359b3a0740",
       });
       expect(result).to.deep.equal(expected);
       expect(stubStat).to.be.called(2);
