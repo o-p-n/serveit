@@ -15,9 +15,6 @@ export const _internal = {
 
 export const DEFAULT_SERVEINIT: ServeInit = {
   port: 4000,
-  onListen: ({ port, hostname }) => {
-    logger.info(`listening on http://${hostname}:${port}/`);
-  }
 }
 
 export class Server {
@@ -28,11 +25,18 @@ export class Server {
     this.handle = this.handle.bind(this);
   }
 
-  async serve(init?: ServeInit) {
-    return await _internal.serve(this.handle, {
+  async serve(init?: ServeInit): Promise<ServeInit> {
+    const onListen = (info = { port: 0, hostname: "" }) => {
+      logger.info(`serving ${this.root} at http://${info.hostname}:${info.port}/`);
+    };
+    const opts = {
       ...DEFAULT_SERVEINIT,
+      onListen,
       ...init,
-    });
+    }
+    await _internal.serve(this.handle, opts);
+
+    return opts;
   }
 
   async handle(req: Request): Promise<Response> {
@@ -54,7 +58,8 @@ export class Server {
       }
     }
 
-    logger.info(`${rsp.status} ${path} ${rsp.headers.get("Content-Length") || 0}`);
+    const size = rsp.headers.get("Content-Length") || "0";
+    logger.info(`${method} ${path} - ${rsp.status} ${size}`);
     return rsp;
   }
 
