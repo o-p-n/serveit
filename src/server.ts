@@ -27,8 +27,8 @@ export class Server {
 
   async serve(init?: ServeInit): Promise<ServeInit> {
     const onListen = (info = { port: 0, hostname: "" }) => {
-      logger.info(
-        `serving ${this.root} at http://${info.hostname}:${info.port}/`,
+      logger.warning(
+        `serving directory ${this.root} at http://${info.hostname}:${info.port}/`,
       );
     };
     const opts = {
@@ -76,7 +76,7 @@ export class Server {
     logger.debug(`finding ${src} (etag=${etag})...`);
 
     const entry = await _internal.find(src);
-    logger.debug(`found ${src} (size]${entry.size}; etag=${entry.etag})`);
+    logger.debug(`found ${src} (size=${entry.size}; etag=${entry.etag})`);
     const headers = {
       "Content-Type": entry.type,
       "Content-Length": entry.size.toString(),
