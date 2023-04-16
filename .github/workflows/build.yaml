@@ -12,8 +12,7 @@ jobs:
     name: Run tests
     runs-on: ubuntu-22.04
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v3
       - name: Setup Deno
         uses: denoland/setup-deno@v1
@@ -23,9 +22,36 @@ jobs:
         run: deno test
       - name: Lint Deno
         run: deno fmt --check && deno lint
+  lint:
+    name: Lint code
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: "1.30.2"
+      - name: Lint Deno
+        run: deno lint
+  fmt-check:
+    name: Check formatting of code
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: "1.30.2"
+      - name: Format-check Deno
+        run: deno fmt --check
   build-image:
     name: Build image
-    needs: test
+    needs:
+      - test
+      - lint
+      - fmt-check
     runs-on: ubuntu-22.04
     services:
       registry:
