@@ -35,7 +35,7 @@ jobs:
       - name: Lint Deno
         run: deno lint
   fmt-check:
-    name: Check formatting of code
+    name: Check formatting
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
