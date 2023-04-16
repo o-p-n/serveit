@@ -23,12 +23,12 @@ export function fromLevelName(name: string): LogLevel | undefined {
   return idx as LogLevel;
 }
 
-export const DEFAULT_LEVEL = LogLevel.INFO;
+export const DEFAULT_LOG_LEVEL = LogLevel.INFO;
 
 export class Logger {
   level: LogLevel;
 
-  constructor(level = DEFAULT_LEVEL) {
+  constructor(level = DEFAULT_LOG_LEVEL) {
     this.level = level;
   }
 

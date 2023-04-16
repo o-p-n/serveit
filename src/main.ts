@@ -6,9 +6,11 @@
 import { resolve } from "../deps/src/path.ts";
 import { Server } from "./server.ts";
 import logger from "./util/log.ts";
+import { load } from "./config.ts";
 
 if (import.meta.main) {
-  const root = resolve(Deno.args[0] || ".");
+  const { root, port, logLevel } = await load(Deno.env);
+  logger.level = logLevel;
 
   const abort = new AbortController();
   const { signal } = abort;
@@ -19,6 +21,7 @@ if (import.meta.main) {
 
   const server = new Server(root);
   await server.serve({
+    port,
     signal,
   });
   logger.warning("stopped");
