@@ -9,15 +9,16 @@ To run SERVEIT in its container, mount a directory to serve to `/app/web` and pu
 ```
 docker run <options> --volume $PWD/web:/app/web --publish 4000:4000 --name serveit linuxwolf/serveit:<TAG>
 ```
+
 ### CONFIGURING
 
 SERVEIT can be configuring via environment variables:
 
-| Option              | Default    | Description                                                  |
-| ------------------- | ---------- | ------------------------------------------------------------ |
-| `SERVEIT_ROOT_DIR`  | `$PWD`     | The root directory of files to serve.                        |
-| `SERVEIT_PORT`      | `"4000"`   | The port to serve on.                                        |
-| `SERVEIT_LOG_LEVEL` | `"INFO"`   | The level to log at (`ALL` == everything; `OFF` == nothing). |
+| Option              | Default  | Description                                                  |
+| ------------------- | -------- | ------------------------------------------------------------ |
+| `SERVEIT_ROOT_DIR`  | `$PWD`   | The root directory of files to serve.                        |
+| `SERVEIT_PORT`      | `"4000"` | The port to serve on.                                        |
+| `SERVEIT_LOG_LEVEL` | `"INFO"` | The level to log at (`ALL` == everything; `OFF` == nothing). |
 
 ## BUILDING
 

@@ -3,7 +3,6 @@
  * @copyright 2023 Matthew A. Miller
  */
 
-import { resolve } from "../deps/src/path.ts";
 import { Server } from "./server.ts";
 import logger from "./util/log.ts";
 import { load } from "./config.ts";

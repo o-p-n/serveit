@@ -21,7 +21,7 @@ export async function load(env: Deno.Env = Deno.env) {
   // default to `cwd`
   const root = resolve(rootDir || ".");
   const port = parseInt(portStr || "4000");
-  const logLevel = (logLevelStr ? fromLevelName(logLevelStr) : DEFAULT_LOG_LEVEL);
+  const logLevel = logLevelStr ? fromLevelName(logLevelStr) : DEFAULT_LOG_LEVEL;
 
   // check it!
   const stat = await Deno.stat(root);
@@ -40,4 +40,4 @@ export async function load(env: Deno.Env = Deno.env) {
     port,
     logLevel,
   };
-} 
+}

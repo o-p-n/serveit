@@ -13,11 +13,13 @@ export enum LogLevel {
   OFF,
 }
 
-export const LOG_LEVEL_NAMES = Object.keys(LogLevel).filter((k) => isNaN(parseInt(k)));
+export const LOG_LEVEL_NAMES = Object.keys(LogLevel).filter((k) =>
+  isNaN(parseInt(k))
+);
 
 export function fromLevelName(name: string): LogLevel | undefined {
   const idx = LOG_LEVEL_NAMES.indexOf(name.toUpperCase());
-  if (idx< 0) {
+  if (idx < 0) {
     return undefined;
   }
   return idx as LogLevel;

@@ -5,7 +5,7 @@
 import { afterEach, beforeEach, describe, it } from "../deps/test/bdd.ts";
 import { expect, mock } from "../deps/test/expecto.ts";
 
-import { LogLevel, DEFAULT_LOG_LEVEL } from "../src/util/log.ts";
+import { DEFAULT_LOG_LEVEL, LogLevel } from "../src/util/log.ts";
 import { load } from "../src/config.ts";
 
 const FILE_INFO_DEFAULTS: Deno.FileInfo = {
@@ -75,10 +75,11 @@ describe("config", () => {
 
   beforeEach(() => {
     if (!stubStat) {
-      stubStat = mock.stub(Deno, "stat", (_: string | URL) => Promise.resolve({
-        ...FILE_INFO_DEFAULTS,
-        isDirectory: true,
-      }));
+      stubStat = mock.stub(Deno, "stat", (_: string | URL) =>
+        Promise.resolve({
+          ...FILE_INFO_DEFAULTS,
+          isDirectory: true,
+        }));
     }
     stubCwd = mock.stub(Deno, "cwd", () => CWD);
   });
@@ -97,7 +98,7 @@ describe("config", () => {
           port: 5000,
           logLevel: LogLevel.DEBUG,
         });
-  
+
         expect(stubStat).to.be.calledWith(["/root"]);
       });
       it("uses defaults if unset", async () => {
@@ -152,10 +153,15 @@ describe("config", () => {
     describe("failure cases", () => {
       it("throws if `SERVET_ROOT_DIR` is a file", async () => {
         stubStat?.restore();
-        stubStat = mock.stub(Deno, "stat", (_: string | URL) => Promise.resolve({
-          ...FILE_INFO_DEFAULTS,
-          isFile: true,
-        }));
+        stubStat = mock.stub(
+          Deno,
+          "stat",
+          (_: string | URL) =>
+            Promise.resolve({
+              ...FILE_INFO_DEFAULTS,
+              isFile: true,
+            }),
+        );
 
         const env = new FakeEnv({
           "SERVEIT_ROOT_DIR": "/is-a-file",
@@ -169,7 +175,11 @@ describe("config", () => {
       });
       it("throws if `SERVEIT_ROOT_DIR` does not exist", async () => {
         stubStat?.restore();
-        stubStat = mock.stub(Deno, "stat", (_: string | URL) => Promise.reject(new Deno.errors.NotFound()));
+        stubStat = mock.stub(
+          Deno,
+          "stat",
+          (_: string | URL) => Promise.reject(new Deno.errors.NotFound()),
+        );
 
         const env = new FakeEnv({
           "SERVEIT_ROOT_DIR": "/is-a-file",
