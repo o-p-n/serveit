@@ -2,8 +2,8 @@
  * @copyright 2023 Matthew A. Miller
  */
 
-import { join } from "../deps/src/path.ts";
-import { serve, ServeInit, Status } from "../deps/src/http.ts";
+import { join } from "path";
+import { serve, ServeInit, Status } from "http";
 
 import logger from "./util/log.ts";
 import { find } from "./file.ts";

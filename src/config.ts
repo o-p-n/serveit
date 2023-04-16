@@ -3,7 +3,7 @@
  * @copyright 2023 Matthew A. Miller
  */
 
-import { resolve } from "../deps/src/path.ts";
+import { resolve } from "path";
 
 import { DEFAULT_LOG_LEVEL, fromLevelName, LogLevel } from "./util/log.ts";
 

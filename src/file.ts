@@ -2,8 +2,8 @@
  * @copyright 2023 Matthew A. Miller
  */
 
-import { extname, join } from "../deps/src/path.ts";
-import { typeByExtension } from "../deps/src/media_types.ts";
+import { extname, join } from "path";
+import { typeByExtension } from "media_types";
 
 import { encode as toHex } from "./util/hex.ts";
 
