@@ -8,7 +8,7 @@ import { readableStreamFromReader } from "../deps/test/streams.ts";
 import { StringReader } from "../deps/test/io.ts";
 import { expect, mock } from "../deps/test/expecto.ts";
 
-import { Handler, ServeInit, Status } from "../deps/src/http.ts";
+import { Handler, ServeInit, Status } from "http";
 import { FileEntry } from "../src/file.ts";
 
 import { _internal, DEFAULT_SERVEINIT, Server } from "../src/server.ts";
