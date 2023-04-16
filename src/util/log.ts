@@ -2,7 +2,7 @@
  * @copyright 2023 Matthew A. Miller
  */
 
-export enum Level {
+export enum LogLevel {
   ALL = 0,
   TRACE,
   DEBUG,
@@ -13,60 +13,70 @@ export enum Level {
   OFF,
 }
 
-const DEFAULT_LEVEL = Level.INFO;
+export const LOG_LEVEL_NAMES = Object.keys(LogLevel).filter((k) => isNaN(parseInt(k)));
+
+export function fromLevelName(name: string): LogLevel | undefined {
+  const idx = LOG_LEVEL_NAMES.indexOf(name.toUpperCase());
+  if (idx< 0) {
+    return undefined;
+  }
+  return idx as LogLevel;
+}
+
+export const DEFAULT_LEVEL = LogLevel.INFO;
 
 export class Logger {
-  level: Level;
+  level: LogLevel;
 
   constructor(level = DEFAULT_LEVEL) {
     this.level = level;
   }
 
-  louder(): Level {
-    if (this.level > Level.ALL) {
+  louder(): LogLevel {
+    if (this.level > LogLevel.ALL) {
       this.level = this.level - 1;
     }
     return this.level;
   }
-  softer(): Level {
-    if (this.level < Level.OFF) {
+  softer(): LogLevel {
+    if (this.level < LogLevel.OFF) {
       this.level = this.level + 1;
     }
     return this.level;
   }
 
-  #log(lvl: Level, message: string) {
+  #log(lvl: LogLevel, message: string) {
     if (this.level > lvl) return;
 
     const timestamp = new Date().toISOString();
-    const level = Level[lvl];
+    const level = LogLevel[lvl];
 
     const output = `${timestamp} [${level}] ${message}`;
     console.log(output);
   }
 
   trace(message: string) {
-    return this.#log(Level.TRACE, message);
+    return this.#log(LogLevel.TRACE, message);
   }
 
   debug(message: string) {
-    return this.#log(Level.DEBUG, message);
+    return this.#log(LogLevel.DEBUG, message);
   }
 
   info(message: string) {
-    return this.#log(Level.INFO, message);
+    return this.#log(LogLevel.INFO, message);
   }
 
   warning(message: string) {
-    return this.#log(Level.WARNING, message);
+    return this.#log(LogLevel.WARNING, message);
   }
 
   error(message: string) {
-    return this.#log(Level.ERROR, message);
+    return this.#log(LogLevel.ERROR, message);
   }
 
   critical(message: string) {
-    return this.#log(Level.CRITICAL, message);
+    return this.#log(LogLevel.CRITICAL, message);
   }
 }
 

@@ -19,58 +19,82 @@ describe("util/log", () => {
     clock.restore();
   });
 
+  describe("fromLevelName()", () => {
+    it("returns the LogLevel for known names", () => {
+      for (const name of logger.LOG_LEVEL_NAMES) {
+        const expected = logger.LOG_LEVEL_NAMES.indexOf(name);
+        const result = logger.fromLevelName(name);
+        expect(result).to.equal(expected);
+      }
+    });
+
+    it("returns the LogLevel for known names (ignoring case)", () => {
+      for (let name of logger.LOG_LEVEL_NAMES) {
+        name = name.toLowerCase();
+        const expected = logger.LOG_LEVEL_NAMES.indexOf(name.toUpperCase());
+        const result = logger.fromLevelName(name);
+        expect(result).to.equal(expected);
+      }
+    });
+
+    it("returns undefined for unknown name", () => {
+      const result = logger.fromLevelName("UNKNOWN");
+      expect(result).to.be.undefined();
+    });
+  });
+
   describe("Logger", () => {
     describe("ctor()", () => {
       it("creates with default level", () => {
         const result = new logger.Logger();
-        expect(result.level).to.equal(logger.Level.INFO);
+        expect(result.level).to.equal(logger.LogLevel.INFO);
       });
       it("creates with the specified level", () => {
-        const result = new logger.Logger(logger.Level.DEBUG);
-        expect(result.level).to.equal(logger.Level.DEBUG);
+        const result = new logger.Logger(logger.LogLevel.DEBUG);
+        expect(result.level).to.equal(logger.LogLevel.DEBUG);
       });
     });
 
     describe("levels", () => {
       it("gets louder", () => {
-        const log = new logger.Logger(logger.Level.INFO);
+        const log = new logger.Logger(logger.LogLevel.INFO);
         let result;
 
         result = log.louder();
-        expect(result).to.equal(logger.Level.DEBUG);
+        expect(result).to.equal(logger.LogLevel.DEBUG);
 
         result = log.louder();
-        expect(result).to.equal(logger.Level.TRACE);
+        expect(result).to.equal(logger.LogLevel.TRACE);
 
         result = log.louder();
-        expect(result).to.equal(logger.Level.ALL);
+        expect(result).to.equal(logger.LogLevel.ALL);
       });
       it("does not get louder than ALL", () => {
-        const log = new logger.Logger(logger.Level.ALL);
+        const log = new logger.Logger(logger.LogLevel.ALL);
         const result = log.louder();
-        expect(result).to.equal(logger.Level.ALL);
+        expect(result).to.equal(logger.LogLevel.ALL);
       });
 
       it("gets softer", () => {
-        const log = new logger.Logger(logger.Level.INFO);
+        const log = new logger.Logger(logger.LogLevel.INFO);
         let result;
 
         result = log.softer();
-        expect(result).to.equal(logger.Level.WARNING);
+        expect(result).to.equal(logger.LogLevel.WARNING);
 
         result = log.softer();
-        expect(result).to.equal(logger.Level.ERROR);
+        expect(result).to.equal(logger.LogLevel.ERROR);
 
         result = log.softer();
-        expect(result).to.equal(logger.Level.CRITICAL);
+        expect(result).to.equal(logger.LogLevel.CRITICAL);
 
         result = log.softer();
-        expect(result).to.equal(logger.Level.OFF);
+        expect(result).to.equal(logger.LogLevel.OFF);
       });
       it("does not get softer than OFF", () => {
-        const log = new logger.Logger(logger.Level.OFF);
+        const log = new logger.Logger(logger.LogLevel.OFF);
         const result = log.softer();
-        expect(result).to.equal(logger.Level.OFF);
+        expect(result).to.equal(logger.LogLevel.OFF);
       });
     });
 
@@ -87,7 +111,7 @@ describe("util/log", () => {
       });
 
       it("logs everything at ALL", () => {
-        log.level = logger.Level.ALL;
+        log.level = logger.LogLevel.ALL;
         log.trace("trace message");
         log.debug("debug message");
         log.info("info message");
@@ -116,7 +140,7 @@ describe("util/log", () => {
         ]);
       });
       it("logs at or above TRACE", () => {
-        log.level = logger.Level.TRACE;
+        log.level = logger.LogLevel.TRACE;
         log.trace("trace message");
         log.debug("debug message");
         log.info("info message");
@@ -145,7 +169,7 @@ describe("util/log", () => {
         ]);
       });
       it("logs at or above DEBUG", () => {
-        log.level = logger.Level.DEBUG;
+        log.level = logger.LogLevel.DEBUG;
         log.trace("trace message");
         log.debug("debug message");
         log.info("info message");
@@ -171,7 +195,7 @@ describe("util/log", () => {
         ]);
       });
       it("logs at or above INFO", () => {
-        log.level = logger.Level.INFO;
+        log.level = logger.LogLevel.INFO;
         log.trace("trace message");
         log.debug("debug message");
         log.info("info message");
@@ -194,7 +218,7 @@ describe("util/log", () => {
         ]);
       });
       it("logs at or above WARNING", () => {
-        log.level = logger.Level.WARNING;
+        log.level = logger.LogLevel.WARNING;
         log.trace("trace message");
         log.debug("debug message");
         log.info("info message");
@@ -214,7 +238,7 @@ describe("util/log", () => {
         ]);
       });
       it("logs at or above ERROR", () => {
-        log.level = logger.Level.ERROR;
+        log.level = logger.LogLevel.ERROR;
         log.trace("trace message");
         log.debug("debug message");
         log.info("info message");
@@ -231,7 +255,7 @@ describe("util/log", () => {
         ]);
       });
       it("logs at or above CRITICAL", () => {
-        log.level = logger.Level.CRITICAL;
+        log.level = logger.LogLevel.CRITICAL;
         log.trace("trace message");
         log.debug("debug message");
         log.info("info message");
@@ -246,7 +270,7 @@ describe("util/log", () => {
       });
 
       it("logs nothing at OFF", () => {
-        log.level = logger.Level.OFF;
+        log.level = logger.LogLevel.OFF;
         log.trace("trace message");
         log.debug("debug message");
         log.info("info message");
