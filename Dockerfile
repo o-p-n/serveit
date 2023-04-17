@@ -1,23 +1,12 @@
-FROM golang:1.19.1 AS builder
-
+FROM lukechannings/deno:v1.30.2 AS builder
 WORKDIR /working
-
-COPY go.mod go.sum /working
-RUN go mod download && go mod verify
-
-ARG TARGETARCH
-ARG TARGETOS
-
 COPY . /working
-RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
-  -o /usr/bin/serveit \
-  main.go
-# RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go test -v ./...
+RUN deno compile --output /usr/bin/serveit --allow-env --allow-net --allow-read --no-prompt src/main.ts
 
-FROM linuxwolf/busybox:1.34.1.6b78e270e42100250574e9a9dbed00b44ae1d9a6 AS serveit
+FROM ubuntu:22.04 AS serveit
 
-WORKDIR /app
+WORKDIR /app/web
 
 COPY --from=builder /usr/bin/serveit /bin/serveit
 
-CMD ["/bin/serveit", "/app/web"]
+CMD [ "/bin/serveit" ]
