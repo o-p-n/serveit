@@ -2,11 +2,11 @@
  * @copyright 2023 Matthew A. Miller
  */
 
-import { afterEach, beforeEach, describe, it } from "../deps/test/bdd.ts";
-import { FakeTime } from "../deps/test/fake_time.ts";
-import { readableStreamFromReader } from "../deps/test/streams.ts";
-import { StringReader } from "../deps/test/io.ts";
-import { expect, mock } from "../deps/test/expecto.ts";
+import { afterEach, beforeEach, describe, it } from "test/bdd";
+import { FakeTime } from "test/fake_time";
+import { readableStreamFromReader } from "test/streams";
+import { StringReader } from "test/io";
+import { expect, mock } from "./setup.ts";
 
 import { Handler, ServeInit, Status } from "http";
 import { FileEntry } from "../src/file.ts";

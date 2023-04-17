@@ -2,8 +2,8 @@
  * @copyright 2023 Matthew A. Miller
  */
 
-import { afterEach, beforeEach, describe, it } from "../deps/test/bdd.ts";
-import { expect, mock } from "../deps/test/expecto.ts";
+import { afterEach, beforeEach, describe, it } from "test/bdd";
+import { expect, mock } from "./setup.ts";
 
 import { DEFAULT_LOG_LEVEL, LogLevel } from "../src/util/log.ts";
 import { load } from "../src/config.ts";

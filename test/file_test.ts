@@ -2,9 +2,9 @@
  * @copyright 2023 Matthew A. Miller
  */
 
-import { afterEach, beforeEach, describe, it } from "../deps/test/bdd.ts";
-import { FakeTime } from "../deps/test/fake_time.ts";
-import { expect, mock } from "../deps/test/expecto.ts";
+import { afterEach, beforeEach, describe, it } from "test/bdd";
+import { FakeTime } from "test/fake_time";
+import { expect, mock } from "./setup.ts";
 
 import { FileEntry, find } from "../src/file.ts";
 

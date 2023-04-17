@@ -2,8 +2,8 @@
  * @copyright 2023 Matthew A. Miller
  */
 
-import { describe, it } from "../../deps/test/bdd.ts";
-import { expect } from "../../deps/test/expecto.ts";
+import { describe, it } from "test/bdd";
+import { expect } from "../setup.ts";
 
 import { decode, encode } from "../../src/util/hex.ts";
 
