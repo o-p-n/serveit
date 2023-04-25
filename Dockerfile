@@ -3,7 +3,7 @@ WORKDIR /working
 COPY . /working
 RUN deno compile --output /usr/bin/serveit --allow-env --allow-net --allow-read --no-prompt src/main.ts
 
-FROM ubuntu:22.04 AS serveit
+FROM gcr.io/distroless/cc AS serveit
 
 WORKDIR /app/web
 
