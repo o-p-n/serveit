@@ -16,7 +16,7 @@ jobs:
         with:
           toolchain: "1.70.0"
       - name: Check lint
-        uses: actions-rs/clippy-checkv1
+        uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: -D warnings
