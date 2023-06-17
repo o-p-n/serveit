@@ -1,12 +1,12 @@
-FROM lukechannings/deno:v1.30.2 AS builder
+FROM rust:1.70 as builder
 WORKDIR /working
 COPY . /working
-RUN deno compile --output /usr/bin/serveit --allow-env --allow-net --allow-read --no-prompt src/main.ts
+RUN cargo build --release
 
 FROM gcr.io/distroless/cc AS serveit
 
 WORKDIR /app/web
 
-COPY --from=builder /usr/bin/serveit /bin/serveit
+COPY --from=builder /working/target/release/serveit /bin/serveit
 
 CMD [ "/bin/serveit" ]

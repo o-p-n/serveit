@@ -1,7 +1,10 @@
 .builder/
 .cache/docker/
+coverage/
+target/
+serveit
+
 .dockerignore
 Dockerfile
 LICENSE
 README.md
-serveit

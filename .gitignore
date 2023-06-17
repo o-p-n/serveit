@@ -1,4 +1,5 @@
 .builder/
 .cache/docker/
-serveit
 coverage/
+target/
+serveit
