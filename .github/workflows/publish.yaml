@@ -7,21 +7,6 @@ on:
       - v*
 
 jobs:
-  test:
-    name: Run tests
-    runs-on: ubuntu-22.04
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Deno
-        uses: denoland/setup-deno@v1
-        with:
-          deno-version: "1.30.2"
-      - name: Test Deno
-        run: deno test
-      - name: Lint Deno
-        run: deno fmt --check && deno lint
   publish-image:
     name: Publish image
     runs-on: ubuntu-latest

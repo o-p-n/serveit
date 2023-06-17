@@ -5,48 +5,39 @@ on:
       - main
 
 jobs:
-  test:
-    name: Run tests
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Deno
-        uses: denoland/setup-deno@v1
-        with:
-          deno-version: "1.30.2"
-      - name: Test Deno
-        run: deno test
-      - name: Lint Deno
-        run: deno fmt --check && deno lint
   lint:
     name: Lint code
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Deno
-        uses: denoland/setup-deno@v1
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
         with:
-          deno-version: "1.30.2"
-      - name: Lint Deno
-        run: deno lint
+          toolchain: "1.70.0"
+      - name: Check lint
+        uses: actions-rs/clippy-checkv1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: -D warnings
   fmt-check:
     name: Check formatting
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Deno
-        uses: denoland/setup-deno@v1
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
         with:
-          deno-version: "1.30.2"
-      - name: Format-check Deno
-        run: deno fmt --check
+          toolchain: "1.70.0"
+      - name: Check formatting
+        uses: actions-rs/@cargo@v1
+        with:
+          command: fmt
+          args: --check
   build-image:
     name: Build image
     needs:
-      - test
       - lint
       - fmt-check
     runs-on: ubuntu-22.04
