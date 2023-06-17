@@ -19,7 +19,7 @@ jobs:
         uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          args: -D warnings
+          args: "-- -D warnings"
   fmt-check:
     name: Check formatting
     runs-on: ubuntu-22.04
