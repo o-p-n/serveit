@@ -1,12 +1,24 @@
-FROM lukechannings/deno:v1.30.2 AS builder
-WORKDIR /working
-COPY . /working
-RUN deno compile --output /usr/bin/serveit --allow-env --allow-net --allow-read --no-prompt src/main.ts
+##### builder #####
+FROM rust:1.70 as builder
 
+# build only dependencies
+WORKDIR /working
+RUN USER=root cargo new --bin serveit
+
+WORKDIR /working/serveit
+COPY ./Cargo.* .
+RUN cargo build --release
+
+# build project
+RUN rm -rf ./src/*.rs
+COPY ./src ./src
+RUN rm -rf ./target/release/serveit* \
+    && cargo build --release
+
+##### shipped #####
 FROM gcr.io/distroless/cc AS serveit
 
+COPY --from=builder /working/serveit/target/release/serveit /bin/serveit
+
 WORKDIR /app/web
-
-COPY --from=builder /usr/bin/serveit /bin/serveit
-
 CMD [ "/bin/serveit" ]
