@@ -10,7 +10,7 @@ COPY ./Cargo.* .
 RUN cargo build --release
 
 # build project
-RUN rm -rf ./src/*.rs
+RUN rm -rf ./src
 COPY ./src ./src
 RUN rm -rf ./target/release/serveit* \
     && cargo build --release
