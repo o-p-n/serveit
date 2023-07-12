@@ -62,6 +62,7 @@ jobs:
     needs:
       - lint
       - fmt-check
+      - compile
     runs-on: ubuntu-22.04
     services:
       registry:
