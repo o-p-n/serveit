@@ -6,7 +6,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 PROJECT_DIR=$(dirname "${SCRIPT_DIR}")
 
 ARCH=$(uname -m)
-OS=$(uname -o)
+OS=$(uname -s)
 
 case "${ARCH}" in
 "arm64")
