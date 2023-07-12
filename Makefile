@@ -16,7 +16,7 @@ PATH := $(shell pwd)/.zig:$(PATH)
 	git clone -q https://github.com/o-p-n/image-builder.git -b main .builder
 
 .zig/zig:
-	./build-tools/download-zig.sh
+	./.build-tools/download-zig.sh
 
 cargo-zigbuild:
 	cargo install cargo-zigbuild
