@@ -38,7 +38,11 @@ jobs:
   compile:
     strategy:
       matrix:
-        target: [ linux-amd64, linux-arm64 ]
+        include:
+          - output: linux-amd64
+            target: x86_64-unknown-linux-musl
+          - output: linux-arm64
+            target: aarch64-unknown-linux-musl
     name: Compile ${{ matrix.target }} binary
     runs-on: ubuntu-22.04
     steps:
@@ -51,12 +55,12 @@ jobs:
           target: ${{ matrix.target }}
       - name: Compile
         run: |
-          make target/${{ matrix.target }}
+          make target/${{ matrix.output }}
       - name: Upload
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.target }}-target
-          path: target/${{ matrix.target }}
+          name: ${{ matrix.output }}-target
+          path: target/${{ matrix.output }}
   build-image:
     name: Build image
     needs:
