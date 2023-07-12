@@ -35,6 +35,27 @@ jobs:
         with:
           command: fmt
           args: --check
+  compile:
+    strategy:
+      matrix:
+        target: [ linux-amd64, linux-arm64 ]
+    name: Compile ${{ matrix.target }} binary
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: "1.70.0"
+          target: ${{ matrix.target }}
+      - name: Compile
+        run: |
+          make target/${{ matrix.target }}
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.target }}-target
+          path: target/${{ matrix.target }}
   build-image:
     name: Build image
     needs:
@@ -47,35 +68,30 @@ jobs:
         ports:
           - 5000:5000
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v3
-      -
-        name: Setup QEMU
+      - name: Setup QEMU
         uses: docker/setup-qemu-action@v2
-      - 
-        name: Setup Docker Buildx
+      - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v2
         with:
           driver-opts: network=host
-      -
-        name: Setup Caching
+      - name: Setup Caching
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
           key: buildx-${{ runner.os }}-${{ github.sha }}
           restore-keys: |
             buildx-${{ runner.os }}
-      - name: Build image
-        uses: docker/build-push-action@v4
+      - name: Download linux/amd64 binary
+        uses: actions/download-artifact@v3
         with:
-          context: .
-          tags: localhost:5000/linuxwolf/serveit:latest
-          push: true
-          platforms: linux/amd64,linux/arm64
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
-      - name: Prune cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+          name: linux-amd64-target
+          path: target
+      - name: Download linux/arm64 binary
+        uses: actions/download-artifact@v3
+        with:
+          name: linux-arm64-target
+          path: target
+      - name: Build image
+        run: make image-only DOCKER_CACHE=/tmp/.buildx-cache
