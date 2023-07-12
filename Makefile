@@ -8,17 +8,22 @@ include .builder/main.mk
 
 PATH := $(shell pwd)/.zig:$(PATH)
 
+.PHONY: cargo-zigbuild compile image image-only
+
+##### SETUP #####
+
 .builder/main.mk:
 	git clone -q https://github.com/o-p-n/image-builder.git -b main .builder
 
-.PHONY: cargo-zigbuild binaries image image-only
-
-##### RUST BINARIES #####
-
-binaries: target/linux-amd64 target/linux-arm64
+.zig/zig:
+	./build-tools/download-zig.sh
 
 cargo-zigbuild:
 	cargo install cargo-zigbuild
+
+##### RUST BINARIES #####
+
+compile: target/linux-amd64 target/linux-arm64
 
 target/linux-arm64: target/aarch64-unknown-linux-musl
 	cp target/aarch64-unknown-linux-musl/release/serveit target/linux-arm64
@@ -34,12 +39,9 @@ target/x86_64-unknown-linux-musl: .zig/zig cargo-zigbuild
 
 ##### CONTAINAER IMAGES #####
 
-image: target/linux-amd64 target/linux-arm64 Dockerfile image-only
+image: compile Dockerfile image-only
 
 image-only: linuxwolf/serveit
 
 linuxwolf/serveit:
-
-.zig/zig:
-	./build-tools/download-zig.sh
 
