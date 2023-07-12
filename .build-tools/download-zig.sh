@@ -33,7 +33,7 @@ if [ ! -f "${ZIG_PATH}/zig" ] || [ ! -d "${ZIG_PATH}/lib" ] ; then
   mkdir -p "${ZIG_PATH}"
 
   ZIG_DOWNLOAD_PATH="zig-${OS}-${ARCH}-0.10.1"
-  curl -s "https://ziglang.org/download/0.10.1/${ZIG_DOWNLOAD_PATH}.tar.xz" | tar -xf - -C "${ZIG_PATH}"
+  curl "https://ziglang.org/download/0.10.1/${ZIG_DOWNLOAD_PATH}.tar.xz" | tar -xf - -C "${ZIG_PATH}"
   mv "${ZIG_PATH}/${ZIG_DOWNLOAD_PATH}/zig" "${ZIG_PATH}/zig"
   mv "${ZIG_PATH}/${ZIG_DOWNLOAD_PATH}/lib" "${ZIG_PATH}/lib"
   rm -rf ".zig/${ZIG_DOWNLOAD_PATH}"
