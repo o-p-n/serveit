@@ -40,6 +40,7 @@ jobs:
       matrix:
         target: [ linux-amd64, linux-arm64 ]
     name: Compile ${{ matrix.target }} binary
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3
