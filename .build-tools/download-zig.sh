@@ -1,6 +1,6 @@
 #! /bin/bash
 
-set -xeuo pipefail
+set -euo pipefail
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 PROJECT_DIR=$(dirname "${SCRIPT_DIR}")
@@ -29,7 +29,7 @@ esac
 ZIG_PATH="${PROJECT_DIR}/.zig"
 
 if [ ! -f "${ZIG_PATH}/zig" ] || [ ! -d "${ZIG_PATH}/lib" ] ; then
-  echo "download zig ..."
+  echo "download zig for ${OS}/${ARCH}..."
   mkdir -p "${ZIG_PATH}"
 
   ZIG_DOWNLOAD_PATH="zig-${OS}-${ARCH}-0.10.1"
