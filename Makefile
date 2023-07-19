@@ -32,10 +32,12 @@ target/linux-amd64: target/x86_64-unknown-linux-musl
 	cp target/x86_64-unknown-linux-musl/release/serveit target/linux-amd64
 
 target/aarch64-unknown-linux-musl: .zig/zig cargo-zigbuild
-	cargo zigbuild --release --target aarch64-unknown-linux-musl
+	rustup target add aarch64-unknown-linux-musl \
+	&& cargo zigbuild --release --target aarch64-unknown-linux-musl
 
 target/x86_64-unknown-linux-musl: .zig/zig cargo-zigbuild
-	cargo zigbuild --release --target x86_64-unknown-linux-musl
+	rustup target add x86_64-unknown-linux-musl \
+	&& cargo zigbuild --release --target x86_64-unknown-linux-musl
 
 ##### CONTAINAER IMAGES #####
 
