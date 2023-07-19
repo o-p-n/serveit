@@ -1,5 +1,5 @@
 ##### shipped #####
-FROM gcr.io/distroless/cc AS serveit
+FROM gcr.io/distroless/static AS serveit
 
 ARG TARGETARCH
 ARG TARGETOS
