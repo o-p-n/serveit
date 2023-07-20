@@ -30,6 +30,9 @@ jobs:
           path: target/${{ matrix.output }}
   publish-image:
     name: Publish image
+    needs:
+      - compile
+    environment: production
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
