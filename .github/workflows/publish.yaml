@@ -26,7 +26,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.output }}-target
+          name: serveit-${{ matrix.output }}
           path: target/${{ matrix.output }}
   publish-image:
     name: Publish image
@@ -58,12 +58,12 @@ jobs:
       - name: Download linux/amd64 binary
         uses: actions/download-artifact@v3
         with:
-          name: linux-amd64-target
+          name: serveit-linux-amd64
           path: target
       - name: Download linux/arm64 binary
         uses: actions/download-artifact@v3
         with:
-          name: linux-arm64-target
+          name: serveit-linux-arm64
           path: target
       - name: Build image
         run: |
