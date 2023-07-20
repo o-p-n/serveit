@@ -1,8 +1,8 @@
 .builder/
+.buid-tools/
 .cache/docker/
+.zig/
 coverage/
-target/
-serveit
 
 .dockerignore
 Dockerfile

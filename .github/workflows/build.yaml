@@ -35,11 +35,33 @@ jobs:
         with:
           command: fmt
           args: --check
+  compile:
+    strategy:
+      matrix:
+        include:
+          - output: linux-amd64
+            target: x86_64-unknown-linux-musl
+          - output: linux-arm64
+            target: aarch64-unknown-linux-musl
+    name: Compile ${{ matrix.target }} binary
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Compile
+        run: |
+          make target/${{ matrix.output }}
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: serveit-${{ matrix.output }}
+          path: target/${{ matrix.output }}
   build-image:
     name: Build image
     needs:
       - lint
       - fmt-check
+      - compile
     runs-on: ubuntu-22.04
     services:
       registry:
@@ -47,35 +69,30 @@ jobs:
         ports:
           - 5000:5000
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v3
-      -
-        name: Setup QEMU
+      - name: Setup QEMU
         uses: docker/setup-qemu-action@v2
-      - 
-        name: Setup Docker Buildx
+      - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v2
         with:
           driver-opts: network=host
-      -
-        name: Setup Caching
+      - name: Setup Caching
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
           key: buildx-${{ runner.os }}-${{ github.sha }}
           restore-keys: |
             buildx-${{ runner.os }}
-      - name: Build image
-        uses: docker/build-push-action@v4
+      - name: Download linux/amd64 binary
+        uses: actions/download-artifact@v3
         with:
-          context: .
-          tags: localhost:5000/linuxwolf/serveit:latest
-          push: true
-          platforms: linux/amd64,linux/arm64
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
-      - name: Prune cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+          name: serveit-linux-amd64
+          path: target
+      - name: Download linux/arm64 binary
+        uses: actions/download-artifact@v3
+        with:
+          name: serveit-linux-arm64
+          path: target
+      - name: Build image
+        run: make image-only DOCKER_CACHE=/tmp/.buildx-cache
