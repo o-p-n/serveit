@@ -19,7 +19,7 @@ PATH := $(shell pwd)/.zig:$(PATH)
 	./.build-tools/download-zig.sh
 
 cargo-zigbuild:
-	cargo install --version 0.16.12 cargo-zigbuild
+	./.build-tools/install-zigbuild.sh
 
 ##### CLEANING #####
 
