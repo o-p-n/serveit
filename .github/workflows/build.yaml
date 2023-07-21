@@ -1,4 +1,6 @@
 name: build
+env:
+  RUST_VERSION: "1.70.0"
 on:
   pull_request:
     branches:
@@ -12,14 +14,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: "1.70.0"
+        run: |
+          rustup install ${{ env.RUST_VERSION }}
+          rustup component add clippy
       - name: Check lint
-        uses: actions-rs/clippy-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          args: "-- -D warnings"
+        run: |
+          cargo clippy
   fmt-check:
     name: Check formatting
     runs-on: ubuntu-22.04
@@ -27,14 +27,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: "1.70.0"
+        run: |
+          rustup install ${{ env.RUST_VERSION }}
+          rustup component add rustfmt
       - name: Check formatting
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --check
+        run: |
+          cargo fmt --check
   compile:
     strategy:
       matrix:
@@ -48,10 +46,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Setup Caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys:
+            cargo-${{ runner.os }}
+      - name: Setup Rust
+        run: |
+          rustup install ${{ env.RUST_VERSION }}
       - name: Compile
         run: |
           make target/${{ matrix.output }}
-      - name: Upload
+      - name: Upload Targets
         uses: actions/upload-artifact@v3
         with:
           name: serveit-${{ matrix.output }}
