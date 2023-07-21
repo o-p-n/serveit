@@ -1,5 +1,6 @@
 ##### shipped #####
 FROM gcr.io/distroless/static AS serveit
+LABEL org.opencontainers.image.source="https://github.com/o-p-n/serveit"
 
 ARG TARGETARCH
 ARG TARGETOS
