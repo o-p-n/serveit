@@ -8,7 +8,7 @@ include .builder/main.mk
 
 PATH := $(shell pwd)/.zig:$(PATH)
 
-.PHONY: cargo-zigbuild compile image image-only
+.PHONY: clean cargo-zigbuild compile image image-only
 
 ##### SETUP #####
 
@@ -19,7 +19,16 @@ PATH := $(shell pwd)/.zig:$(PATH)
 	./.build-tools/download-zig.sh
 
 cargo-zigbuild:
-	cargo install cargo-zigbuild
+	cargo install --version 0.16.12 cargo-zigbuild
+
+##### CLEANING #####
+
+clean-compile:
+	cargo clean
+
+clean: clean-compile
+
+clean-all: clean-compile clean-cache clean-builder
 
 ##### RUST BINARIES #####
 
@@ -43,7 +52,7 @@ target/x86_64-unknown-linux-musl: .zig/zig cargo-zigbuild
 
 image: compile Dockerfile image-only
 
-image-only: linuxwolf/serveit
+image-only: $(DOCKER_REPO_OWNER)/serveit
 
-linuxwolf/serveit:
+# $(DOCKER_REPO_OWNER)/serveit:
 
