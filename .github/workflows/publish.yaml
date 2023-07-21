@@ -15,7 +15,7 @@ jobs:
             target: x86_64-unknown-linux-musl
           - output: linux-arm64
             target: aarch64-unknown-linux-musl
-    name: Compile ${{ matrix.target }} binary
+    name: Compile ${{ matrix.output }} binary
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
@@ -30,9 +30,9 @@ jobs:
             ~/.cargo/git/db/
             .zig/
             target/
-          key: cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
+          key: cargo-${{ matrix.output }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys:
-            cargo-${{ matrix.target }}
+            cargo-${{ matrix.output }}
       - name: Setup Rust
         run: |
           rustup install ${{ env.RUST_VERSION }}
