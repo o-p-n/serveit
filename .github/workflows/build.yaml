@@ -24,6 +24,7 @@ jobs:
           key: cargo-lint-${{ hashFiles('**/Cargo.lock') }}
       - name: Setup Rust
         run: |
+          chmod +x -R ~/.cargo/bin/*
           rustup install ${{ env.RUST_VERSION }}
           rustup component add clippy
       - name: Check lint
