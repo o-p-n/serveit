@@ -19,7 +19,7 @@ jobs:
           rustup component add clippy
       - name: Check lint
         run: |
-          cargo clippy
+          cargo clippy --no-deps
   fmt-check:
     name: Check formatting
     runs-on: ubuntu-22.04
