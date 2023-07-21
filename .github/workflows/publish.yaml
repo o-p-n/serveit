@@ -30,9 +30,9 @@ jobs:
             ~/.cargo/git/db/
             .zig/
             target/
-          key: cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+          key: cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys:
-            cargo-${{ runner.os }}
+            cargo-${{ matrix.target }}
       - name: Setup Rust
         run: |
           rustup install ${{ env.RUST_VERSION }}
