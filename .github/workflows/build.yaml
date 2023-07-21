@@ -22,8 +22,6 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
           key: cargo-lint-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys:
-            cargo-lint
       - name: Setup Rust
         run: |
           rustup install ${{ env.RUST_VERSION }}
@@ -68,8 +66,6 @@ jobs:
             .zig/
             target/
           key: cargo-${{ matrix.output }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys:
-            cargo-${{ matrix.output }}
       - name: Setup Rust
         run: |
           rustup install ${{ env.RUST_VERSION }}
