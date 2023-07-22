@@ -8,8 +8,6 @@ SOURCES=$(wildcard src/**/*.rs)
 
 include .builder/main.mk
 
-PATH := $(shell pwd)/.zig:$(PATH)
-
 .PHONY: clean compile image-only image
 
 ##### SETUP #####
