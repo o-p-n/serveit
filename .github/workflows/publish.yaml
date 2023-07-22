@@ -20,7 +20,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Caching
+      - name: Setup LLVM Caching
+        id: cache-llvm
+        uses: actions/cache@v3
+        with:
+          path: |
+            ./llvm
+          key: llvm-${{ runner.os }}
+      - name: Setup LLVM
+        uses: KyleMayes/install-llvm-action@v1
+        with:
+          version: "15"
+          cached: ${{ steps.cache-llvm.outputs.cache-hit }}
+      - name: Setup Rust Caching
         uses: actions/cache@v3
         with:
           path: |
@@ -28,13 +40,14 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            .zig/
             target/
           key: cargo-${{ matrix.output }}-${{ hashFiles('**/Cargo.lock') }}
       - name: Setup Rust
         run: |
           rustup install ${{ env.RUST_VERSION }}
       - name: Compile
+        env:
+          CARGO_TARGET_${{ matrix.config }}_LINKER: "./llvm/bin/lld"
         run: |
           make target/${{ matrix.output }}
       - name: Upload Targets
@@ -76,7 +89,7 @@ jobs:
         with:
           version: "15"
           cached: ${{ steps.cache-llvm.outputs.cache-hit }}
-      - name: Setup Rust Caching
+      - name: Setup Caching
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
