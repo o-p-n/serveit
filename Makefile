@@ -4,49 +4,43 @@ DOCKER_BUILDER=container-builder
 DOCKER_CACHE=${HOME}/.cache/docker-buildx
 STAMP=latest
 
+SOURCES=$(wildcard src/**/*.rs)
+
 include .builder/main.mk
 
 PATH := $(shell pwd)/.zig:$(PATH)
 
-.PHONY: clean cargo-zigbuild compile image image-only
+.PHONY: clean compile image-only image
 
 ##### SETUP #####
 
 .builder/main.mk:
 	git clone -q https://github.com/o-p-n/image-builder.git -b main .builder
 
-.zig/zig:
-	./.build-tools/download-zig.sh
-
-cargo-zigbuild:
-	./.build-tools/install-zigbuild.sh
-
 ##### CLEANING #####
 
-clean-compile:
-	cargo clean
+clean:
+	git clean -dfx .
 
-clean: clean-compile
-
-clean-all: clean-compile clean-cache clean-builder
+clean-all: clean clean-cache clean-builder
 
 ##### RUST BINARIES #####
 
 compile: target/linux-amd64 target/linux-arm64
 
-target/linux-arm64: target/aarch64-unknown-linux-musl
+target/linux-arm64: target/aarch64-unknown-linux-musl/release/serveit
 	cp target/aarch64-unknown-linux-musl/release/serveit target/linux-arm64
 
-target/linux-amd64: target/x86_64-unknown-linux-musl
+target/linux-amd64: target/x86_64-unknown-linux-musl/release/serveit
 	cp target/x86_64-unknown-linux-musl/release/serveit target/linux-amd64
 
-target/aarch64-unknown-linux-musl: .zig/zig cargo-zigbuild
+target/aarch64-unknown-linux-musl/release/serveit: $(SOURCES)
 	rustup target add aarch64-unknown-linux-musl \
-	&& cargo zigbuild --release --target aarch64-unknown-linux-musl
+	&& cargo build --release --target aarch64-unknown-linux-musl
 
-target/x86_64-unknown-linux-musl: .zig/zig cargo-zigbuild
+target/x86_64-unknown-linux-musl/release/serveit: $(SOURCES)
 	rustup target add x86_64-unknown-linux-musl \
-	&& cargo zigbuild --release --target x86_64-unknown-linux-musl
+	&& cargo build --release --target x86_64-unknown-linux-musl
 
 ##### CONTAINAER IMAGES #####
 

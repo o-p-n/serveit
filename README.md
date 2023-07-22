@@ -22,8 +22,34 @@ SERVEIT can be configuring via environment variables:
 
 ## BUILDING
 
-To build, use `docker build` (or `docker buildx build`):
+### PREREQUISITES
+
+The following need to be installed in order to build:
+
+* Docker (version `20.0` or higher)
+* Make (version `3.81` or higher)
+* Rust via `rustup` (version `1.70.0` or higher)
+
+### CROSS-COMPILING
+
+A cross-compiling linker needs to be available.  On linux, modern version of GCC and LLVM+Clang already support this.
+
+On MacOS, there are a few options.  The method tested is to use the Homebrew version of LLVM plus a custom linker in Cargo configuration.
+
+First, install LLVM:
+
+```bash
+brew install llvm
+```
+
+Next, add the following to `~/.cargo/config.toml` (create the file if missing):
 
 ```
-docker build -t <REPO>/serveit:latest .
+[target.aarch64-unknown-linux-musl]
+linker="/opt/homebrew/opt/llvm/bin/lld
+
+[target.x86_64-unknown-linux-musl]
+linker="/opt/homebrew/opt/llvm/bin/lld
 ```
+
+The above is for an Apple Silicon Mac, on Intel Macs replace `/opt/homebrew/opt` with `/usr/local/opt`
