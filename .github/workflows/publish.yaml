@@ -64,7 +64,20 @@ jobs:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup Caching
+      - name: Setup LLVM Caching
+        id: cache-llvm
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/llvm
+          key: llvm-${{ runner.os }}
+      - name: Setup LLVM
+        uses: KyleMayes/install-llvm-action@v1
+        with:
+          version: "15"
+          directory: "~/llvm"
+          cached: ${{ steps.cache-llvm.outputs.cache-hit }}
+      - name: Setup Rust Caching
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
