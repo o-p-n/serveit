@@ -42,6 +42,14 @@ target/x86_64-unknown-linux-musl/release/serveit: $(SOURCES)
 	rustup target add x86_64-unknown-linux-musl \
 	&& cargo build --release --target x86_64-unknown-linux-musl
 
+##### CHECKS #####
+
+lint:
+	cargo clippy --no-deps
+
+fmt-check:
+	cargo fmt --check
+
 ##### CONTAINAER IMAGES #####
 
 image: compile Dockerfile image-only
