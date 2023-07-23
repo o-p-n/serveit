@@ -32,24 +32,22 @@ The following need to be installed in order to build:
 
 ### CROSS-COMPILING
 
-A cross-compiling linker needs to be available.  On linux, modern version of GCC and LLVM+Clang already support this.
+A cross-compiling linker needs to be available.  LLVM's' `lld` is such a linker that is available for all of this project's supported platforms.  This project uses version `15.0.7` in CI.
 
-On MacOS, there are a few options.  The method tested is to use the Homebrew version of LLVM plus a custom linker in Cargo configuration.
+The easiest method is to install a pre-built package:
+* **Ubuntu/Debian:** there are DEB and RPM packages available for many distributions
+* **MacOS:** can be installed via Homebrew (`brew install llvm`) as a Keg-only
 
-First, install LLVM:
+Make note of where LLVM is installed and the path to `lld`.  For MacOS + Homebrew, `brew --prefix llvm` will provide the base path, then append `/bin/lld`.  For Linux, it is often in `/usr/bin` with the version appended (e.g., `/usr/bin/llvm-15`).
 
-```bash
-brew install llvm
-```
-
-Next, add the following to `~/.cargo/config.toml` (create the file if missing):
+For a persistent setup, add the following to `~/.cargo/config.toml` (create the file if missing), replacing `<path/to/lld>` with the absolute path that LLVM's `lld` is located:
 
 ```
 [target.aarch64-unknown-linux-musl]
-linker="/opt/homebrew/opt/llvm/bin/lld
+linker="<path/to/lld>"
 
 [target.x86_64-unknown-linux-musl]
-linker="/opt/homebrew/opt/llvm/bin/lld
+linker="<path/to/lld>"
 ```
 
-The above is for an Apple Silicon Mac, on Intel Macs replace `/opt/homebrew/opt` with `/usr/local/opt`
+Alternatively, the environment variables `TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER` and `TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER` can be set, both with the absolute path to your installed `lld`.
