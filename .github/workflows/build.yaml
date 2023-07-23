@@ -81,7 +81,7 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: cargo-${{ matrix.output }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: cargo-${{ matrix.output }}
+          restore-keys: cargo-${{ matrix.output }}-${{ hashFiles('**/Cargo.lock') }} cargo-${{ matrix.output }} 
       - name: Setup Rust
         run: |
           rustup install ${{ env.RUST_VERSION }}
@@ -121,8 +121,7 @@ jobs:
         with:
           path: /tmp/.buildx-cache
           key: buildx-${{ runner.os }}-${{ github.sha }}
-          restore-keys: |
-            buildx-${{ runner.os }}
+          restore-keys:  buildx-${{ runner.os }}
       - name: Download linux/amd64 binary
         uses: actions/download-artifact@v3
         with:
