@@ -13,8 +13,10 @@ jobs:
         include:
           - output: linux-amd64
             target: x86_64-unknown-linux-musl
+            config: X86_64_UNKNOWN_LINUX_MUSL
           - output: linux-arm64
             target: aarch64-unknown-linux-musl
+            config: AARCH64_UNKNOWN_LINUX_MUSL
     name: Compile ${{ matrix.output }} binary
     runs-on: ubuntu-22.04
     steps:
@@ -77,19 +79,7 @@ jobs:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup LLVM Caching
-        id: cache-llvm
-        uses: actions/cache@v3
-        with:
-          path: |
-            ./llvm
-          key: llvm-${{ runner.os }}
-      - name: Setup LLVM
-        uses: KyleMayes/install-llvm-action@v1
-        with:
-          version: "15"
-          cached: ${{ steps.cache-llvm.outputs.cache-hit }}
-      - name: Setup Caching
+      - name: Setup Container Caching
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
