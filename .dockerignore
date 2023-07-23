@@ -1,7 +1,6 @@
 .builder/
 .buid-tools/
 .cache/docker/
-.zig/
 coverage/
 
 .dockerignore

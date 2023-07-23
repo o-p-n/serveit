@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Caching
+      - name: Setup Rust Caching
         uses: actions/cache@v3
         with:
           path: |
@@ -21,6 +21,7 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
+            target/
           key: cargo-lint-${{ hashFiles('**/Cargo.lock') }}
       - name: Setup Rust
         run: |
@@ -52,10 +53,25 @@ jobs:
             target: aarch64-unknown-linux-musl
     name: Compile ${{ matrix.output }} binary
     runs-on: ubuntu-22.04
+    env:
+      CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER: "./llvm/bin/lld"
+      CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER: "./llvm/bin/lld"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Caching
+      - name: Setup LLVM Caching
+        id: cache-llvm
+        uses: actions/cache@v3
+        with:
+          path: |
+            ./llvm
+          key: llvm-${{ runner.os }}
+      - name: Setup LLVM
+        uses: KyleMayes/install-llvm-action@v1
+        with:
+          version: "15"
+          cached: ${{ steps.cache-llvm.outputs.cache-hit }}
+      - name: Setup Rust Caching
         uses: actions/cache@v3
         with:
           path: |
@@ -63,13 +79,15 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            .zig/
             target/
           key: cargo-${{ matrix.output }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: cargo-${{ matrix.output }}-${{ hashFiles('**/Cargo.lock') }} cargo-${{ matrix.output }} 
       - name: Setup Rust
         run: |
           rustup install ${{ env.RUST_VERSION }}
       - name: Compile
+        env:
+          CARGO_TARGET_${{ matrix.config }}_LINKER: "./llvm/bin/lld"
         run: |
           make target/${{ matrix.output }}
       - name: Upload Targets
@@ -98,13 +116,12 @@ jobs:
         uses: docker/setup-buildx-action@v2
         with:
           driver-opts: network=host
-      - name: Setup Caching
+      - name: Setup Container Caching
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
           key: buildx-${{ runner.os }}-${{ github.sha }}
-          restore-keys: |
-            buildx-${{ runner.os }}
+          restore-keys:  buildx-${{ runner.os }}
       - name: Download linux/amd64 binary
         uses: actions/download-artifact@v3
         with:
