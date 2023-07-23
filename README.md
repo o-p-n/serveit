@@ -7,7 +7,10 @@ SERVEIT is a very simple web server. It serves all files from a specified direct
 To run SERVEIT in its container, mount a directory to serve to `/app/web` and publish the container's port 4000:
 
 ```
-docker run <options> --volume $PWD/web:/app/web --publish 4000:4000 --name serveit linuxwolf/serveit:<TAG>
+docker run <options> \
+    --volume $PWD/web:/app/web \
+    --publish 4000:4000 \
+    gcr.io/o-p-n/serveit:<TAG>
 ```
 
 ### CONFIGURING
