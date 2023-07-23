@@ -45,6 +45,7 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: cargo-${{ matrix.output }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: cargo-${{ matrix.output }}
       - name: Setup Rust
         run: |
           rustup install ${{ env.RUST_VERSION }}
