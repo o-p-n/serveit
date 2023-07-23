@@ -20,7 +20,7 @@ SERVEIT can be configuring via environment variables:
 | `SERVEIT_PORT`      | `"4000"` | The port to serve on.                                        |
 | `SERVEIT_LOG_LEVEL` | `"INFO"` | The level to log at (`ALL` == everything; `OFF` == nothing). |
 
-## BUILDING
+## DEVELOPMENT
 
 ### PREREQUISITES
 
@@ -51,3 +51,25 @@ linker="<path/to/lld>"
 ```
 
 Alternatively, the environment variables `TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER` and `TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER` can be set, both with the absolute path to your installed `lld`.
+
+### BUILDING
+
+To create a multi-architecture (`linux/amd64` and `linux/arm64`) that is available in a local Docker registry (`localhost:5000/o-p-n/serveit:latest`), run:
+
+```
+make image
+```
+
+To compile only the binaries but not the full image, run:
+
+```
+make compile
+```
+
+To perform linting and format checks, run:
+
+```
+make fmt-check lint
+```
+
+The project will build on MacOS (Intel and Apple silicon) using `cargo`, which is helpful for local development and debugging.
