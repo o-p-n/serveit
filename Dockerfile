@@ -1,5 +1,5 @@
 ##### shipped #####
-FROM gcr.io/distroless/static AS serveit
+FROM gcr.io/distroless/static-debian11@sha256:9ecc53c269509f63c69a266168e4a687c7eb8c0cfd753bd8bfcaa4f58a90876f AS serveit
 LABEL org.opencontainers.image.source="https://github.com/o-p-n/serveit"
 
 ARG TARGETARCH
