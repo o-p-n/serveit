@@ -49,12 +49,13 @@ jobs:
         include:
           - output: linux-amd64
             target: x86_64-unknown-linux-musl
-            config: X86_64_UNKNOWN_LINUX_MUSL
           - output: linux-arm64
             target: aarch64-unknown-linux-musl
-            config: AARCH64_UNKNOWN_LINUX_MUSL
     name: Compile ${{ matrix.output }} binary
     runs-on: ubuntu-22.04
+    env:
+      CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER: "./llvm/bin/lld"
+      CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER: "./llvm/bin/lld"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
