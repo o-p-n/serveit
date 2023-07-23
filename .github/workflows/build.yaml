@@ -69,7 +69,7 @@ jobs:
         uses: KyleMayes/install-llvm-action@v1
         with:
           version: "15"
-          # cached: ${{ steps.cache-llvm.outputs.cache-hit }}
+          cached: ${{ steps.cache-llvm.outputs.cache-hit }}
       - name: Setup Rust Caching
         uses: actions/cache@v3
         with:
