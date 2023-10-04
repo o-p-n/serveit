@@ -53,7 +53,7 @@ linker="<path/to/lld>"
 linker="<path/to/lld>"
 ```
 
-Alternatively, the environment variables `TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER` and `TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER` can be set, both with the absolute path to your installed `lld`.
+Alternatively, the environment variables `CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER` and `CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER` can be set, both with the absolute path to your installed `lld`.
 
 ### BUILDING
 
