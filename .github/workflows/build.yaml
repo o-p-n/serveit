@@ -7,6 +7,29 @@ on:
       - main
 
 jobs:
+  test:
+    name: Test code
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Rust Caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: cargo-lint-${{ hashFiles('**/Cargo.lock') }}
+      - name: Setup Rust
+        run: |
+          rustup install ${{ env.RUST_VERSION }}
+          rustup component add clippy
+      - name: Run tests
+        run: |
+          cargo test
   lint:
     name: Lint code
     runs-on: ubuntu-22.04

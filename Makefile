@@ -42,6 +42,9 @@ target/x86_64-unknown-linux-musl/release/serveit: $(SOURCES)
 
 ##### CHECKS #####
 
+test:
+	cargo test
+
 lint:
 	cargo clippy --no-deps
 
@@ -50,7 +53,7 @@ fmt-check:
 
 ##### CONTAINAER IMAGES #####
 
-image: compile Dockerfile image-only
+image: test lint fmt-check compile Dockerfile image-only
 
 image-only: $(DOCKER_REPO_OWNER)/serveit
 
