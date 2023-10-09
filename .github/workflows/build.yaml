@@ -29,7 +29,10 @@ jobs:
           rustup component add clippy
       - name: Run tests
         run: |
-          make cover
+          make test
+      - name: Generate coverage
+        run: |
+          make cover-only
       - name: Report coverage
         uses: codecov/codecov-action@v3
         env:

@@ -27,7 +27,7 @@ jobs:
         run: |
           rustup install ${{ env.RUST_VERSION }}
           rustup component add clippy
-      - name: Run tests
+      - name: Run tests + coverage
         run: |
           make cover
       - name: Report coverage

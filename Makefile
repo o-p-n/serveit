@@ -60,13 +60,15 @@ target/x86_64-unknown-linux-musl/release/serveit: $(SOURCES)
 test: $(SOURCES) clean-profiling
 	RUSTFLAGS="$(RUSTFLAGS) -Cinstrument-coverage" cargo test
 
-cover: init-grcov clean-coverage test
+cover-only: init-grcov clean-coverage
 	mkdir coverage && \
 	grcov -t html -t lcov -o coverage \
 		-s . -b target/debug \
 		--keep-only "src/**" \
 		--branch --ignore-not-existing \
 		target/profile
+
+cover: test cover-only
 
 lint:
 	cargo clippy --no-deps
