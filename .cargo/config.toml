@@ -1,3 +1,3 @@
 [env]
-LLVM_PROFILE_FILE = "coverage/profile/%p-%m.profraw"
+LLVM_PROFILE_FILE = "target/profile/%p-%m.profraw"
 

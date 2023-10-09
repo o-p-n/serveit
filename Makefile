@@ -30,7 +30,7 @@ clean-target:
 	git clean -dfx target
 
 clean-coverage:
-	git clean -dfx coverage
+	git clean -dfx target/profile
 
 clean-all: clean clean-cache clean-builder
 
@@ -54,15 +54,16 @@ target/x86_64-unknown-linux-musl/release/serveit: $(SOURCES)
 
 ##### CHECKS #####
 
-test: $(SOURCES)
+test: $(SOURCES) clean-coverage
 	RUSTFLAGS="$(RUSTFLAGS) -Cinstrument-coverage" cargo test
 
-cover: init-grcov clean-coverage test
+cover: init-grcov test
+	mkdir coverage && \
 	grcov -t html -t lcov -o coverage \
 		-s . -b target/debug \
 		--keep-only "src/**" \
 		--branch --ignore-not-existing \
-		coverage/profile
+		target/profile
 
 lint:
 	cargo clippy --no-deps
@@ -72,7 +73,7 @@ fmt-check:
 
 ##### CONTAINAER IMAGES #####
 
-image: test lint fmt-check compile Dockerfile image-only
+image: lint fmt-check test compile Dockerfile image-only
 
 image-only: $(DOCKER_REPO_OWNER)/serveit
 
