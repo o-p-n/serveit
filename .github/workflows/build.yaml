@@ -7,6 +7,38 @@ on:
       - main
 
 jobs:
+  test:
+    name: Test code
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Rust Caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: cargo-lint-${{ hashFiles('**/Cargo.lock') }}
+      - name: Setup Rust
+        run: |
+          rustup install ${{ env.RUST_VERSION }}
+          rustup component add clippy
+      - name: Run tests
+        run: |
+          make test
+      - name: Generate coverage
+        run: |
+          make cover-only
+      - name: Report coverage
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          files: coverage/lcov
   lint:
     name: Lint code
     runs-on: ubuntu-22.04
@@ -29,7 +61,7 @@ jobs:
           rustup component add clippy
       - name: Check lint
         run: |
-          cargo clippy --no-deps
+          make lint
   fmt-check:
     name: Check formatting
     runs-on: ubuntu-22.04
@@ -42,7 +74,7 @@ jobs:
           rustup component add rustfmt
       - name: Check formatting
         run: |
-          cargo fmt --check
+          make fmt-check
   compile:
     strategy:
       matrix:
@@ -52,6 +84,10 @@ jobs:
           - output: linux-arm64
             target: aarch64-unknown-linux-musl
     name: Compile ${{ matrix.output }} binary
+    needs:
+      - test
+      - lint
+      - fmt-check
     runs-on: ubuntu-22.04
     env:
       CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER: "./llvm/bin/lld"
@@ -98,8 +134,6 @@ jobs:
   build-image:
     name: Build image
     needs:
-      - lint
-      - fmt-check
       - compile
     runs-on: ubuntu-22.04
     services:
