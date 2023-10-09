@@ -52,10 +52,6 @@ target/x86_64-unknown-linux-musl/release/serveit: $(SOURCES)
 	rustup target add x86_64-unknown-linux-musl \
 	&& cargo build --release --target x86_64-unknown-linux-musl
 
-target/aarch64-apple-darwin/release/$(PROJECT): $(SOURCES)
-	rustup target add aarch64-apple-darwin \
-	&& cargo build --release --target aarch64-apple-darwin
-
 ##### CHECKS #####
 
 test: $(SOURCES)
