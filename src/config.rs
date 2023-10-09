@@ -47,6 +47,13 @@ mod tests {
     use temp_env::with_vars;
 
     #[test]
+    fn impl_default() {
+        let settings = Settings::default();
+        assert_eq!(settings.port(), 4000);
+        assert_eq!(settings.root_dir(), ".");
+    }
+
+    #[test]
     fn loads_with_defaults() {
         let settings = with_vars([("DUMMY_VAR", Some("1"))], || Settings::defaults());
         assert_eq!(settings.port(), 4000);

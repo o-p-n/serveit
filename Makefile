@@ -29,8 +29,11 @@ clean:
 clean-target:
 	git clean -dfx target
 
-clean-coverage:
+clean-profiling:
 	git clean -dfx target/profile
+
+clean-coverage:
+	git clean -dfx coverage
 
 clean-all: clean clean-cache clean-builder
 
@@ -54,10 +57,10 @@ target/x86_64-unknown-linux-musl/release/serveit: $(SOURCES)
 
 ##### CHECKS #####
 
-test: $(SOURCES) clean-coverage
+test: $(SOURCES) clean-profiling
 	RUSTFLAGS="$(RUSTFLAGS) -Cinstrument-coverage" cargo test
 
-cover: init-grcov test
+cover: init-grcov clean-coverage test
 	mkdir coverage && \
 	grcov -t html -t lcov -o coverage \
 		-s . -b target/debug \
