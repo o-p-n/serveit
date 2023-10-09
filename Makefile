@@ -4,7 +4,8 @@ DOCKER_BUILDER=container-builder
 DOCKER_CACHE=${HOME}/.cache/docker-buildx
 STAMP=latest
 
-SOURCES=$(wildcard src/**/*.rs)
+SOURCES=$(wildcard src/**/*.rs) \
+				Cargo.toml
 
 include .builder/main.mk
 
@@ -15,10 +16,21 @@ include .builder/main.mk
 .builder/main.mk:
 	git clone -q https://github.com/o-p-n/image-builder.git -b main .builder
 
+init-grcov:
+	rustup component add llvm-tools && \
+	cargo install grcov
+
+
 ##### CLEANING #####
 
 clean:
 	git clean -dfx .
+
+clean-target:
+	git clean -dfx target
+
+clean-coverage:
+	git clean -dfx coverage
 
 clean-all: clean clean-cache clean-builder
 
@@ -40,10 +52,21 @@ target/x86_64-unknown-linux-musl/release/serveit: $(SOURCES)
 	rustup target add x86_64-unknown-linux-musl \
 	&& cargo build --release --target x86_64-unknown-linux-musl
 
+target/aarch64-apple-darwin/release/$(PROJECT): $(SOURCES)
+	rustup target add aarch64-apple-darwin \
+	&& cargo build --release --target aarch64-apple-darwin
+
 ##### CHECKS #####
 
-test:
-	cargo test
+test: $(SOURCES)
+	RUSTFLAGS="$(RUSTFLAGS) -Cinstrument-coverage" cargo test
+
+cover: init-grcov clean-coverage test
+	grcov -t html -t lcov -o coverage \
+		-s . -b target/debug \
+		--keep-only "src/**" \
+		--branch --ignore-not-existing \
+		coverage/profile
 
 lint:
 	cargo clippy --no-deps
