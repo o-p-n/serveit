@@ -5,7 +5,7 @@ DOCKER_CACHE=${HOME}/.cache/docker-buildx
 STAMP=latest
 
 SOURCES=$(wildcard src/**/*.rs) \
-				Cargo.toml
+				Cargo.toml Cargo.lock
 
 include .builder/main.mk
 
