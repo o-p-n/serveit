@@ -18,7 +18,7 @@ include .builder/main.mk
 
 init-grcov:
 	rustup component add llvm-tools && \
-	cargo install grcov
+	(which grcov || cargo install grcov)
 
 
 ##### CLEANING #####
