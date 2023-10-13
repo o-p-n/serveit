@@ -11,7 +11,7 @@ async fn main() {
     setup_logging();
 
     // read configuration (ENV)
-    let settings = Settings::defaults();
+    let settings = Settings::from_env();
     let app = app::create(&settings);
 
     tokio::join!(serve_app(&settings, app),);

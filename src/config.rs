@@ -17,7 +17,7 @@ impl Default for Settings {
 }
 
 impl Settings {
-    pub fn defaults() -> Self {
+    pub fn from_env() -> Self {
         let cfg = Config::builder()
             .set_default("root_dir", String::from("."))
             .unwrap()
@@ -47,27 +47,27 @@ mod tests {
     use temp_env::with_vars;
 
     #[test]
-    fn impl_default() {
+    fn loads_from_default() {
         let settings = Settings::default();
         assert_eq!(settings.port(), 4000);
         assert_eq!(settings.root_dir(), ".");
     }
 
     #[test]
-    fn loads_with_defaults() {
-        let settings = with_vars([("DUMMY_VAR", Some("1"))], || Settings::defaults());
+    fn loads_from_env_defaults() {
+        let settings = with_vars([("DUMMY_VAR", Some("1"))], || Settings::from_env());
         assert_eq!(settings.port(), 4000);
         assert_eq!(settings.root_dir(), ".");
     }
 
     #[test]
-    fn loads_with_envvars() {
+    fn loads_from_env_allset() {
         let settings = with_vars(
             [
                 ("SERVEIT_PORT", Some("4000")),
                 ("SERVEIT_ROOT_DIR", Some("/app/web")),
             ],
-            || Settings::defaults(),
+            || Settings::from_env(),
         );
         assert_eq!(settings.port(), 4000);
         assert_eq!(settings.root_dir(), "/app/web");
