@@ -1,5 +1,6 @@
-.builder/
-.cache/docker/
-coverage/
-target/
+/.builder/
+/.cache/docker/
+/.task/
+/coverage/
+/target/
 serveit
