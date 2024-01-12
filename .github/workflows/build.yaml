@@ -123,10 +123,29 @@ jobs:
         with:
           version: 3.x
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup LLVM Caching
+        id: cache-llvm
+        uses: actions/cache@v3
+        with:
+          path: |
+            ./llvm
+          key: llvm-${{ runner.os }}
       - name: Setup LLVM
         uses: KyleMayes/install-llvm-action@v1
         with:
           version: "15"
+          cached: ${{ steps.cache-llvm.outputs.cache-hit }}
+      - name: Setup Rust Caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: cargo-${{ matrix.output }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: cargo-${{ matrix.output }} 
       - name: Setup Rust
         run: |
           rustup install ${{ env.RUST_VERSION }}
