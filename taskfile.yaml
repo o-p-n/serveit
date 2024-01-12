@@ -35,22 +35,36 @@ tasks:
       - task: test
       - task: rust:coverage
 
+  check.lint:
+    deps:
+      - rust:check.lint
+  check.fmt:
+    deps:
+      - rust:check.fmt
+
   checks:
     desc: Performs checks on Rust sources (lint, format checks)
-    cmds:
-      - task: rust:checks
+    deps:
+      - check.lint
+      - check.fmt
+
+  compile.linux/arm64:
+    - task: rust:compile
+      vars:
+        TARGET_TRIPLE: aarch64-unknown-linux-musl
+        TARGET_PLATFORM: linux-arm64
+
+  compile.linux/amd64:
+    - task: rust:compile
+      vars:
+        TARGET_TRIPLE: x86_64-unknown-linux-musl
+        TARGET_PLATFORM: linux-amd64
 
   compile:
     desc: Compiles the release binaries for all supported platforms
     deps:
-      - task: rust:compile
-        vars:
-          TARGET_TRIPLE: aarch64-unknown-linux-musl
-          TARGET_PLATFORM: linux-arm64
-      - task: rust:compile
-        vars:
-          TARGET_TRIPLE: x86_64-unknown-linux-musl
-          TARGET_PLATFORM: linux-amd64
+      - compile.linux/amd64
+      - compile.linux/arm64
 
   image.only:
     cmds:

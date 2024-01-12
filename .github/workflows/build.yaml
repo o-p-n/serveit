@@ -23,20 +23,20 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: cargo-lint-${{ hashFiles('**/Cargo.lock') }}
+      - name: Setup Task
+        uses: arduino/setup-task@v1
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup Rust
         run: |
           rustup install ${{ env.RUST_VERSION }}
           rustup component add clippy
       - name: Run tests
         run: |
-          make test
-      - name: Generate coverage
-        run: |
-          make cover-only
+          task cover
       - name: Report coverage
         uses: codecov/codecov-action@v3
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           files: coverage/lcov
   lint:
@@ -45,6 +45,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Setup Task
+        uses: arduino/setup-task@v1
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup Rust Caching
         uses: actions/cache@v3
         with:
@@ -55,26 +60,36 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: cargo-lint-${{ hashFiles('**/Cargo.lock') }}
+      - name: Setup Task
+        uses: arduino/setup-task@v1
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup Rust
         run: |
           rustup install ${{ env.RUST_VERSION }}
           rustup component add clippy
       - name: Check lint
         run: |
-          make lint
+          task check.lint
   fmt-check:
     name: Check formatting
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Setup Task
+        uses: arduino/setup-task@v1
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup Rust
         run: |
           rustup install ${{ env.RUST_VERSION }}
           rustup component add rustfmt
       - name: Check formatting
         run: |
-          make fmt-check
+          task check.fmt
   compile:
     strategy:
       matrix:
