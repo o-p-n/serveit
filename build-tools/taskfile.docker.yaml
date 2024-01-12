@@ -1,0 +1,95 @@
+version: "3"
+
+vars:
+  DOCKER_REGISTRY: "localhost:5000"
+  DOCKER_BUILDER: "container-builder"
+  DOCKER_REGISTRY_NAME: "registry"
+  DOCKER_REGISTRY_IMAGE: "registry:2"
+
+  DOCKER_CACHE: '{{ default ".cache/docker" .DOCKER_CACHE }}'
+  IMAGE_TAG: '{{ default "latest" .IMAGE_TAG }}'
+
+tasks:
+  init.builder:
+    status:
+      - docker buildx inspect {{ .DOCKER_BUILDER }} 2>&1 > /dev/null
+    cmds:
+      - |
+        registry_host=$(echo ${DOCKER_REGISTRY} | awk -F ':' '{print $1}')
+        registry_port=$(echo ${DOCKER_REGISTRY} | awk -F ':' '{print $2}')
+        config_dir=$(mktemp -d)
+        cat << ---EOF--- > ${config_dir}/buildx.toml
+        debug = true
+        insecure-entitlements = [ "network.host", "security.insecure" ]
+        [registry."localhost:${registry_port}"]
+          http = true
+          insecure = true
+        ---EOF---
+        docker buildx create --name "{{ .DOCKER_BUILDER }}" \
+          --driver docker-container \
+          --driver-opt network=host \
+          --config ${config_dir}/buildx.toml \
+          --bootstrap
+  init.registry:
+    status:
+      - test {{ .DOCKER_REGISTRY }} = "localhost:$(echo {{ .DOCKER_REGISTRY }} | awk -F ':' '{print $2}')"
+      - test -n "$(docker ps -aq -f "name={{ .DOCKER_REGISTRY_NAME }}")"
+    cmds:
+      - |
+        docker run --name "{{ .DOCKER_REGISTRY_NAME }}" \
+          --restart always \
+          --publish "$(echo {{ .DOCKER_REGISTRY }} | awk -F ':' '{print $2}'):5000" \
+          --detach \
+          {{ .DOCKER_REGISTRY_IMAGE }}
+
+  init:
+    deps:
+      - init.builder
+      - init.registry
+
+  clean.builder:
+    status:
+      - "! docker buildx inspect {{ .DOCKER_BUILDER }} 2>&1 > /dev/null"
+    cmds:
+      - cmd: docker buildx rm {{ .DOCKER_BUILDER }}
+        ignore_error: true
+  clean.registry:
+    status:
+      - test -z $(docker ps -aq -f "name={{ .DOCKER_REGISTRY_NAME }}")
+    cmds:
+      - cmd: docker stop {{ .DOCKER_REGISTRY_NAME }} > /dev/null
+      - cmd: docker rm --volumes {{ .DOCKER_REGISTRY_NAME }} > /dev/null
+
+  clean.cache:
+    - git clean -dfx {{ .DOCKER_CACHE }} {{ .DOCKER_CACHE}}-new
+
+  clean:
+    deps:
+      - clean.builder
+      - clean.registry
+      - clean.cache
+
+  image:
+    deps:
+      - init
+    requires:
+      vars:
+        - IMAGE_REPOSITORY
+        - IMAGE_TAG
+    vars:
+      DOCKERFILE: '{{ default "Dockerfile" .DOCKERFILE }}'
+    cmds:
+      - |
+        docker buildx build --builder {{ .DOCKER_BUILDER }} \
+          --provenance false \
+          --cache-from type=local,src={{ .DOCKER_CACHE }} \
+          --cache-to type=local,dest={{ .DOCKER_CACHE }}-new,mode=max \
+          --output type=image,push=true \
+          --platform linux/amd64,linux/arm64 \
+          --tag {{ .DOCKER_REGISTRY }}/{{ .IMAGE_REPOSITORY }}:{{ .IMAGE_TAG }} \
+          --build-arg DOCKER_REGISTRY={{ .DOCKER_REGISTRY }} \
+          --build-arg STAMP={{ .IMAGE_TAG }} \
+          -f {{ .DOCKERFILE }} \
+          .
+      - rm -rf {{ .DOCKER_CACHE }}
+      - mv {{ .DOCKER_CACHE }}-new {{ .DOCKER_CACHE }}

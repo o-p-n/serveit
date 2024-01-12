@@ -4,6 +4,8 @@ includes:
   rust:
     taskfile: ./build-tools/taskfile.rust.yaml
     internal: true
+  docker:
+    taskfile: ./build-tools/taskfile.docker.yaml
 
 tasks:
   clean:
@@ -31,3 +33,11 @@ tasks:
         vars:
           TARGET_TRIPLE: x86_64-unknown-linux-musl
           TARGET_PLATFORM: linux-amd64
+
+  image:
+    deps:
+      - compile
+    cmds:
+      - task: docker:image
+        vars:
+          IMAGE_REPOSITORY: o-p-n/serveit
