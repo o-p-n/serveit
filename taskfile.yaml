@@ -2,9 +2,9 @@ version: "3"
 
 includes:
   rust:
-    taskfile: ./build-tools/taskfile.rust.yaml
+    taskfile: ./build-tools/rust.yaml
   docker:
-    taskfile: ./build-tools/taskfile.docker.yaml
+    taskfile: ./build-tools/docker/taskfile.yaml
 
 tasks:
   clean:
