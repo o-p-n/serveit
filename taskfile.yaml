@@ -6,91 +6,28 @@ includes:
     internal: true
 
 tasks:
-  init.llvm-tools:
-    status:
-      - rustup component list | grep llvm-tools
-    cmds:
-      - rustup component add llvm-tools
-  
-  init.grcov:
-    status:
-      - which grcov
-    cmds:
-      - cargo install grcov
-  
-  init.target/aarch64-unknown-linux-musl:
-    status:
-      - rustup target list  | grep aarch64-unknown-linux-musl
-    cmds:
-      - rustup target add aarch64-unknown-linux-musl
-  init.target/x86_64-unknown-linux-musl:
-    status:
-      - rustup target list  | grep x86_64-unknown-linux-musl
-    cmds:
-      - rustup target add x86_64-unknown-linux-musl
-
-  clean: git clean -dfx .
-
-  clean.target: git clean -dfx target
-  clean.profiling: git clean -dfx target/profile
-  clean.coverage: git clean -dfx coverage
+  clean:
+    deps:
+      - rust:clean.target
+      - rust:clean.coverage
 
   test:
-    deps:
-      - init.llvm-tools
-      - clean.profiling
-    cmds:
-      - RUSTFLAGS="${RUSTFLAGS} -Cinstrument-coverage" cargo test
+    - task: rust:test
 
-  cover.only:
-    deps:
-      - init.llvm-tools
-      - init.grcov
-      - clean.coverage
-    cmds:
-      - mkdir -p coverage
-      - |
-        grcov -t html -t lcov -o coverage \
-          -s . -b target/debug \
-          --keep-only "src/**" \
-          --branch --ignore-not-existing \
-          target/profile
-  
   cover:
     - task: test
-    - task: cover.only
+    - task: rust:coverage
 
-  lint:
-    cargo clippy --no-deps
-
-  fmt.check:
-    cargo fmt --check
-
-  target/linux-arm64:
-    deps:
-      - init.target/aarch64-unknown-linux-musl
-    generates:
-      - target/linux-arm64
-    sources:
-      - src/**/*.rs
-      - Cargo.toml
-    cmds:
-      - cargo build --release --target aarch64-unknown-linux-musl
-      - cp target/aarch64-unknown-linux-musl/release/serveit target/linux-arm64
-
-  target/linux-amd64:
-    deps:
-      - init.target/x86_64-unknown-linux-musl
-    generates:
-      - target/linux-amd64
-    sources:
-      - src/**/*.rs
-      - Cargo.toml
-    cmds:
-      - cargo build --release --target x86_64-unknown-linux-musl
-      - cp target/x86_64-unknown-linux-musl/release/serveit target/linux-amd64
+  checks:
+    - task: rust:checks
 
   compile:
     deps:
-      - target/linux-arm64
-      - target/linux-amd64
+      - task: rust:compile
+        vars:
+          TARGET_TRIPLE: aarch64-unknown-linux-musl
+          TARGET_PLATFORM: linux-arm64
+      - task: rust:compile
+        vars:
+          TARGET_TRIPLE: x86_64-unknown-linux-musl
+          TARGET_PLATFORM: linux-amd64
