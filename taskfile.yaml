@@ -48,13 +48,13 @@ tasks:
       - check.lint
       - check.fmt
 
-  compile.linux/arm64:
+  compile.linux-arm64:
     - task: rust:compile
       vars:
         TARGET_TRIPLE: aarch64-unknown-linux-musl
         TARGET_PLATFORM: linux-arm64
 
-  compile.linux/amd64:
+  compile.linux-amd64:
     - task: rust:compile
       vars:
         TARGET_TRIPLE: x86_64-unknown-linux-musl
@@ -63,8 +63,8 @@ tasks:
   compile:
     desc: Compiles the release binaries for all supported platforms
     deps:
-      - compile.linux/amd64
-      - compile.linux/arm64
+      - compile.linux-amd64
+      - compile.linux-arm64
 
   image.only:
     cmds:
