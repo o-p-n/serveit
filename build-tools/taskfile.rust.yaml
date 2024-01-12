@@ -29,6 +29,12 @@ tasks:
   clean.profiling: git clean -dfx target/profile
   clean.coverage: git clean -dfx coverage
 
+  clean:
+    deps:
+      - clean.target
+      - clean.profiling
+      - clean.coverage
+
   check.lint:
     - cargo clippy --no-deps
 
@@ -49,9 +55,13 @@ tasks:
       - Cargo.lock
     generates:
       - target/profile/**
+    env:
+      LLVM_PROFILE_FILE: "target/profile/%p-%m.profraw"
+      RUSTFLAGS:
+        sh: echo "${RUSTFLAGS} -Cinstrument-coverage"
     cmds:
       - task: clean.profiling
-      - RUSTFLAGS="${RUSTFLAGS} -Cinstrument-coverage" cargo test
+      - cargo test
   
   coverage:
     deps:

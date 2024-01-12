@@ -1,3 +1,0 @@
-[env]
-LLVM_PROFILE_FILE = "target/profile/%p-%m.profraw"
-
