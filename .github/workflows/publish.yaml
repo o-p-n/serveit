@@ -13,6 +13,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Setup Task
+        uses: arduino/setup-task@v1
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup Rust Caching
         uses: actions/cache@v3
         with:
@@ -29,7 +34,7 @@ jobs:
           rustup component add clippy
       - name: Run tests + coverage
         run: |
-          make cover
+          task cover
       - name: Report coverage
         uses: codecov/codecov-action@v3
         env:
@@ -52,6 +57,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Setup Task
+        uses: arduino/setup-task@v1
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup LLVM Caching
         id: cache-llvm
         uses: actions/cache@v3
@@ -79,10 +89,8 @@ jobs:
         run: |
           rustup install ${{ env.RUST_VERSION }}
       - name: Compile
-        env:
-          CARGO_TARGET_${{ matrix.config }}_LINKER: "./llvm/bin/lld"
         run: |
-          make target/${{ matrix.output }}
+          task target.${{ matrix.output }}
       - name: Upload Targets
         uses: actions/upload-artifact@v3
         with:
@@ -99,6 +107,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Setup Task
+        uses: arduino/setup-task@v1
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v2
       - name: Setup Docker Buildx
@@ -129,7 +142,7 @@ jobs:
           path: target
       - name: Build image
         run: |
-          make image-only \
+          task image.only \
             DOCKER_CACHE=/tmp/.buildx-cache \
             DOCKER_REGISTRY=${{ env.CONTAINER_REGISTRY }} \
-            STAMP=${{ github.sha }}
+            IMAGE_TAG=${{ github.sha }}
