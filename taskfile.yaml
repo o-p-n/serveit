@@ -3,27 +3,43 @@ version: "3"
 includes:
   rust:
     taskfile: ./build-tools/taskfile.rust.yaml
-    internal: true
   docker:
     taskfile: ./build-tools/taskfile.docker.yaml
 
 tasks:
   clean:
+    desc: Cleans all intermediates, excluding caches
     deps:
       - rust:clean.target
       - rust:clean.coverage
+  
+  clean.cache:
+    - git -dfx .cache
+  
+  dist-clean:
+    desc: Cleans everything, including local caches
+    deps:
+      - clean
+      - docker:clean
 
   test:
-    - task: rust:test
+    desc: Builds and runs tests
+    cmds:
+      - task: rust:test
 
   cover:
-    - task: test
-    - task: rust:coverage
+    desc: Builds and runs tests, and reports coverage
+    cmds:
+      - task: test
+      - task: rust:coverage
 
   checks:
-    - task: rust:checks
+    desc: Performs checks on Rust sources (lint, format checks)
+    cmds:
+      - task: rust:checks
 
   compile:
+    desc: Compiles the release binaries for all supported platforms
     deps:
       - task: rust:compile
         vars:
@@ -34,10 +50,14 @@ tasks:
           TARGET_TRIPLE: x86_64-unknown-linux-musl
           TARGET_PLATFORM: linux-amd64
 
-  image:
-    deps:
-      - compile
+  image.only:
     cmds:
       - task: docker:image
         vars:
           IMAGE_REPOSITORY: o-p-n/serveit
+    
+  image:
+    desc: Creates a multi-arch container image
+    cmds:
+      - task: compile
+      - task: image.only
