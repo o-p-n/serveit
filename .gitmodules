@@ -1,0 +1,4 @@
+[submodule ".builder"]
+	path = .builder
+	url = https://github.com/o-p-n/builder-tasks.git
+	branch = use-task
