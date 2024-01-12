@@ -150,10 +150,8 @@ jobs:
         run: |
           rustup install ${{ env.RUST_VERSION }}
       - name: Compile
-        env:
-          CARGO_TARGET_${{ matrix.config }}_LINKER: "./llvm/bin/lld"
         run: |
-          task compile.${{ matrix.output }}
+          task --verbose compile.${{ matrix.output }}
       - name: Upload Targets
         uses: actions/upload-artifact@v3
         with:
@@ -202,4 +200,4 @@ jobs:
           name: serveit-linux-arm64
           path: target
       - name: Build image
-        run: task image.only DOCKER_CACHE=/tmp/.buildx-cache
+        run: task --verbose image.only DOCKER_CACHE=/tmp/.buildx-cache
