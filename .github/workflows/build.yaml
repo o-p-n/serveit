@@ -41,6 +41,7 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           files: coverage/lcov
+
   lint:
     name: Lint code
     runs-on: ubuntu-22.04
@@ -64,11 +65,6 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: cargo-lint-${{ hashFiles('**/Cargo.lock') }}
-      - name: Setup Task
-        uses: arduino/setup-task@v1
-        with:
-          version: 3.x
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup Rust
         run: |
           rustup install ${{ env.RUST_VERSION }}
@@ -151,7 +147,7 @@ jobs:
           rustup install ${{ env.RUST_VERSION }}
       - name: Compile
         run: |
-          task --verbose compile.${{ matrix.output }}
+          task compile.${{ matrix.output }}
       - name: Upload Targets
         uses: actions/upload-artifact@v3
         with:
