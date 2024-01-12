@@ -1,5 +1,5 @@
 /.builder/
-/.cache/docker/
+/.cache/
 /.task/
 /coverage/
 /target/
