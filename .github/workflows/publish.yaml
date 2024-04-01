@@ -15,11 +15,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Setup Task
-        uses: arduino/setup-task@v1
-        with:
-          version: 3.x
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Tooling
+        run: ./.github/scripts/install-tooling.sh
+        env:
+          INSTALL_PATH: /usr/local/bin
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup Rust Caching
         uses: actions/cache@v3
         with:
@@ -61,11 +61,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Setup Task
-        uses: arduino/setup-task@v1
-        with:
-          version: 3.x
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Tooling
+        run: ./.github/scripts/install-tooling.sh
+        env:
+          INSTALL_PATH: /usr/local/bin
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup LLVM Caching
         id: cache-llvm
         uses: actions/cache@v3
@@ -113,11 +113,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Setup Task
-        uses: arduino/setup-task@v1
-        with:
-          version: 3.x
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Tooling
+        run: ./.github/scripts/install-tooling.sh
+        env:
+          INSTALL_PATH: /usr/local/bin
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v2
       - name: Setup Docker Buildx

@@ -3,10 +3,8 @@ version: "3"
 includes:
   rust:
     taskfile: ./.builder/rust/taskfile.yaml
-    internal: true
   docker:
     taskfile: ./.builder/docker/taskfile.yaml
-    internal: true
 
 tasks:
   clean:
@@ -71,6 +69,7 @@ tasks:
       - task: docker:image
         vars:
           IMAGE_REPOSITORY: o-p-n/serveit
+          IMAGE_TAG: '{{ default "latest" .IMAGE_TAG }}'
     
   image:
     desc: Creates a multi-arch container image
