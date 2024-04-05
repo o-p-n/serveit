@@ -1,4 +1,4 @@
-FROM gcr.io/distroless/static-debian11@sha256:9ecc53c269509f63c69a266168e4a687c7eb8c0cfd753bd8bfcaa4f58a90876f as base
+FROM gcr.io/distroless/static-debian12@sha256:41972110a1c1a5c0b6adb283e8aa092c43c31f7c5d79b8656fbffff2c3e61f05 as base
 
 ARG TARGETARCH
 ARG TARGETOS
