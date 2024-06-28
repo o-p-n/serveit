@@ -3,5 +3,13 @@
     ".builder/**",
     ".cache/**",
     "target/**"
-  ]
+  ],
+  "imports": {
+    "@std/path": "jsr:@std/path@^0.225.2",
+    "@std/testing": "jsr:@std/testing@^0.225.3",
+    "chai": "npm:chai@^5.1.1",
+    "chai-as-promised": "npm:chai-as-promised@^8.0.0",
+    "sinon": "npm:sinon@^18.0.0",
+    "sinon-chai-es": "npm:sinon-chai-es@^3.7.0"
+  }
 }
