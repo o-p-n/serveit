@@ -6,7 +6,4 @@ import chaiPromised from "chai-as-promised";
 use(chaiSinon);
 use(chaiPromised);
 
-export {
-  expect,
-  sinon,
-};
+export { expect, sinon };

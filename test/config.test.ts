@@ -28,7 +28,7 @@ class MockEnv implements Deno.Env {
     return key in this.#data;
   }
 
-  toObject(): { [index: string]: string; } {
+  toObject(): { [index: string]: string } {
     return {
       ...this.#data,
     };
@@ -43,7 +43,7 @@ describe("config", () => {
       return normalize(
         join("/app/web", p),
       );
-    }
+    };
     spyResolve = sinon.stub(_internals, "resolve")
       .callsFake(fn);
   });

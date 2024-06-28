@@ -24,7 +24,7 @@ export async function load(env: Deno.Env = _internals.env) {
 
   // dummy await
   await Promise.resolve();
-  
+
   return {
     root,
     port,
