@@ -1,18 +1,49 @@
-name: build
-env:
-  RUST_VERSION: "1.70.0"
 on:
   pull_request:
     branches:
       - main
+  workflow_call:
+    inputs:
+      distribute:
+        type: boolean
+        default: false
+      no-build-sha:
+        type: boolean
+        default: true
+
+env:
+  CACHE_DIR: "${{ github.workspace }}/.cache"
+  TASK_TEMP_DIR: "${{ github.workspace }}/.cache/task"
+  DENO_DIR: "${{ github.workspace }}/.cache/deno"
 
 jobs:
+  checks:
+    name: Coding Checks
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Setup Tooling
+        run: ./.github/scripts/install-tooling.sh
+        env:
+          INSTALL_PATH: /usr/local/bin
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Deno caching
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DENO_DIR }}
+          key: deno-${{ runner.os }}-${{ hashFiles('deno.*') }}
+      - name: Run checks
+        run: |
+          task checks
   test:
     name: Test code
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Check out
+        uses: actions/checkout@v4
         with:
           submodules: true
       - name: Setup Tooling
@@ -20,140 +51,50 @@ jobs:
         env:
           INSTALL_PATH: /usr/local/bin
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup Rust Caching
-        uses: actions/cache@v3
+      - name: Setup Deno caching
+        uses: actions/cache@v4
         with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: cargo-lint-${{ hashFiles('**/Cargo.lock') }}
-      - name: Setup Rust
-        run: |
-          rustup install ${{ env.RUST_VERSION }}
-          rustup component add clippy
+          path: ${{ env.DENO_DIR }}
+          key: deno-${{ runner.os }}-${{ hashFiles('deno.*', '**/deps.ts') }}
       - name: Run tests
         run: |
           task cover
       - name: Report coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: coverage/lcov
-
-  lint:
-    name: Lint code
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-      - name: Setup Tooling
-        run: ./.github/scripts/install-tooling.sh
-        env:
-          INSTALL_PATH: /usr/local/bin
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup Rust Caching
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: cargo-lint-${{ hashFiles('**/Cargo.lock') }}
-      - name: Setup Rust
-        run: |
-          rustup install ${{ env.RUST_VERSION }}
-          rustup component add clippy
-      - name: Check lint
-        run: |
-          task check.lint
-  fmt-check:
-    name: Check formatting
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-      - name: Setup Tooling
-        run: ./.github/scripts/install-tooling.sh
-        env:
-          INSTALL_PATH: /usr/local/bin
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup Rust
-        run: |
-          rustup install ${{ env.RUST_VERSION }}
-          rustup component add rustfmt
-      - name: Check formatting
-        run: |
-          task check.fmt
+          token: ${{secrets.CODECOV_TOKEN}}
   compile:
-    strategy:
-      matrix:
-        include:
-          - output: linux-amd64
-            target: x86_64-unknown-linux-musl
-          - output: linux-arm64
-            target: aarch64-unknown-linux-musl
-    name: Compile ${{ matrix.output }} binary
-    needs:
-      - test
-      - lint
-      - fmt-check
+    name: Compile binaries
     runs-on: ubuntu-22.04
-    env:
-      CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER: "./llvm/bin/lld"
-      CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER: "./llvm/bin/lld"
+    needs:
+      - checks
+      - test
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Check out
+        uses: actions/checkout@v4
         with:
           submodules: true
       - name: Setup Tooling
         run: ./.github/scripts/install-tooling.sh
         env:
           INSTALL_PATH: /usr/local/bin
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
-      - name: Setup LLVM Caching
-        id: cache-llvm
-        uses: actions/cache@v3
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Deno caching
+        uses: actions/cache@v4
         with:
-          path: |
-            ./llvm
-          key: llvm-${{ runner.os }}
-      - name: Setup LLVM
-        uses: KyleMayes/install-llvm-action@v1
-        with:
-          version: "15"
-          cached: ${{ steps.cache-llvm.outputs.cache-hit }}
-      - name: Setup Rust Caching
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: cargo-${{ matrix.output }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: cargo-${{ matrix.output }} 
-      - name: Setup Rust
-        run: |
-          rustup install ${{ env.RUST_VERSION }}
+          path: ${{ env.DENO_DIR }}
+          key: deno-${{ runner.os }}-${{ hashFiles('deno.*', '**/deps.ts') }}
       - name: Compile
         run: |
-          task compile.${{ matrix.output }}
-      - name: Upload Targets
-        uses: actions/upload-artifact@v3
+          task compile
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
-          name: serveit-${{ matrix.output }}
-          path: target/${{ matrix.output }}
-  build-image:
+          name: artifact
+          path:
+            target/      
+  image:
     name: Build image
     needs:
       - compile
@@ -164,8 +105,8 @@ jobs:
         ports:
           - 5000:5000
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Check out
+        uses: actions/checkout@v4
         with:
           submodules: true
       - name: Setup Tooling
@@ -173,27 +114,28 @@ jobs:
         env:
           INSTALL_PATH: /usr/local/bin
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Deno caching
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DENO_DIR }}
+          key: deno-${{ runner.os }}-${{ hashFiles('deno.*', '**/deps.ts') }}
       - name: Setup QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
         with:
           driver-opts: network=host
       - name: Setup Container Caching
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
           key: buildx-${{ runner.os }}-${{ github.sha }}
           restore-keys:  buildx-${{ runner.os }}
-      - name: Download linux/amd64 binary
-        uses: actions/download-artifact@v3
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
         with:
-          name: serveit-linux-amd64
-          path: target
-      - name: Download linux/arm64 binary
-        uses: actions/download-artifact@v3
-        with:
-          name: serveit-linux-arm64
+          name: artifact
           path: target
       - name: Build image
-        run: task --verbose image.only DOCKER_CACHE=/tmp/.buildx-cache
+        run: |
+          task image.only
