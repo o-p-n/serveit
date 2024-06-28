@@ -1,8 +1,8 @@
 version: "3"
 
 includes:
-  rust:
-    taskfile: ./.builder/rust/taskfile.yaml
+  deno:
+    taskfile: ./.builder/deno/taskfile.yaml
   docker:
     taskfile: ./.builder/docker/taskfile.yaml
 
@@ -10,9 +10,8 @@ tasks:
   clean:
     desc: Cleans all intermediates, excluding caches
     deps:
-      - rust:clean.target
-      - rust:clean.coverage
-  
+      - deno:clean
+
   clean.cache:
     - git -dfx .cache
   
@@ -25,38 +24,34 @@ tasks:
   test:
     desc: Builds and runs tests
     cmds:
-      - task: rust:test
+      - task: deno:test
 
   cover:
     desc: Builds and runs tests, and reports coverage
     cmds:
       - task: test
-      - task: rust:coverage
-
-  check.lint:
-    deps:
-      - rust:check.lint
-  check.fmt:
-    deps:
-      - rust:check.fmt
+      - task: deno:coverage
 
   checks:
     desc: Performs checks on Rust sources (lint, format checks)
     deps:
-      - check.lint
-      - check.fmt
+      - deno:checks
 
   compile.linux-arm64:
-    - task: rust:compile
+    - task: deno:compile
       vars:
-        TARGET_TRIPLE: aarch64-unknown-linux-musl
+        TARGET_TRIPLE: aarch64-unknown-linux-gnu
         TARGET_PLATFORM: linux-arm64
+        BINARY: serveit
+        ENTRYPOINT: src/main.ts
 
   compile.linux-amd64:
-    - task: rust:compile
+    - task: deno:compile
       vars:
-        TARGET_TRIPLE: x86_64-unknown-linux-musl
+        TARGET_TRIPLE: x86_64-unknown-linux-gnu
         TARGET_PLATFORM: linux-amd64
+        BINARY: serveit
+        ENTRYPOINT: src/main.ts
 
   compile:
     desc: Compiles the release binaries for all supported platforms
