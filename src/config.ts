@@ -4,7 +4,7 @@
  */
 
 import { resolve } from "@std/path";
-import { getLevelByName, LevelName, LogLevel } from "@std/log";
+import { fromLevelName, LogLevel } from "./logger.ts";
 
 export const _internals = {
   env: Deno.env,
@@ -22,7 +22,7 @@ export async function load(env: Deno.Env = _internals.env) {
   const portStr = env.get("SERVEIT_PORT");
   const levelName = env.get("SERVEIT_LOG_LEVEL");
 
-  const logLevel = getLevelByName((levelName || "INFO") as LevelName);
+  const logLevel = fromLevelName(levelName || "INFO");
   const rootDir = _internals.resolve(rootDirStr || ".");
   const port = parseInt(portStr || "4000");
   if (Number.isNaN(port)) {

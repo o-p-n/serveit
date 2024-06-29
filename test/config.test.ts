@@ -3,7 +3,7 @@ import { expect, sinon } from "./setup.ts";
 
 import { join, normalize } from "@std/path";
 
-import { LogLevels } from "@std/log";
+import { LogLevel } from "../src/logger.ts"
 import { _internals, load } from "../src/config.ts";
 
 class MockEnv implements Deno.Env {
@@ -63,7 +63,7 @@ describe("config", () => {
       expect(result).to.deep.equal({
         rootDir: "/app/web",
         port: 4000,
-        logLevel: LogLevels.INFO,
+        logLevel: LogLevel.INFO,
       });
       expect(spyResolve).to.be.calledWith(".");
     });
@@ -78,7 +78,7 @@ describe("config", () => {
       expect(result).to.deep.equal({
         rootDir: "/some/path",
         port: 5000,
-        logLevel: LogLevels.ERROR,
+        logLevel: LogLevel.ERROR,
       });
       expect(spyResolve).to.be.calledWith("/some/path");
     });
