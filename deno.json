@@ -5,6 +5,7 @@
     "target/**"
   ],
   "imports": {
+    "@std/log": "jsr:@std/log@^0.224.3",
     "@std/path": "jsr:@std/path@^0.225.2",
     "@std/testing": "jsr:@std/testing@^0.225.3",
     "chai": "npm:chai@^5.1.1",

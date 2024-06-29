@@ -4,6 +4,7 @@
  */
 
 import { resolve } from "@std/path";
+import { getLevelByName, LevelName, LogLevel } from "@std/log";
 
 export const _internals = {
   env: Deno.env,
@@ -11,22 +12,29 @@ export const _internals = {
 };
 
 export interface Config {
-  root: string;
+  rootDir: string;
   port: number;
+  logLevel: LogLevel;
 }
 
 export async function load(env: Deno.Env = _internals.env) {
-  const rootDir = env.get("SERVEIT_ROOT_DIR");
+  const rootDirStr = env.get("SERVEIT_ROOT_DIR");
   const portStr = env.get("SERVEIT_PORT");
+  const levelName = env.get("SERVEIT_LOG_LEVEL");
 
-  const root = _internals.resolve(rootDir || ".");
+  const logLevel = getLevelByName((levelName || "INFO") as LevelName);
+  const rootDir = _internals.resolve(rootDirStr || ".");
   const port = parseInt(portStr || "4000");
+  if (Number.isNaN(port)) {
+    throw new Error(`invalid port: ${portStr}`);
+  }
 
   // dummy await
   await Promise.resolve();
 
   return {
-    root,
+    rootDir,
     port,
+    logLevel,
   };
 }

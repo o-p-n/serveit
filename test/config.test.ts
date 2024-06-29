@@ -3,6 +3,7 @@ import { expect, sinon } from "./setup.ts";
 
 import { join, normalize } from "@std/path";
 
+import { LogLevels } from "@std/log";
 import { _internals, load } from "../src/config.ts";
 
 class MockEnv implements Deno.Env {
@@ -40,6 +41,10 @@ describe("config", () => {
 
   beforeEach(() => {
     const fn = (p: string) => {
+      if (p.startsWith("/")) {
+        return p;
+      }
+
       return normalize(
         join("/app/web", p),
       );
@@ -56,10 +61,43 @@ describe("config", () => {
       const env = new MockEnv();
       const result = await load(env);
       expect(result).to.deep.equal({
-        root: "/app/web",
+        rootDir: "/app/web",
         port: 4000,
+        logLevel: LogLevels.INFO,
       });
-      expect(spyResolve).calledWith(".");
+      expect(spyResolve).to.be.calledWith(".");
+    });
+
+    it("loads with specified envs", async () => {
+      const env = new MockEnv({
+        "SERVEIT_ROOT_DIR": "/some/path",
+        "SERVEIT_PORT": "5000",
+        "SERVEIT_LOG_LEVEL": "ERROR",
+      });
+      const result = await load(env);
+      expect(result).to.deep.equal({
+        rootDir: "/some/path",
+        port: 5000,
+        logLevel: LogLevels.ERROR,
+      });
+      expect(spyResolve).to.be.calledWith("/some/path");
+    });
+
+    it("rejects if invalid port", async () => {
+      const env = new MockEnv({
+        "SERVEIT_PORT": "blah",
+      });
+      await expect(load(env)).to.be.rejectedWith(Error, "invalid port: blah");
+    });
+
+    it("rejects if invalid log-level", async () => {
+      const env = new MockEnv({
+        "SERVEIT_LOG_LEVEL": "stuff",
+      });
+      await expect(load(env)).to.be.rejectedWith(
+        Error,
+        "no log level found for name: stuff",
+      );
     });
   });
 });
