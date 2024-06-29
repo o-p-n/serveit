@@ -78,3 +78,6 @@ export class Logger {
     this.#log(LogLevel.ERROR, msg);
   }
 }
+
+const log = new Logger();
+export default log;
