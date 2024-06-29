@@ -21,7 +21,10 @@ describe("logger", () => {
         expect(result).to.equal(logger.LogLevel.ERROR);
       });
       it("throws if name is not found", () => {
-        expect(() => logger.fromLevelName("stuff")).to.throw(Error, "no log level found for name: stuff");
+        expect(() => logger.fromLevelName("stuff")).to.throw(
+          Error,
+          "no log level found for name: stuff",
+        );
       });
     });
     describe("toLevelName()", () => {
@@ -40,7 +43,10 @@ describe("logger", () => {
         expect(result).to.equal("ERROR");
       });
       it("throws if level is not recognized", () => {
-        expect(() => logger.toLevelName(12 as logger.LogLevel)).to.throw(Error, "not a log level: 12");
+        expect(() => logger.toLevelName(12 as logger.LogLevel)).to.throw(
+          Error,
+          "not a log level: 12",
+        );
       });
     });
 
@@ -98,7 +104,7 @@ describe("logger", () => {
 
         beforeEach(() => {
           clock = sinon.useFakeTimers();
-          spyConsoleLog = sinon.stub(console, "log")
+          spyConsoleLog = sinon.stub(console, "log");
         });
 
         afterEach(() => {
@@ -116,9 +122,15 @@ describe("logger", () => {
           expect(spyConsoleLog).to.have.callCount(3);
           // expect(spyConsoleLog).to.have.been.calledWith("1970-01-01T00:00:00.000Z [DEBUG]: this is at DEBUG");
           // expect(spyConsoleLog).to.have.been.calledWith("1970-01-01T00:00:00.000Z [VERBOSE]: this is at VERBOSE");
-          expect(spyConsoleLog).to.have.been.calledWith("1970-01-01T00:00:00.000Z [INFO]: this is at INFO");
-          expect(spyConsoleLog).to.have.been.calledWith("1970-01-01T00:00:00.000Z [WARN]: this is at WARN");
-          expect(spyConsoleLog).to.have.been.calledWith("1970-01-01T00:00:00.000Z [ERROR]: this is at ERROR");
+          expect(spyConsoleLog).to.have.been.calledWith(
+            "1970-01-01T00:00:00.000Z [INFO]: this is at INFO",
+          );
+          expect(spyConsoleLog).to.have.been.calledWith(
+            "1970-01-01T00:00:00.000Z [WARN]: this is at WARN",
+          );
+          expect(spyConsoleLog).to.have.been.calledWith(
+            "1970-01-01T00:00:00.000Z [ERROR]: this is at ERROR",
+          );
         });
 
         it("logs a function when at or above level", () => {
@@ -147,9 +159,15 @@ describe("logger", () => {
           expect(spyConsoleLog).to.have.callCount(3);
           // expect(spyConsoleLog).to.have.been.calledWith("1970-01-01T00:00:00.000Z [DEBUG]: this is at DEBUG");
           // expect(spyConsoleLog).to.have.been.calledWith("1970-01-01T00:00:00.000Z [VERBOSE]: this is at VERBOSE");
-          expect(spyConsoleLog).to.have.been.calledWith("1970-01-01T00:00:00.000Z [INFO]: this is at INFO");
-          expect(spyConsoleLog).to.have.been.calledWith("1970-01-01T00:00:00.000Z [WARN]: this is at WARN");
-          expect(spyConsoleLog).to.have.been.calledWith("1970-01-01T00:00:00.000Z [ERROR]: this is at ERROR");
+          expect(spyConsoleLog).to.have.been.calledWith(
+            "1970-01-01T00:00:00.000Z [INFO]: this is at INFO",
+          );
+          expect(spyConsoleLog).to.have.been.calledWith(
+            "1970-01-01T00:00:00.000Z [WARN]: this is at WARN",
+          );
+          expect(spyConsoleLog).to.have.been.calledWith(
+            "1970-01-01T00:00:00.000Z [ERROR]: this is at ERROR",
+          );
         });
       });
     });

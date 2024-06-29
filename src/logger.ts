@@ -1,6 +1,4 @@
-/**
- * 
- */
+/** */
 
 export enum LogLevel {
   ALL = 0,
@@ -10,7 +8,7 @@ export enum LogLevel {
   WARN = 40,
   ERROR = 50,
   OFF = 100,
-};
+}
 
 const LOG_LEVEL_NAMES = Object.entries(LogLevel).reduce((acc, entry) => {
   const [key, value] = entry;
@@ -52,13 +50,11 @@ export class Logger {
   }
 
   #log(lvl: LogLevel, msg: LogMessage) {
-    if (lvl < this.level) { return; }
+    if (lvl < this.level) return;
 
     const timestamp = new Date().toISOString();
     const level = toLevelName(lvl);
-    const message = typeof msg === "function"
-      ? msg()
-      : msg;
+    const message = typeof msg === "function" ? msg() : msg;
     console.log(`${timestamp} [${level}]: ${message}`);
   }
 

@@ -3,7 +3,7 @@ import { expect, sinon } from "./setup.ts";
 
 import { join, normalize } from "@std/path";
 
-import { LogLevel } from "../src/logger.ts"
+import { LogLevel } from "../src/logger.ts";
 import { _internals, load } from "../src/config.ts";
 
 class MockEnv implements Deno.Env {
