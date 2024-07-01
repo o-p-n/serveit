@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { expect, sinon } from "./setup.ts";
+import { expect, mock } from "./setup.ts";
 
 import { join, normalize } from "@std/path";
 
@@ -37,7 +37,7 @@ class MockEnv implements Deno.Env {
 }
 
 describe("config", () => {
-  let spyResolve: sinon.Spy;
+  let spyResolve: mock.Spy;
 
   beforeEach(() => {
     const fn = (p: string) => {
@@ -49,8 +49,7 @@ describe("config", () => {
         join("/app/web", p),
       );
     };
-    spyResolve = sinon.stub(_internals, "resolve")
-      .callsFake(fn);
+    spyResolve = mock.stub(_internals, "resolve", fn);
   });
   afterEach(() => {
     spyResolve.restore();
@@ -65,7 +64,7 @@ describe("config", () => {
         port: 4000,
         logLevel: LogLevel.INFO,
       });
-      expect(spyResolve).to.be.calledWith(".");
+      expect(spyResolve).to.be.deep.calledWith(["."]);
     });
 
     it("loads with specified envs", async () => {
@@ -80,7 +79,7 @@ describe("config", () => {
         port: 5000,
         logLevel: LogLevel.ERROR,
       });
-      expect(spyResolve).to.be.calledWith("/some/path");
+      expect(spyResolve).to.be.deep.calledWith(["/some/path"]);
     });
 
     it("rejects if invalid port", async () => {

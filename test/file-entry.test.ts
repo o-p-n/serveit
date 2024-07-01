@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { expect, sinon } from "./setup.ts";
+import { expect, FakeTime, mock } from "./setup.ts";
 import { ExpandGlobOptions } from "@std/fs";
 import { basename, dirname } from "@std/path";
 
@@ -15,7 +15,7 @@ function toStat(info: Partial<Deno.FileInfo>) {
     birthtime: new Date(60000),
     mtime: new Date(120000),
     ...info,
-  };
+  } as Deno.FileInfo;
 }
 
 describe("file-entry", () => {
@@ -24,76 +24,84 @@ describe("file-entry", () => {
       const content = ReadableStream.from([new Uint8Array()]);
       const seedTime = new Date(86400000);
 
-      let spyOpen: sinon.Spy;
-      let spyStat: sinon.Spy;
-      let spyExpandGlob: sinon.Spy;
-      let clock: sinon.FakeTimers;
+      let spyOpen: mock.Spy;
+      let spyStat: mock.Spy;
+      let spyExpandGlob: mock.Spy;
+      let clock: FakeTime;
 
       beforeEach(() => {
-        clock = sinon.useFakeTimers(seedTime);
+        clock = new FakeTime(seedTime);
 
-        spyOpen = sinon.stub(_internals, "open");
-        spyOpen.resolves({ readable: content });
+        spyOpen = mock.stub(
+          _internals,
+          "open",
+          () => Promise.resolve({ readable: content } as Deno.FsFile),
+        );
 
-        spyStat = sinon.stub(_internals, "stat");
-        // deno-lint-ignore require-await
-        spyStat.callsFake(async (path: string | URL) => {
-          switch (path.toString()) {
-            case "/root/app/symlink":
-              return toStat({
-                isSymlink: true,
-              });
-            case "/root/app/file.unknownext":
-              return toStat({
-                isFile: true,
-              });
-            case "/root/app/file.txt":
-              return toStat({
-                isFile: true,
-              });
-            case "/root/app/sub":
-              return toStat({
-                isDirectory: true,
-                size: 0,
-              });
-            case "/root/app/sub/index.html":
-              return toStat({
-                isFile: true,
-              });
-            case "/root/app/no-index":
-              return toStat({
-                isDirectory: true,
-                size: 0,
-              });
-            case "/root/app/notime.md":
-              return toStat({
-                isFile: true,
-                birthtime: null,
-                mtime: null,
-              });
-            default:
-              throw new Deno.errors.NotFound(
-                `No such file or directory (os error 2): stat '${path}'`,
-              );
-          }
-        });
-
-        spyExpandGlob = sinon.stub(_internals, "expandGlob");
-        spyExpandGlob.callsFake(
-          async function* fakeExpandGlob(_: string, opts: ExpandGlobOptions) {
-            if (opts.root === "/root/app/sub") {
-              const path = `${opts.root!}/index.html`;
-              yield {
-                path,
-                parentPath: dirname(path),
-                name: basename(path),
-                isFile: true,
-                isDirectory: false,
-                isSymlink: false,
-              };
+        spyStat = mock.stub(
+          _internals,
+          "stat",
+          // deno-lint-ignore require-await
+          async (path: string | URL): Promise<Deno.FileInfo> => {
+            switch (path.toString()) {
+              case "/root/app/symlink":
+                return toStat({
+                  isSymlink: true,
+                });
+              case "/root/app/file.unknownext":
+                return toStat({
+                  isFile: true,
+                });
+              case "/root/app/file.txt":
+                return toStat({
+                  isFile: true,
+                });
+              case "/root/app/sub":
+                return toStat({
+                  isDirectory: true,
+                  size: 0,
+                });
+              case "/root/app/sub/index.html":
+                return toStat({
+                  isFile: true,
+                });
+              case "/root/app/no-index":
+                return toStat({
+                  isDirectory: true,
+                  size: 0,
+                });
+              case "/root/app/notime.md":
+                return toStat({
+                  isFile: true,
+                  birthtime: null,
+                  mtime: null,
+                });
+              default:
+                throw new Deno.errors.NotFound(
+                  `No such file or directory (os error 2): stat '${path}'`,
+                );
             }
           },
         );
+
+        async function* mockExpand(
+          _glob: string | URL,
+          opts?: ExpandGlobOptions,
+        ) {
+          opts = opts || {};
+          if (opts.root === "/root/app/sub") {
+            const path = `${opts.root!}/index.html`;
+            yield {
+              path,
+              parentPath: dirname(path),
+              name: basename(path),
+              isFile: true,
+              isDirectory: false,
+              isSymlink: false,
+            };
+          }
+        }
+        spyExpandGlob = mock.stub(_internals, "expandGlob", mockExpand);
       });
 
       afterEach(() => {

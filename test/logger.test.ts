@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { expect, sinon } from "./setup.ts";
+import { expect, FakeTime, mock } from "./setup.ts";
 
 import * as logger from "../src/logger.ts";
 
@@ -95,16 +95,16 @@ describe("logger", () => {
       describe("logging", () => {
         const log = new logger.Logger();
 
-        let clock: sinon.FakeTimers;
-        let spyConsoleLog: sinon.Spy;
+        let clock: FakeTime;
+        let spyConsoleLog: mock.Spy;
 
         function spyMessage(msg: string) {
-          return sinon.spy(() => msg);
+          return mock.spy(() => msg);
         }
 
         beforeEach(() => {
-          clock = sinon.useFakeTimers();
-          spyConsoleLog = sinon.stub(console, "log");
+          clock = new FakeTime(new Date(0));
+          spyConsoleLog = mock.stub(console, "log");
         });
 
         afterEach(() => {
@@ -119,18 +119,18 @@ describe("logger", () => {
           log.warn("this is at WARN");
           log.error("this is at ERROR");
 
-          expect(spyConsoleLog).to.have.callCount(3);
-          // expect(spyConsoleLog).to.have.been.calledWith("1970-01-01T00:00:00.000Z [DEBUG]: this is at DEBUG");
-          // expect(spyConsoleLog).to.have.been.calledWith("1970-01-01T00:00:00.000Z [VERBOSE]: this is at VERBOSE");
-          expect(spyConsoleLog).to.have.been.calledWith(
+          expect(spyConsoleLog).to.have.been.called(3);
+          // expect(spyConsoleLog).to.have.been.deep.calledWith(["1970-01-01T00:00:00.000Z [DEBUG]: this is at DEBUG"]);
+          // expect(spyConsoleLog).to.have.been.deep.calledWith(["1970-01-01T00:00:00.000Z [VERBOSE]: this is at VERBOSE"]);
+          expect(spyConsoleLog).to.have.been.deep.calledWith([
             "1970-01-01T00:00:00.000Z [INFO]: this is at INFO",
-          );
-          expect(spyConsoleLog).to.have.been.calledWith(
+          ]);
+          expect(spyConsoleLog).to.have.been.deep.calledWith([
             "1970-01-01T00:00:00.000Z [WARN]: this is at WARN",
-          );
-          expect(spyConsoleLog).to.have.been.calledWith(
+          ]);
+          expect(spyConsoleLog).to.have.been.deep.calledWith([
             "1970-01-01T00:00:00.000Z [ERROR]: this is at ERROR",
-          );
+          ]);
         });
 
         it("logs a function when at or above level", () => {
@@ -138,36 +138,36 @@ describe("logger", () => {
 
           spy = spyMessage("this is at DEBUG");
           log.debug(spy);
-          expect(spy).to.not.have.been.called;
+          expect(spy).to.not.have.been.called();
 
           spy = spyMessage("this is at VERBOSE");
           log.verbose(spy);
-          expect(spy).to.not.have.been.called;
+          expect(spy).to.not.have.been.called();
 
           spy = spyMessage("this is at INFO");
           log.info(spy);
-          expect(spy).to.have.been.called;
+          expect(spy).to.have.been.called();
 
           spy = spyMessage("this is at WARN");
           log.warn(spy);
-          expect(spy).to.have.been.called;
+          expect(spy).to.have.been.called();
 
           spy = spyMessage("this is at ERROR");
           log.error(spy);
-          expect(spy).to.have.been.called;
+          expect(spy).to.have.been.called();
 
-          expect(spyConsoleLog).to.have.callCount(3);
-          // expect(spyConsoleLog).to.have.been.calledWith("1970-01-01T00:00:00.000Z [DEBUG]: this is at DEBUG");
-          // expect(spyConsoleLog).to.have.been.calledWith("1970-01-01T00:00:00.000Z [VERBOSE]: this is at VERBOSE");
-          expect(spyConsoleLog).to.have.been.calledWith(
+          expect(spyConsoleLog).to.have.been.called(3);
+          // expect(spyConsoleLog).to.have.been.deep.calledWith(["1970-01-01T00:00:00.000Z [DEBUG]: this is at DEBUG"]);
+          // expect(spyConsoleLog).to.have.been.deep.calledWith(["1970-01-01T00:00:00.000Z [VERBOSE]: this is at VERBOSE"]);
+          expect(spyConsoleLog).to.have.been.deep.calledWith([
             "1970-01-01T00:00:00.000Z [INFO]: this is at INFO",
-          );
-          expect(spyConsoleLog).to.have.been.calledWith(
+          ]);
+          expect(spyConsoleLog).to.have.been.deep.calledWith([
             "1970-01-01T00:00:00.000Z [WARN]: this is at WARN",
-          );
-          expect(spyConsoleLog).to.have.been.calledWith(
+          ]);
+          expect(spyConsoleLog).to.have.been.deep.calledWith([
             "1970-01-01T00:00:00.000Z [ERROR]: this is at ERROR",
-          );
+          ]);
         });
       });
     });

@@ -1,9 +1,7 @@
-import sinon from "sinon";
-import { expect, use } from "chai";
-import chaiSinon from "sinon-chai-es";
-import chaiPromised from "chai-as-promised";
+import { expect, use } from "@x/expecto/index.ts";
+import mocked, { mock } from "@x/expecto/mocked.ts";
+import { FakeTime } from "@x/testing/time";
 
-use(chaiSinon);
-use(chaiPromised);
+use(mocked);
 
-export { expect, sinon };
+export { expect, FakeTime, mock };
