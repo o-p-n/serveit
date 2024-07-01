@@ -60,6 +60,7 @@ export class FileEntry {
         throw new NotFound();
       });
     if (stat.isDirectory) {
+      log.debug(() => `${path} is a directory; looking for index`);
       const candidates = await Array.fromAsync(
         _internals.expandGlob("index\\.{html,htm,shtml}", { root: path }),
       );
@@ -72,6 +73,7 @@ export class FileEntry {
       return FileEntry.find(candidates[0].path);
     }
     if (!stat.isFile) {
+      log.warn(() => `${path} is not a supported kind`);
       throw new NotFound();
     }
 

@@ -1,10 +1,18 @@
-import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  it,
+} from "@std/testing/bdd";
 import { expect, FakeTime, mock } from "./setup.ts";
 import { ExpandGlobOptions } from "@std/fs";
 import { basename, dirname } from "@std/path";
 
 import { _internals, FileEntry } from "../src/file-entry.ts";
 import { NotFound } from "../src/errors.ts";
+import log, { LogLevel } from "../src/logger.ts";
 
 function toStat(info: Partial<Deno.FileInfo>) {
   return {
@@ -19,6 +27,14 @@ function toStat(info: Partial<Deno.FileInfo>) {
 }
 
 describe("file-entry", () => {
+  beforeAll(() => {
+    log.level = LogLevel.ALL;
+  });
+
+  afterAll(() => {
+    log.level = LogLevel.INFO;
+  });
+
   describe("FileEntry", () => {
     describe("find()", () => {
       const content = ReadableStream.from([new Uint8Array()]);
