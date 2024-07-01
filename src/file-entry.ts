@@ -62,7 +62,7 @@ export class FileEntry {
     if (stat.isDirectory) {
       log.debug(() => `${path} is a directory; looking for index`);
       const candidates = await Array.fromAsync(
-        _internals.expandGlob("index\\.{html,htm,shtml}", { root: path }),
+        _internals.expandGlob("index\\.{html,htm}", { root: path }),
       );
 
       // TODO: iterate over found candidates
