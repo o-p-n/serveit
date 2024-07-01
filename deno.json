@@ -7,11 +7,7 @@
   "imports": {
     "@std/encoding": "jsr:@std/encoding@^0.224.3",
     "@std/fs": "jsr:@std/fs@^0.229.3",
-    "@std/log": "jsr:@std/log@^0.224.3",
     "@std/media-types": "jsr:@std/media-types@^1.0.0",
-    "@std/path": "jsr:@std/path@^0.225.2",
-    "@std/testing": "jsr:@std/testing@^0.225.3",
-    "@x/expecto/": "https://deno.land/x/expecto@v0.1.4/mod/",
-    "@x/testing/time": "https://deno.land/std@0.210.0/testing/time.ts"
+    "@std/path": "jsr:@std/path@^0.225.2"
   }
 }

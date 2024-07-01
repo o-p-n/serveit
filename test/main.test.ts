@@ -1,4 +1,4 @@
-import { describe, it } from "@std/testing/bdd";
+import { describe, it } from "./deps.ts";
 
 describe("main", () => {
   it("has a binary", () => {});

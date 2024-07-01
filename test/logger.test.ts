@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { expect, FakeTime, mock } from "./setup.ts";
+import { afterEach, beforeEach, describe, it } from "./deps.ts";
+import { expect, FakeTime, mock } from "./deps.ts";
 
 import * as logger from "../src/logger.ts";
 

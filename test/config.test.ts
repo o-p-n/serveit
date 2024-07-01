@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { expect, mock } from "./setup.ts";
+import { afterEach, beforeEach, describe, it } from "./deps.ts";
+import { expect, mock } from "./deps.ts";
 
 import { join, normalize } from "@std/path";
 

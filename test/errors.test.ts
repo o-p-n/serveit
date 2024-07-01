@@ -1,5 +1,5 @@
-import { describe, it } from "@std/testing/bdd";
-import { expect } from "./setup.ts";
+import { describe, it } from "./deps.ts";
+import { expect } from "./deps.ts";
 
 import * as errors from "../src/errors.ts";
 

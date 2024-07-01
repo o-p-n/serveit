@@ -5,8 +5,8 @@ import {
   beforeEach,
   describe,
   it,
-} from "@std/testing/bdd";
-import { expect, FakeTime, mock } from "./setup.ts";
+} from "./deps.ts";
+import { expect, FakeTime, mock } from "./deps.ts";
 import { ExpandGlobOptions } from "@std/fs";
 import { basename, dirname } from "@std/path";
 
