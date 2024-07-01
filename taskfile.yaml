@@ -44,6 +44,7 @@ tasks:
         TARGET_PLATFORM: linux-arm64
         BINARY: serveit
         ENTRYPOINT: src/main.ts
+        PERMISSIONS: "--allow-net --allow-read"
 
   compile.linux-amd64:
     - task: deno:compile
@@ -52,6 +53,7 @@ tasks:
         TARGET_PLATFORM: linux-amd64
         BINARY: serveit
         ENTRYPOINT: src/main.ts
+        PERMISSIONS: "--allow-net --allow-read"
 
   compile:
     desc: Compiles the release binaries for all supported platforms
