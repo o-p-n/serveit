@@ -1,0 +1,4 @@
+pre-push:
+  commands:
+    checks:
+      run: task checks
