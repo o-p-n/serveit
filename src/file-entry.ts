@@ -36,7 +36,7 @@ export class FileEntry {
   readonly modifiedAt: Date;
   readonly etag: string;
 
-  private constructor(props: FileEntryProps) {
+  constructor(props: FileEntryProps) {
     this.path = props.path;
     this.type = props.type;
     this.size = props.size;
@@ -44,6 +44,30 @@ export class FileEntry {
     this.createdAt = props.createdAt;
     this.modifiedAt = props.modifiedAt;
     this.etag = props.etag;
+  }
+
+  headers(): Record<string, string> {
+    return {
+      "Content-Type": this.type,
+      "Content-Length": this.size.toString(),
+      "Date": this.modifiedAt.toUTCString(),
+      "ETag": `"${this.etag}"`,
+    };
+  }
+
+  matches(header?: string): boolean {
+    if (!header) return false;
+
+    const entries = header.split(/\s*,\s*/);
+    let result = false;
+    for (const entry of entries) {
+      const value = /^(?:W\/)?"([\u0021\u0023-\u007e\u0080-\u00ff]*)"$/.exec(
+        entry,
+      )?.[1];
+      result = result || (value === this.etag);
+    }
+
+    return result;
   }
 
   async open() {
@@ -105,5 +129,5 @@ async function calculateETag(props: Partial<FileEntryProps>) {
     new TextEncoder().encode(json),
   );
 
-  return `W/${encodeHex(digest)}`;
+  return encodeHex(digest);
 }
