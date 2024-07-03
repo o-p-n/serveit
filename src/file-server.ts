@@ -37,17 +37,22 @@ export class Server {
     return this.config.signal;
   }
 
-  start() {
-    Deno.serve({
+  async serve() {
+    const srv = Deno.serve({
       handler: (req: Request) => this.handle(req),
       port: this.port,
       signal: this.signal,
       onListen: (addr: Deno.NetAddr) =>
         log.info(
-          `serving directory ${this.rootDir} at ${addr.hostname}:${addr.port}`,
+          `now serving directory ${this.rootDir} at ${addr.hostname}:${addr.port}`,
         ),
       onError: (err: unknown) => this.error(err),
     });
+    await srv.finished;
+
+    log.info(
+      `stopped serving ${this.rootDir} at ${srv.addr.hostname}:${srv.addr.port}`,
+    );
   }
 
   private error(err: unknown): Response {

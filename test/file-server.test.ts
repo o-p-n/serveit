@@ -60,7 +60,7 @@ describe("file-server", () => {
       });
     });
 
-    describe("start()", () => {
+    describe("serve()", () => {
       let spyLogInfo: mock.Spy;
 
       let spyServe: mock.Spy;
@@ -70,7 +70,18 @@ describe("file-server", () => {
       beforeEach(() => {
         spyLogInfo = mock.spy(log, "info");
 
-        spyServe = mock.stub(Deno, "serve");
+        spyServe = mock.stub(Deno, "serve", (_) =>
+          ({
+            finished: Promise.resolve(),
+            addr: {
+              transport: "tcp",
+              hostname: "0.0.0.0",
+              port: 4000,
+            },
+            ref: () => {},
+            unref: () => {},
+            shutdown: () => Promise.resolve(),
+          }) as Deno.HttpServer<Deno.NetAddr>);
         spyHandle = mock.stub(Object.getPrototypeOf(server), "handle");
         spyError = mock.stub(Object.getPrototypeOf(server), "error");
       });
@@ -82,8 +93,11 @@ describe("file-server", () => {
         spyError.restore();
       });
 
-      it("starts the server", () => {
-        server.start();
+      it("runs the server", async () => {
+        await server.serve();
+        expect(spyLogInfo).to.have.been.deep.calledWith([
+          "stopped serving /root/app at 0.0.0.0:4000",
+        ]);
 
         const args = spyServe.calls[0].args;
         expect(args.length).to.equal(1);
@@ -107,7 +121,7 @@ describe("file-server", () => {
           port: 4000,
         });
         expect(spyLogInfo).to.have.been.deep.calledWith([
-          "serving directory /root/app at 0.0.0.0:4000",
+          "now serving directory /root/app at 0.0.0.0:4000",
         ]);
       });
     });
