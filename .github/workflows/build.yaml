@@ -7,14 +7,12 @@ on:
       distribute:
         type: boolean
         default: false
-      no-build-sha:
-        type: boolean
-        default: true
 
 env:
   CACHE_DIR: "${{ github.workspace }}/.cache"
   TASK_TEMP_DIR: "${{ github.workspace }}/.cache/task"
   DENO_DIR: "${{ github.workspace }}/.cache/deno"
+  PUBLISH_REGISTRY: ghcr.io
 
 jobs:
   checks:
@@ -138,4 +136,8 @@ jobs:
           path: target
       - name: Build image
         run: |
+          if [[ "${{ inputs.distribute }}" == "true" ]] ; then
+            export IMAGE_TAG="${{ github.sha }}"
+            export DOCKER_REGISTRY="${{ env.PUBLISH_REGISTRY }}"
+          fi
           task image.only
