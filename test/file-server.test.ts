@@ -223,6 +223,22 @@ describe("file-server", () => {
         expect(rsp.headers.get("ETag")).to.equal('"qwerty"');
         expect(rsp.body).to.be.null();
       });
+      it("returns a 404 for path outside of root (GET)", async () => {
+        const rsp = await spyLookup.call(
+          "../hacked/file.txt",
+          '"qwerty"',
+          false,
+        );
+        expect(rsp.status).to.equal(404);
+      });
+      it("returns a 404 for path outside of root (HEAD)", async () => {
+        const rsp = await spyLookup.call(
+          "../hacked/file.txt",
+          '"qwerty"',
+          true,
+        );
+        expect(rsp.status).to.equal(404);
+      });
     });
 
     describe("handle()", () => {
