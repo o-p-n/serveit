@@ -1,5 +1,8 @@
 version: "3"
 
+vars:
+  TARGET_BINARY: serveit
+
 includes:
   rust:
     taskfile: ./.builder/rust/taskfile.yaml
@@ -51,12 +54,14 @@ tasks:
       vars:
         TARGET_TRIPLE: aarch64-unknown-linux-musl
         TARGET_PLATFORM: linux-arm64
+        TARGET_BINARY: '{{ .TARGET_BINARY }}'
 
   compile.linux-amd64:
     - task: rust:compile
       vars:
         TARGET_TRIPLE: x86_64-unknown-linux-musl
         TARGET_PLATFORM: linux-amd64
+        TARGET_BINARY: '{{ .TARGET_BINARY }}'
 
   compile:
     desc: Compiles the release binaries for all supported platforms
