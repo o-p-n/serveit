@@ -54,20 +54,19 @@ jobs:
         with:
           path: ${{ env.DENO_DIR }}
           key: deno-${{ runner.os }}-${{ hashFiles('deno.*', '**/deps.ts') }}
-      - name: Run tests
-        run: |
-          task cover
+      - name: Run tests with coverage
+        run: task cover
+      - name: Report test results
+        if: "always()"
+        uses: codecov/test-results-action@v1
+        with:
+          files: coverage/report.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
       - name: Report coverage
         uses: codecov/codecov-action@v4
         with:
           files: coverage/lcov
           token: ${{secrets.CODECOV_TOKEN}}
-      - name: "Report test results"
-        if: always()
-        uses: codecov/test-results-action@v1
-        with:
-          files: coverage/report.xml
-          token: ${{ secrets.CODECOV_TOKEN }}
       compile:
     name: Compile binaries
     runs-on: ubuntu-22.04
