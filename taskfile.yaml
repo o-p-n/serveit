@@ -1,5 +1,8 @@
 version: "3"
 
+vars:
+  TARGET_BINARY: serveit
+
 includes:
   deno:
     taskfile: ./.builder/deno/taskfile.yaml
