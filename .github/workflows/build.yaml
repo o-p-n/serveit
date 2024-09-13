@@ -57,6 +57,7 @@ jobs:
       - name: Run tests with coverage
         run: task cover
       - name: Report test results
+        if: success() || failure()
         uses: codecov/test-results-action@v1
         with:
           files: coverage/report.xml
@@ -66,7 +67,7 @@ jobs:
         with:
           files: coverage/lcov
           token: ${{secrets.CODECOV_TOKEN}}
-      compile:
+  compile:
     name: Compile binaries
     runs-on: ubuntu-22.04
     needs:
