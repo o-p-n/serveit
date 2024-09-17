@@ -1,5 +1,4 @@
 .builder/
-.buid-tools/
 .cache/docker/
 coverage/
 
