@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, expect, it, mock } from "./deps.ts";
 
 import { typeByExtension } from "@std/media-types";
 import { NotFound } from "../src/errors.ts";
-import { LogLevel } from "../src/logger.ts";
 import { FileEntry } from "../src/file-entry.ts";
 
+import { DEFAULT_CONFIG } from "../src/config.ts";
 import log from "../src/logger.ts";
 import { Server } from "../src/file-server.ts";
 import { extname } from "@std/path";
@@ -44,13 +44,15 @@ function createBoundSpy<fn>(src: any, method: string): BoundSpy<fn> {
 }
 
 describe("file-server", () => {
+  const logger = log();
+
   describe("Server", () => {
     const abort = new AbortController();
     const server = new Server({
       rootDir: "/root/app",
       port: 4000,
       signal: abort.signal,
-      logLevel: LogLevel.INFO,
+      logLevel: DEFAULT_CONFIG.logLevel,
     });
 
     describe("ctor", () => {
@@ -68,7 +70,7 @@ describe("file-server", () => {
       let spyError: mock.Spy;
 
       beforeEach(() => {
-        spyLogInfo = mock.spy(log, "info");
+        spyLogInfo = mock.spy(logger, "info");
 
         spyServe = mock.stub(Deno, "serve", (_) =>
           ({
@@ -96,7 +98,10 @@ describe("file-server", () => {
       it("runs the server", async () => {
         await server.serve();
         expect(spyLogInfo).to.have.been.deep.calledWith([
-          "stopped serving /root/app at 0.0.0.0:4000",
+          ["stopped serving ", " at ", ":", ""],
+          "/root/app",
+          "0.0.0.0",
+          4000,
         ]);
 
         const args = spyServe.calls[0].args;
@@ -121,7 +126,10 @@ describe("file-server", () => {
           port: 4000,
         });
         expect(spyLogInfo).to.have.been.deep.calledWith([
-          "now serving directory /root/app at 0.0.0.0:4000",
+          ["now serving directory ", " at ", ":", ""],
+          "/root/app",
+          "0.0.0.0",
+          4000,
         ]);
       });
     });
@@ -247,7 +255,7 @@ describe("file-server", () => {
       let spyHandle: BoundSpy<(req: Request) => Promise<Response>>;
 
       beforeEach(() => {
-        spyLogInfo = mock.spy(log, "info");
+        spyLogInfo = mock.spy(logger, "info");
 
         const fnLookup = (path: string, etags?: string): Promise<Response> => {
           const [status, statusText] = (etags === '"qwerty"')
@@ -309,7 +317,11 @@ describe("file-server", () => {
         expect(spyLookup).to.have.not.been.called();
 
         expect(spyLogInfo).to.have.been.deep.calledWith([
-          "DELETE /file.txt - 405 0",
+          ["", " ", " - ", " ", ""],
+          "DELETE",
+          "/file.txt",
+          405,
+          "0",
         ]);
       });
 
@@ -325,7 +337,11 @@ describe("file-server", () => {
         expect(spyLookup).to.not.have.been.called();
 
         expect(spyLogInfo).to.have.been.deep.calledWith([
-          "OPTIONS / - 204 0",
+          ["", " ", " - ", " ", ""],
+          "OPTIONS",
+          "/",
+          204,
+          "0",
         ]);
       });
 
@@ -349,7 +365,11 @@ describe("file-server", () => {
           ]);
 
           expect(spyLogInfo).to.have.been.deep.calledWith([
-            "GET /file.txt - 200 1000",
+            ["", " ", " - ", " ", ""],
+            "GET",
+            "/file.txt",
+            200,
+            "1000",
           ]);
         });
         it("handles a GET of a known file path w/ mismatch ETag", async () => {
@@ -374,7 +394,11 @@ describe("file-server", () => {
           ]);
 
           expect(spyLogInfo).to.have.been.deep.calledWith([
-            "GET /file.txt - 200 1000",
+            ["", " ", " - ", " ", ""],
+            "GET",
+            "/file.txt",
+            200,
+            "1000",
           ]);
         });
         it("handles a GET of a known file path w/ matching ETag", async () => {
@@ -399,7 +423,11 @@ describe("file-server", () => {
           ]);
 
           expect(spyLogInfo).to.have.been.deep.calledWith([
-            "GET /file.txt - 304 1000",
+            ["", " ", " - ", " ", ""],
+            "GET",
+            "/file.txt",
+            304,
+            "1000",
           ]);
         });
         it("handles a GET of a known directory path", async () => {
@@ -421,7 +449,11 @@ describe("file-server", () => {
           ]);
 
           expect(spyLogInfo).to.have.been.deep.calledWith([
-            "GET / - 200 1000",
+            ["", " ", " - ", " ", ""],
+            "GET",
+            "/",
+            200,
+            "1000",
           ]);
         });
         it("handles a GET of an unknown path", async () => {
@@ -440,7 +472,11 @@ describe("file-server", () => {
           ]);
 
           expect(spyLogInfo).to.have.been.deep.calledWith([
-            "GET /unknown.txt - 404 0",
+            ["", " ", " - ", " ", ""],
+            "GET",
+            "/unknown.txt",
+            404,
+            "0",
           ]);
         });
       });
@@ -465,7 +501,11 @@ describe("file-server", () => {
           ]);
 
           expect(spyLogInfo).to.have.been.deep.calledWith([
-            "HEAD /file.txt - 200 1000",
+            ["", " ", " - ", " ", ""],
+            "HEAD",
+            "/file.txt",
+            200,
+            "1000",
           ]);
         });
         it("handles a HEAD  of a known file path w/ mismatch ETag", async () => {
@@ -490,7 +530,11 @@ describe("file-server", () => {
           ]);
 
           expect(spyLogInfo).to.have.been.deep.calledWith([
-            "HEAD /file.txt - 200 1000",
+            ["", " ", " - ", " ", ""],
+            "HEAD",
+            "/file.txt",
+            200,
+            "1000",
           ]);
         });
         it("handles a HEAD  of a known file path w/ matching ETag", async () => {
@@ -515,7 +559,11 @@ describe("file-server", () => {
           ]);
 
           expect(spyLogInfo).to.have.been.deep.calledWith([
-            "HEAD /file.txt - 304 1000",
+            ["", " ", " - ", " ", ""],
+            "HEAD",
+            "/file.txt",
+            304,
+            "1000",
           ]);
         });
         it("handles a HEAD  of a known directory path", async () => {
@@ -537,7 +585,11 @@ describe("file-server", () => {
           ]);
 
           expect(spyLogInfo).to.have.been.deep.calledWith([
-            "HEAD / - 200 1000",
+            ["", " ", " - ", " ", ""],
+            "HEAD",
+            "/",
+            200,
+            "1000",
           ]);
         });
         it("handles a HEAD of an unknown path", async () => {
@@ -556,7 +608,11 @@ describe("file-server", () => {
           ]);
 
           expect(spyLogInfo).to.have.been.deep.calledWith([
-            "HEAD /unknown.txt - 404 0",
+            ["", " ", " - ", " ", ""],
+            "HEAD",
+            "/unknown.txt",
+            404,
+            "0",
           ]);
         });
       });

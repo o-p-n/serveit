@@ -3,7 +3,6 @@ import { expect, mock } from "./deps.ts";
 
 import { join, normalize } from "@std/path";
 
-import { LogLevel } from "../src/logger.ts";
 import { _internals, load } from "../src/config.ts";
 
 class MockEnv implements Deno.Env {
@@ -62,7 +61,7 @@ describe("config", () => {
       expect(result).to.deep.equal({
         rootDir: "/app/web",
         port: 4000,
-        logLevel: LogLevel.INFO,
+        logLevel: "info",
       });
       expect(spyResolve).to.be.deep.calledWith(["."]);
     });
@@ -77,9 +76,33 @@ describe("config", () => {
       expect(result).to.deep.equal({
         rootDir: "/some/path",
         port: 5000,
-        logLevel: LogLevel.ERROR,
+        logLevel: "error",
       });
       expect(spyResolve).to.be.deep.calledWith(["/some/path"]);
+    });
+
+    it("loads with logging OFF", async () => {
+      const env = new MockEnv({
+        "SERVEIT_LOG_LEVEL": "OFF",
+      });
+      const result = await load(env);
+      expect(result).to.deep.equal({
+        rootDir: "/app/web",
+        port: 4000,
+        logLevel: null,
+      });
+    });
+
+    it("loads with logging ALL", async () => {
+      const env = new MockEnv({
+        "SERVEIT_LOG_LEVEL": "ALL",
+      });
+      const result = await load(env);
+      expect(result).to.deep.equal({
+        rootDir: "/app/web",
+        port: 4000,
+        logLevel: "debug",
+      });
     });
 
     it("rejects if invalid port", async () => {

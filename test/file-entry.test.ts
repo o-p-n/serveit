@@ -12,7 +12,8 @@ import { basename, dirname } from "@std/path";
 
 import { _internals, FileEntry } from "../src/file-entry.ts";
 import { NotFound } from "../src/errors.ts";
-import log, { LogLevel } from "../src/logger.ts";
+import { DEFAULT_CONFIG } from "../src/config.ts";
+import { reset, setup } from "../src/logger.ts";
 
 function toStat(info: Partial<Deno.FileInfo>) {
   return {
@@ -27,12 +28,15 @@ function toStat(info: Partial<Deno.FileInfo>) {
 }
 
 describe("file-entry", () => {
-  beforeAll(() => {
-    log.level = LogLevel.ALL;
+  beforeAll(async () => {
+    await setup({
+      ...DEFAULT_CONFIG,
+      logLevel: "debug",
+    });
   });
 
-  afterAll(() => {
-    log.level = LogLevel.INFO;
+  afterAll(async () => {
+    await reset();
   });
 
   describe("FileEntry", () => {

@@ -1,10 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from "./deps.ts";
 
+import { type LogLevel } from "@logtape/logtape";
 import { _internals, main } from "../src/main.ts";
-import log, { LogLevel } from "../src/logger.ts";
+import log from "../src/logger.ts";
 import { Server } from "../src/file-server.ts";
 
 describe("main", () => {
+  const logger = log();
   describe("main()", () => {
     let spyLogInfo: mock.Spy;
     let spyLoad: mock.Spy;
@@ -12,13 +14,13 @@ describe("main", () => {
     let spyAddListener: mock.Spy;
 
     beforeEach(() => {
-      spyLogInfo = mock.spy(log, "info");
+      spyLogInfo = mock.spy(logger, "info");
 
       spyLoad = mock.stub(_internals, "load", () =>
         Promise.resolve({
           rootDir: "/root/app",
           port: 4000,
-          logLevel: LogLevel.INFO,
+          logLevel: "info" as LogLevel,
         }));
       spyServe = mock.stub(Server.prototype, "serve", () => Promise.resolve());
       spyAddListener = mock.stub(Deno, "addSignalListener");
@@ -45,7 +47,6 @@ describe("main", () => {
       _internals.main = true;
 
       await main();
-      expect(log.level).to.equal(LogLevel.INFO);
       expect(spyServe).to.have.been.called();
 
       expect(spyAddListener).to.have.been.called();

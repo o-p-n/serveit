@@ -5,6 +5,7 @@
     "target/**"
   ],
   "imports": {
+    "@logtape/logtape": "jsr:@logtape/logtape@^0.5.1",
     "@std/encoding": "jsr:@std/encoding@^0.224.3",
     "@std/fs": "jsr:@std/fs@^0.229.3",
     "@std/media-types": "jsr:@std/media-types@^1.0.0",

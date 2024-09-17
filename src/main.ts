@@ -2,7 +2,7 @@
  * @copyright 2024 Matthew A. Miller
  */
 
-import log from "./logger.ts";
+import log, { setup } from "./logger.ts";
 import { load } from "./config.ts";
 import { Server } from "./file-server.ts";
 
@@ -15,12 +15,12 @@ export async function main() {
   if (!_internals.main) return;
 
   const config = await _internals.load();
-  log.level = config.logLevel;
+  await setup(config);
 
   const abort = new AbortController();
   const signal = abort.signal;
   Deno.addSignalListener("SIGINT", () => {
-    log.info("stopping ...");
+    log().info("stopping ...");
     abort.abort();
   });
 
@@ -29,7 +29,7 @@ export async function main() {
     signal,
   });
   await srv.serve();
-  log.info("... stopped");
+  log().info("... stopped");
 }
 
 await main();

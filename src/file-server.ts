@@ -47,21 +47,20 @@ export class Server {
       handler: (req: Request) => this.handle(req),
       port: this.port,
       signal: this.signal,
-      onListen: (addr: Deno.NetAddr) =>
-        log.info(
-          `now serving directory ${this.rootDir} at ${addr.hostname}:${addr.port}`,
-        ),
+      onListen: (addr: Deno.NetAddr) => (
+        log()
+          .info`now serving directory ${this.rootDir} at ${addr.hostname}:${addr.port}`
+      ),
       onError: (err: unknown) => this.error(err),
     });
     await srv.finished;
 
-    log.info(
-      `stopped serving ${this.rootDir} at ${srv.addr.hostname}:${srv.addr.port}`,
-    );
+    log()
+      .info`stopped serving ${this.rootDir} at ${srv.addr.hostname}:${srv.addr.port}`;
   }
 
   private error(err: unknown): Response {
-    log.error(`error encountered: ${err}`);
+    log().error`error encountered: ${err}`;
 
     if (err instanceof HttpError) {
       return err.toResponse();
@@ -98,7 +97,7 @@ export class Server {
       rsp = this.error(err);
     }
     const size = rsp.headers.get("Content-Length") || "0";
-    log.info(`${method} ${path} - ${rsp.status} ${size}`);
+    log().info`${method} ${path} - ${rsp.status} ${size}`;
 
     return rsp;
   }
@@ -110,7 +109,7 @@ export class Server {
   ): Promise<Response> {
     path = join(this.config.rootDir, path);
     if (common([this.rootDir, path]) !== this.rootDir) {
-      log.warn(`invalid path requested: ${path}`);
+      log().warn`invalid path requested: ${path}`;
       return new NotFound().toResponse();
     }
 

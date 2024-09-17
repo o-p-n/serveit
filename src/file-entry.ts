@@ -76,28 +76,28 @@ export class FileEntry {
   }
 
   static async find(path: string): Promise<FileEntry> {
-    log.debug(() => `attempting to find ${path} ...`);
+    log().debug`attempting to find ${path} ...`;
 
     const stat = await _internals.stat(path)
       .catch((err) => {
-        log.warn(`failed to stat ${path}: ${err.message}`);
+        log().warn`failed to stat ${path}: ${err.message}`;
         throw new NotFound();
       });
     if (stat.isDirectory) {
-      log.debug(() => `${path} is a directory; looking for index`);
+      log().debug`${path} is a directory; looking for index`;
       const candidates = await Array.fromAsync(
         _internals.expandGlob("index\\.{html,htm}", { root: path }),
       );
 
       // TODO: iterate over found candidates
       if (candidates.length === 0) {
-        log.warn(`no index found for ${path}`);
+        log().warn`no index found for ${path}`;
         throw new NotFound();
       }
       return FileEntry.find(candidates[0].path);
     }
     if (!stat.isFile) {
-      log.warn(() => `${path} is not a supported kind`);
+      log().warn`${path} is not a supported kind`;
       throw new NotFound();
     }
 
@@ -117,7 +117,7 @@ export class FileEntry {
       etag: await calculateETag(props),
     };
 
-    log.debug(() => `found ${path} (type=${props.type}, size=${props.size})!`);
+    log().debug`found ${path} (type=${props.type}, size=${props.size})!`;
     return new FileEntry(props as FileEntryProps);
   }
 }
