@@ -1,54 +1,57 @@
 {
-  "version": "3",
-  "packages": {
-    "specifiers": {
-      "jsr:@logtape/logtape@^0.5.1": "jsr:@logtape/logtape@0.5.1",
-      "jsr:@std/assert@^0.226.0": "jsr:@std/assert@0.226.0",
-      "jsr:@std/encoding@^0.224.3": "jsr:@std/encoding@0.224.3",
-      "jsr:@std/fs@^0.229.3": "jsr:@std/fs@0.229.3",
-      "jsr:@std/media-types@^1.0.0": "jsr:@std/media-types@1.0.0",
-      "jsr:@std/path@1.0.0-rc.1": "jsr:@std/path@1.0.0-rc.1",
-      "jsr:@std/path@^0.225.2": "jsr:@std/path@0.225.2",
-      "jsr:@std/testing@^0.225.3": "jsr:@std/testing@0.225.3",
-      "npm:@types/node": "npm:@types/node@18.16.19"
+  "version": "4",
+  "specifiers": {
+    "jsr:@logtape/logtape@~0.5.1": "0.5.4",
+    "jsr:@std/assert@0.226": "0.226.0",
+    "jsr:@std/encoding@~0.224.3": "0.224.3",
+    "jsr:@std/fs@~0.229.3": "0.229.3",
+    "jsr:@std/media-types@1": "1.0.3",
+    "jsr:@std/path@1.0.0-rc.1": "1.0.0-rc.1",
+    "jsr:@std/path@~0.225.2": "0.225.2",
+    "jsr:@std/testing@~0.225.3": "0.225.3",
+    "npm:@types/node@*": "22.5.4"
+  },
+  "jsr": {
+    "@logtape/logtape@0.5.4": {
+      "integrity": "32390a211f9b77d9cf9d84180bcbac2413e287c058d4dbd917367438e61997c7"
     },
-    "jsr": {
-      "@logtape/logtape@0.5.1": {
-        "integrity": "0efc66de84284f35499674c512b4c942d2a2fc44f03e444a815a6ac8b42fccd3"
-      },
-      "@std/assert@0.226.0": {
-        "integrity": "0dfb5f7c7723c18cec118e080fec76ce15b4c31154b15ad2bd74822603ef75b3"
-      },
-      "@std/encoding@0.224.3": {
-        "integrity": "5e861b6d81be5359fad4155e591acf17c0207b595112d1840998bb9f476dbdaf"
-      },
-      "@std/fs@0.229.3": {
-        "integrity": "783bca21f24da92e04c3893c9e79653227ab016c48e96b3078377ebd5222e6eb",
-        "dependencies": [
-          "jsr:@std/path@1.0.0-rc.1"
-        ]
-      },
-      "@std/media-types@1.0.0": {
-        "integrity": "58ff81ce1f7af8c46304a52482db804c42936492daad19c0bd5d887832737d2b"
-      },
-      "@std/path@0.225.2": {
-        "integrity": "0f2db41d36b50ef048dcb0399aac720a5348638dd3cb5bf80685bf2a745aa506",
-        "dependencies": [
-          "jsr:@std/assert@^0.226.0"
-        ]
-      },
-      "@std/path@1.0.0-rc.1": {
-        "integrity": "b8c00ae2f19106a6bb7cbf1ab9be52aa70de1605daeb2dbdc4f87a7cbaf10ff6"
-      },
-      "@std/testing@0.225.3": {
-        "integrity": "348c24d0479d44ab3dbb4f26170f242e19f24051b45935d4a9e7ca0ab7e37780"
-      }
+    "@std/assert@0.226.0": {
+      "integrity": "0dfb5f7c7723c18cec118e080fec76ce15b4c31154b15ad2bd74822603ef75b3"
     },
-    "npm": {
-      "@types/node@18.16.19": {
-        "integrity": "sha512-IXl7o+R9iti9eBW4Wg2hx1xQDig183jj7YLn8F7udNceyfkbn1ZxmzZXuak20gR40D7pIkIY1kYGx5VIGbaHKA==",
-        "dependencies": {}
-      }
+    "@std/encoding@0.224.3": {
+      "integrity": "5e861b6d81be5359fad4155e591acf17c0207b595112d1840998bb9f476dbdaf"
+    },
+    "@std/fs@0.229.3": {
+      "integrity": "783bca21f24da92e04c3893c9e79653227ab016c48e96b3078377ebd5222e6eb",
+      "dependencies": [
+        "jsr:@std/path@1.0.0-rc.1"
+      ]
+    },
+    "@std/media-types@1.0.3": {
+      "integrity": "b12d30a7852f7578f4d210622df713bbfd1cbdd9b4ec2eaf5c1845ab70bab159"
+    },
+    "@std/path@0.225.2": {
+      "integrity": "0f2db41d36b50ef048dcb0399aac720a5348638dd3cb5bf80685bf2a745aa506",
+      "dependencies": [
+        "jsr:@std/assert"
+      ]
+    },
+    "@std/path@1.0.0-rc.1": {
+      "integrity": "b8c00ae2f19106a6bb7cbf1ab9be52aa70de1605daeb2dbdc4f87a7cbaf10ff6"
+    },
+    "@std/testing@0.225.3": {
+      "integrity": "348c24d0479d44ab3dbb4f26170f242e19f24051b45935d4a9e7ca0ab7e37780"
+    }
+  },
+  "npm": {
+    "@types/node@22.5.4": {
+      "integrity": "sha512-FDuKUJQm/ju9fT/SeX/6+gBzoPzlVCzfzmGkwKvRHQVxi4BntVbyIwf6a4Xn62mrvndLiml6z/UBXIdEVjQLXg==",
+      "dependencies": [
+        "undici-types"
+      ]
+    },
+    "undici-types@6.19.8": {
+      "integrity": "sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw=="
     }
   },
   "remote": {
@@ -114,11 +117,11 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@logtape/logtape@^0.5.1",
-      "jsr:@std/encoding@^0.224.3",
-      "jsr:@std/fs@^0.229.3",
-      "jsr:@std/media-types@^1.0.0",
-      "jsr:@std/path@^0.225.2"
+      "jsr:@logtape/logtape@~0.5.1",
+      "jsr:@std/encoding@~0.224.3",
+      "jsr:@std/fs@~0.229.3",
+      "jsr:@std/media-types@1",
+      "jsr:@std/path@~0.225.2"
     ]
   }
 }
