@@ -17,7 +17,7 @@ tasks:
 
   clean.cache:
     - git -dfx .cache
-  
+
   dist-clean:
     desc: Cleans everything, including local caches
     deps:
@@ -70,7 +70,7 @@ tasks:
         vars:
           IMAGE_REPOSITORY: o-p-n/serveit
           IMAGE_TAG: '{{ default "latest" .IMAGE_TAG }}'
-    
+
   image:
     desc: Creates a multi-arch container image
     cmds:
