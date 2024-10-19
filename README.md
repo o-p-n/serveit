@@ -41,10 +41,13 @@ To build `serveit` locally, the following tools must be available in your `PATH`
 * [Deno](https://deno.land/), v2.0.0 or later
 * [Crane](https://github.com/google/go-containerregistry/blob/main/cmd/crane/README.md) v0.19.0 or later
 * [Task](https://taskfile.dev/), v3.30.0 or later
+* [Docker](https://docker.com/), v25 or later
 
-In addition, Docker v25 or later is required to be installed and running.
+It is possible to obtain most of these (excluding Docker) using an [installer script](./.github/scripts/install-tooling.sh) for most of these dependencies (plus others needed by GitHub Actions for publishing and distritubing).  By default the script installs tools in `${HOME}/bin`.
 
-It is possible to obtain these using an [installer script](./.github/scripts/install-tooling.sh) for most of these dependencies (plus others needed by GitHub Actions for publishing and distritubing).  By default the script installs tools in `${HOME}/bin`.
+In addition, git hooks are managed using [Lefthook](https://github.com/evilmartians/lefthook).  It currently has the following hooks:
+
+* `pre-push` — runs code styling checks (linting and format-checking)
 
 ### WORKING COPY
 
