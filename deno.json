@@ -5,11 +5,11 @@
     "target/**"
   ],
   "imports": {
-    "@logtape/logtape": "jsr:@logtape/logtape@^0.5.1",
-    "@std/encoding": "jsr:@std/encoding@^0.224.3",
-    "@std/fs": "jsr:@std/fs@^0.229.3",
+    "@logtape/logtape": "jsr:@logtape/logtape@^0.6.3",
+    "@std/encoding": "jsr:@std/encoding@^1.0.5",
+    "@std/fs": "jsr:@std/fs@^1.0.4",
     "@std/media-types": "jsr:@std/media-types@^1.0.0",
-    "@std/path": "jsr:@std/path@^0.225.2"
+    "@std/path": "jsr:@std/path@^1.0.6"
   },
   "fmt": {
     "exclude": ["README.md"]
