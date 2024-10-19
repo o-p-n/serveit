@@ -149,16 +149,16 @@ describe("file-entry", () => {
           },
         );
 
-        async function mockExists(
-          path: string | URL,
-          _opts?: ExistsOptions,
-        ) {
-          return await Promise.resolve(
-            path === "/root/app/sub/index.html" ||
-              path === "/root/app/other-sub/index.htm",
-          );
-        }
-        spyExists = mock.stub(_internals, "exists", mockExists);
+        spyExists = mock.stub(
+          _internals,
+          "exists",
+          (path: string | URL, _opts?: ExistsOptions) => {
+            return Promise.resolve(
+              (path === "/root/app/sub/index.html") ||
+                (path === "/root/app/other-sub/index.htm"),
+            );
+          },
+        );
       });
 
       afterEach(() => {
