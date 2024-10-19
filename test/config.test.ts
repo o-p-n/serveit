@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, it } from "./deps.ts";
 import { expect, mock } from "./deps.ts";
 
-import { resolve, normalize } from "@std/path";
+import { resolve } from "@std/path";
 
 import { _internals, load } from "../src/config.ts";
 
