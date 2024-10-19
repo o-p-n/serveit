@@ -12,6 +12,12 @@
     "@std/path": "jsr:@std/path@^0.225.2"
   },
   "fmt": {
-    "exclude": ["README.md"]
+    "exclude": [
+      ".cache/**",
+      ".task/**",
+      "coverage/**",
+      "target/**",
+      "README.md"
+    ]
   }
 }
