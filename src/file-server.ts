@@ -11,7 +11,7 @@ import {
   MethodNotAllowed,
   NotFound,
 } from "./errors.ts";
-import { common, join } from "@std/path";
+import { common, resolve } from "@std/path";
 
 const ALLOWED_METHODS = [
   "GET",
@@ -107,7 +107,7 @@ export class Server {
     etags?: string,
     preview = false,
   ): Promise<Response> {
-    path = join(this.config.rootDir, path);
+    path = resolve(this.config.rootDir, path);
     if (common([this.rootDir, path]) !== this.rootDir) {
       log().warn`invalid path requested: ${path}`;
       return new NotFound().toResponse();

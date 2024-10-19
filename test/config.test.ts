@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, it } from "./deps.ts";
 import { expect, mock } from "./deps.ts";
 
-import { join, normalize } from "@std/path";
+import { resolve, normalize } from "@std/path";
 
 import { _internals, load } from "../src/config.ts";
 
@@ -44,9 +44,7 @@ describe("config", () => {
         return p;
       }
 
-      return normalize(
-        join("/app/web", p),
-      );
+      return resolve("/app/web", p);
     };
     spyResolve = mock.stub(_internals, "resolve", fn);
   });
