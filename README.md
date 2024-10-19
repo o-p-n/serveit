@@ -13,6 +13,15 @@ docker run <options> \
     gcr.io/o-p-n/serveit:<TAG>
 ```
 
+### IMAGES
+
+Releases can be found at the [`serveit` container package](https://github.com/o-p-n/serveit/pkgs/container/serveit).  Generally, each release is tagged with its corresponding git commit hash.  There is no `latest` tag, currently.
+
+The following platforms are supported:
+
+* `linux/amd64`
+* `linux/arm64`
+
 ### CONFIGURING
 
 SERVEIT can be configuring via environment variables:
