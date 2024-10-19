@@ -1,43 +1,32 @@
 {
   "version": "4",
   "specifiers": {
-    "jsr:@logtape/logtape@~0.5.1": "0.5.4",
-    "jsr:@std/assert@0.226": "0.226.0",
-    "jsr:@std/encoding@~0.224.3": "0.224.3",
-    "jsr:@std/fs@~0.229.3": "0.229.3",
+    "jsr:@logtape/logtape@~0.6.3": "0.6.3",
+    "jsr:@std/encoding@^1.0.5": "1.0.5",
+    "jsr:@std/fs@^1.0.4": "1.0.4",
     "jsr:@std/media-types@1": "1.0.3",
-    "jsr:@std/path@1.0.0-rc.1": "1.0.0-rc.1",
-    "jsr:@std/path@~0.225.2": "0.225.2",
+    "jsr:@std/path@^1.0.6": "1.0.6",
     "jsr:@std/testing@~0.225.3": "0.225.3",
     "npm:@types/node@*": "22.5.4"
   },
   "jsr": {
-    "@logtape/logtape@0.5.4": {
-      "integrity": "32390a211f9b77d9cf9d84180bcbac2413e287c058d4dbd917367438e61997c7"
+    "@logtape/logtape@0.6.3": {
+      "integrity": "64cac3459fddf0455b85d36c8ca3e21764d6b2965c426fb40a0e4a98be436d2b"
     },
-    "@std/assert@0.226.0": {
-      "integrity": "0dfb5f7c7723c18cec118e080fec76ce15b4c31154b15ad2bd74822603ef75b3"
+    "@std/encoding@1.0.5": {
+      "integrity": "ecf363d4fc25bd85bd915ff6733a7e79b67e0e7806334af15f4645c569fefc04"
     },
-    "@std/encoding@0.224.3": {
-      "integrity": "5e861b6d81be5359fad4155e591acf17c0207b595112d1840998bb9f476dbdaf"
-    },
-    "@std/fs@0.229.3": {
-      "integrity": "783bca21f24da92e04c3893c9e79653227ab016c48e96b3078377ebd5222e6eb",
+    "@std/fs@1.0.4": {
+      "integrity": "2907d32d8d1d9e540588fd5fe0ec21ee638134bd51df327ad4e443aaef07123c",
       "dependencies": [
-        "jsr:@std/path@1.0.0-rc.1"
+        "jsr:@std/path"
       ]
     },
     "@std/media-types@1.0.3": {
       "integrity": "b12d30a7852f7578f4d210622df713bbfd1cbdd9b4ec2eaf5c1845ab70bab159"
     },
-    "@std/path@0.225.2": {
-      "integrity": "0f2db41d36b50ef048dcb0399aac720a5348638dd3cb5bf80685bf2a745aa506",
-      "dependencies": [
-        "jsr:@std/assert"
-      ]
-    },
-    "@std/path@1.0.0-rc.1": {
-      "integrity": "b8c00ae2f19106a6bb7cbf1ab9be52aa70de1605daeb2dbdc4f87a7cbaf10ff6"
+    "@std/path@1.0.6": {
+      "integrity": "ab2c55f902b380cf28e0eec501b4906e4c1960d13f00e11cfbcd21de15f18fed"
     },
     "@std/testing@0.225.3": {
       "integrity": "348c24d0479d44ab3dbb4f26170f242e19f24051b45935d4a9e7ca0ab7e37780"
@@ -117,11 +106,11 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@logtape/logtape@~0.5.1",
-      "jsr:@std/encoding@~0.224.3",
-      "jsr:@std/fs@~0.229.3",
+      "jsr:@logtape/logtape@~0.6.3",
+      "jsr:@std/encoding@^1.0.5",
+      "jsr:@std/fs@^1.0.4",
       "jsr:@std/media-types@1",
-      "jsr:@std/path@~0.225.2"
+      "jsr:@std/path@^1.0.6"
     ]
   }
 }
