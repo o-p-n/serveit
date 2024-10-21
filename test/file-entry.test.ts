@@ -7,9 +7,8 @@ import {
   it,
 } from "./deps.ts";
 import { expect, FakeTime, mock } from "./deps.ts";
-import { ExpandGlobOptions } from "@std/fs";
-import { basename, dirname } from "@std/path";
 
+import type { ExistsOptions } from "@std/fs";
 import { _internals, FileEntry } from "../src/file-entry.ts";
 import { NotFound } from "../src/errors.ts";
 import { DEFAULT_CONFIG } from "../src/config.ts";
@@ -83,7 +82,7 @@ describe("file-entry", () => {
 
       let spyOpen: mock.Spy;
       let spyStat: mock.Spy;
-      let spyExpandGlob: mock.Spy;
+      let spyExists: mock.Spy;
       let clock: FakeTime;
 
       beforeEach(() => {
@@ -122,6 +121,15 @@ describe("file-entry", () => {
                 return toStat({
                   isFile: true,
                 });
+              case "/root/app/other-sub":
+                return toStat({
+                  isDirectory: true,
+                  size: 0,
+                });
+              case "/root/app/other-sub/index.htm":
+                return toStat({
+                  isFile: true,
+                });
               case "/root/app/no-index":
                 return toStat({
                   isDirectory: true,
@@ -141,28 +149,20 @@ describe("file-entry", () => {
           },
         );
 
-        async function* mockExpand(
-          _glob: string | URL,
-          opts?: ExpandGlobOptions,
-        ) {
-          opts = opts || {};
-          if (opts.root === "/root/app/sub") {
-            const path = `${opts.root!}/index.html`;
-            yield {
-              path,
-              parentPath: dirname(path),
-              name: basename(path),
-              isFile: true,
-              isDirectory: false,
-              isSymlink: false,
-            };
-          }
-        }
-        spyExpandGlob = mock.stub(_internals, "expandGlob", mockExpand);
+        spyExists = mock.stub(
+          _internals,
+          "exists",
+          (path: string | URL, _opts?: ExistsOptions) => {
+            return Promise.resolve(
+              (path === "/root/app/sub/index.html") ||
+                (path === "/root/app/other-sub/index.htm"),
+            );
+          },
+        );
       });
 
       afterEach(() => {
-        spyExpandGlob.restore();
+        spyExists.restore();
         spyStat.restore();
         spyOpen.restore();
 
@@ -230,7 +230,7 @@ describe("file-entry", () => {
         await expect(result.open()).to.eventually.equal(content);
       });
 
-      it("loads the index for a directory", async () => {
+      it("loads the index for a directory (index.html)", async () => {
         const result = await FileEntry.find("/root/app/sub");
         expect(result.path).to.equal("/root/app/sub/index.html");
         expect(result.type).to.equal("text/html");
@@ -249,6 +249,42 @@ describe("file-entry", () => {
             '"997b12928a38a3dad580f7d40b34c84930f5f7621bfdf0bd0edcfb658163ea7f"',
         });
         await expect(result.open()).to.eventually.equal(content);
+
+        expect(spyExists).to.have.been.called(1);
+        expect(spyExists).to.have.been.deep.calledWith([
+          "/root/app/sub/index.html",
+          { isFile: true },
+        ]);
+      });
+      it("loads the index for a directory (index.htm)", async () => {
+        const result = await FileEntry.find("/root/app/other-sub");
+        expect(result.path).to.equal("/root/app/other-sub/index.htm");
+        expect(result.type).to.equal("text/html");
+        expect(result.size).to.equal(1000);
+        expect(result.createdAt).to.deep.equal(new Date(60000));
+        expect(result.modifiedAt).to.deep.equal(new Date(120000));
+        expect(result.etag).to.equal(
+          "d8cc7d9d2c74940b4c686becfaec3f17749db078b2b6a5f028bca2f9f3f137d4",
+        );
+
+        expect(result.headers()).to.deep.equal({
+          "Content-Type": "text/html",
+          "Content-Length": "1000",
+          "Date": new Date(120000).toUTCString(),
+          "ETag":
+            '"d8cc7d9d2c74940b4c686becfaec3f17749db078b2b6a5f028bca2f9f3f137d4"',
+        });
+        await expect(result.open()).to.eventually.equal(content);
+
+        expect(spyExists).to.have.been.called(2);
+        expect(spyExists).to.have.been.deep.calledWith([
+          "/root/app/other-sub/index.html",
+          { isFile: true },
+        ]);
+        expect(spyExists).to.have.been.deep.calledWith([
+          "/root/app/other-sub/index.htm",
+          { isFile: true },
+        ]);
       });
 
       it("throws NotFound for non-existent file", async () => {
