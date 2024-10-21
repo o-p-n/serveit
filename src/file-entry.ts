@@ -4,9 +4,9 @@
  */
 
 import { encodeHex } from "@std/encoding";
-import { expandGlob } from "@std/fs";
+import { exists } from "@std/fs";
 import { typeByExtension } from "@std/media-types";
-import { extname } from "@std/path";
+import { extname, resolve } from "@std/path";
 
 import { NotFound } from "./errors.ts";
 import log from "./logger.ts";
@@ -14,7 +14,7 @@ import log from "./logger.ts";
 export const _internals = {
   open: Deno.open,
   stat: Deno.stat,
-  expandGlob,
+  exists,
 };
 
 interface FileEntryProps {
@@ -85,16 +85,16 @@ export class FileEntry {
       });
     if (stat.isDirectory) {
       log().debug`${path} is a directory; looking for index`;
-      const candidates = await Array.fromAsync(
-        _internals.expandGlob("index\\.{html,htm}", { root: path }),
-      );
 
-      // TODO: iterate over found candidates
-      if (candidates.length === 0) {
-        log().warn`no index found for ${path}`;
-        throw new NotFound();
+      for (const index of ["index.html", "index.htm"]) {
+        const indexPath = resolve(path, index);
+        if (await _internals.exists(indexPath, { isFile: true })) {
+          return FileEntry.find(indexPath);
+        }
       }
-      return FileEntry.find(candidates[0].path);
+
+      log().warn`no index file found for ${path}`;
+      throw new NotFound();
     }
     if (!stat.isFile) {
       log().warn`${path} is not a supported kind`;
