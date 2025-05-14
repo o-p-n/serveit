@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from "./deps.ts";
+import { BoundSpy, createBoundSpy } from "./bound-spy.ts";
 
 import { typeByExtension } from "@std/media-types";
 import { NotFound } from "../src/errors.ts";
@@ -24,23 +25,6 @@ function createEntry(path: string) {
   mock.stub(entry, "open", () => Promise.resolve(DEFAULT_CONTENT));
 
   return entry;
-}
-
-// deno-lint-ignore no-explicit-any
-type Fn = (...args: any[]) => any;
-interface BoundSpy<fn = Fn> {
-  spy: mock.Spy;
-  call: fn;
-}
-// deno-lint-ignore no-explicit-any
-function createBoundSpy<fn>(src: any, method: string): BoundSpy<fn> {
-  const spy = mock.spy(Object.getPrototypeOf(src), method);
-  const call: fn = spy.bind(src) as fn;
-
-  return {
-    spy,
-    call,
-  };
 }
 
 describe("file-server", () => {
