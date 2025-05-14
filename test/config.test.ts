@@ -113,6 +113,13 @@ describe("config", () => {
       await expect(load(env)).to.be.rejectedWith(Error, "invalid port: blah");
     });
 
+    it("rejects if invalid meta port", async () => {
+      const env = new MockEnv({
+        "SERVEIT_META_PORT": "blah",
+      });
+      await expect(load(env)).to.be.rejectedWith(Error, "invalid meta port: blah");
+    });
+
     it("rejects if invalid log-level", async () => {
       const env = new MockEnv({
         "SERVEIT_LOG_LEVEL": "stuff",
