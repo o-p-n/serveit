@@ -1,10 +1,11 @@
-import { afterEach, beforeEach, describe, expect, FakeTime, it, mock } from "./deps.ts";
-import { BoundSpy, createBoundSpy } from "./bound-spy.ts";
+import { afterEach, beforeEach, describe, expect, FakeTime, it, mock } from "../deps.ts";
+import { BoundSpy, createBoundSpy } from "../bound-spy.ts";
 
-import log from "../src/logger.ts";
-import { MetaServer } from "../src/meta-server.ts";
-import { DEFAULT_CONFIG } from "../src/config.ts";
-import { NotFound } from "../src/errors.ts";
+import log from "../../src/logger.ts";
+import { MetaServer } from "../../src/meta/meta-server.ts";
+import { DEFAULT_CONFIG } from "../../src/config.ts";
+import { NotFound } from "../../src/errors.ts";
+import { Health } from "../../src/meta/health.ts";
 
 describe("meta-server", () => {
   const logger = log();
@@ -129,63 +130,35 @@ describe("meta-server", () => {
     });
 
     describe("handle()", () => {
-      let spyHandle: BoundSpy<(req: Request) => Response>;
+      let spyHandle: BoundSpy<(req: Request) => Promise<Response>>;
       let spyHealth: mock.Spy;
 
       beforeEach(() => {
         spyHandle = createBoundSpy(server, "handle");
-        spyHealth = mock.stub(Object.getPrototypeOf(server), "health", (_) => new Response(null, {
+        spyHealth = mock.stub(Health.prototype, "handle", (_) => Promise.resolve(new Response(null, {
           status: 200,
           statusText: "ok",
-        }));
+        })));
       });
       afterEach(() => {
         spyHandle.spy.restore();
         spyHealth.restore();
       });
 
-      it("handls 'GET /health'", () => {
+      it("handles 'GET /health'", async () => {
         const req = new Request("http://example.com:12676/health");
-        spyHandle.call(req);
+        await spyHandle.call(req);
 
         expect(spyHealth).to.have.been.called();
       });
 
-      it("returns 404 for unknown path", () => {
+      it("returns 404 for unknown path", async () => {
         const req = new Request("http://example.com:12676/not-a-path");
-        const rsp = spyHandle.call(req);
+        const rsp = await spyHandle.call(req);
 
         const expected = new NotFound();
         expect(rsp.status).to.equal(expected.code);
         expect(rsp.statusText).to.equal(expected.message);
-      });
-    });
-
-    describe("meta endpoints", () => {
-      describe("/health", () => {
-        let spyHealth: BoundSpy<() => Response>;
-
-        beforeEach(() => {
-          spyHealth = createBoundSpy(server, "health");
-        });
-        afterEach(() => {
-          spyHealth.spy.restore();
-        });
-
-        it("returns health stats", async () => {
-          clock.tick(60000);
-          const rsp = spyHealth.call();
-
-          expect(rsp.status).to.equal(200);
-          expect(rsp.headers.get("Content-Type")).to.equal("application/json");
-          expect(rsp.headers.get("Content-Length")).to.equal("31");
-
-          const body = await rsp.json();
-          expect(body).to.deep.equal({
-            healthy: true,
-            uptime: 60000,
-          });
-        });
       });
     });
   });

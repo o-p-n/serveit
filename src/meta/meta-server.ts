@@ -2,23 +2,22 @@
  * @copyright 2025 Matthew A. Miller
  */
 
-import log from "./logger.ts";
-import { HttpError, InternalServerError, NotFound } from "./errors.ts";
-import { ServerConfig } from "./file-server.ts";
-import { StatusCode } from "./constants.ts";
+import log from "../logger.ts";
+import { HttpError, InternalServerError, NotFound } from "../errors.ts";
+import { ServerConfig } from "../file-server.ts";
+import { MetaHandler } from "./basics.ts";
 
-export interface HealthStats {
-  healthy: boolean;
-  uptime: number;
-}
+import { Health } from "./health.ts";
 
 export class MetaServer {
   private config: ServerConfig;
 
-  private started = new Date();
+  private handlers: Record<string, MetaHandler> = {};
 
   constructor(config: ServerConfig) {
     this.config = { ...config };
+
+    this.apply(new Health());
   }
 
   get metaPort() {
@@ -29,8 +28,10 @@ export class MetaServer {
     return this.config.signal;
   }
 
-  get startTime() {
-    return this.started.getTime();
+  private apply(hnd: MetaHandler) {
+    const key = `${hnd.method} ${hnd.path}`;
+
+    this.handlers[key] = hnd;
   }
 
   async serve() {
@@ -50,15 +51,17 @@ export class MetaServer {
       .info`stopped serving metainfo at ${srv.addr.hostname}:${srv.addr.port}`;
   }
 
-  private handle(req: Request) {
+  private async handle(req: Request) {
+    const method = req.method;
     const path = new URL(req.url).pathname;
+    const key = `${method} ${path}`;
+    const handler = this.handlers[key];
 
-    switch (path) {
-      case "/health":
-        return this.health();
+    if (!handler) {
+      return new NotFound().toResponse();
     }
 
-    return new NotFound().toResponse();
+    return await handler.handle(req);
   }
 
   private error(err: unknown): Response {
@@ -68,22 +71,5 @@ export class MetaServer {
       return err.toResponse();
     }
     return new InternalServerError().toResponse();
-  }
-
-  private health() {
-    const stats = {
-      healthy: true,
-      uptime: Date.now() - this.startTime,
-    }
-
-    const body = new TextEncoder().encode(JSON.stringify(stats));
-    const len = body.length;
-    return new Response(body, {
-      status: StatusCode.Ok,
-      headers: {
-        "Content-Type": "application/json",
-        "Content-Length": len.toString(),
-      },
-    });
   }
 }
