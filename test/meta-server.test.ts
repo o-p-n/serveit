@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, mock } from "./deps.ts";
+import { afterEach, beforeEach, describe, expect, FakeTime, it, mock } from "./deps.ts";
 import { BoundSpy, createBoundSpy } from "./bound-spy.ts";
 
 import log from "../src/logger.ts";
@@ -8,13 +8,28 @@ import { NotFound } from "../src/errors.ts";
 
 describe("meta-server", () => {
   const logger = log();
+  const seedTime = new Date();
 
+  let clock: FakeTime;
+
+  beforeEach(() => {
+    clock = new FakeTime(seedTime);
+  });
+  afterEach(() => {
+    clock.restore();
+  });
+  
   describe("MetaServer", () => {
     const abort = new AbortController();
-    const server = new MetaServer({
-      ...DEFAULT_CONFIG,
-      rootDir: "/root/app",
-      signal: abort.signal,
+ 
+    let server: MetaServer;
+
+    beforeEach(() => {
+      server = new MetaServer({
+        ...DEFAULT_CONFIG,
+        rootDir: "/root/app",
+        signal: abort.signal,
+      });
     });
 
     describe("ctor", () => {
@@ -110,6 +125,67 @@ describe("meta-server", () => {
         const result: Response = spyError.call(err);
         expect(result.status).to.equal(500);
         expect(result.statusText).to.equal("internal server error");
+      });
+    });
+
+    describe("handle()", () => {
+      let spyHandle: BoundSpy<(req: Request) => Response>;
+      let spyHealth: mock.Spy;
+
+      beforeEach(() => {
+        spyHandle = createBoundSpy(server, "handle");
+        spyHealth = mock.stub(Object.getPrototypeOf(server), "health", (_) => new Response(null, {
+          status: 200,
+          statusText: "ok",
+        }));
+      });
+      afterEach(() => {
+        spyHandle.spy.restore();
+        spyHealth.restore();
+      });
+
+      it("handls 'GET /health'", () => {
+        const req = new Request("http://example.com:12676/health");
+        spyHandle.call(req);
+
+        expect(spyHealth).to.have.been.called();
+      });
+
+      it("returns 404 for unknown path", () => {
+        const req = new Request("http://example.com:12676/not-a-path");
+        const rsp = spyHandle.call(req);
+
+        const expected = new NotFound();
+        expect(rsp.status).to.equal(expected.code);
+        expect(rsp.statusText).to.equal(expected.message);
+      });
+    });
+
+    describe("meta endpoints", () => {
+      describe("/health", () => {
+        let spyHealth: BoundSpy<() => Response>;
+
+        beforeEach(() => {
+          spyHealth = createBoundSpy(server, "health");
+        });
+        afterEach(() => {
+          spyHealth.spy.restore();
+        });
+
+        it("returns health stats", async () => {
+          clock.tick(60000);
+          const rsp = spyHealth.call();
+
+          expect(rsp.status).to.equal(200);
+          expect(rsp.headers.get("Content-Type")).to.equal("application/json");
+          expect(rsp.headers.get("Content-Length")).to.equal("31");
+
+          const body = await rsp.json();
+          expect(body).to.deep.equal({
+            healthy: true,
+            uptime: 60000,
+          });
+        });
       });
     });
   });
