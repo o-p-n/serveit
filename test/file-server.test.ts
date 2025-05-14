@@ -49,10 +49,9 @@ describe("file-server", () => {
   describe("Server", () => {
     const abort = new AbortController();
     const server = new Server({
+      ...DEFAULT_CONFIG,
       rootDir: "/root/app",
-      port: 4000,
       signal: abort.signal,
-      logLevel: DEFAULT_CONFIG.logLevel,
     });
 
     describe("ctor", () => {

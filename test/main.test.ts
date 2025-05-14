@@ -4,6 +4,7 @@ import { type LogLevel } from "@logtape/logtape";
 import { _internals, main } from "../src/main.ts";
 import log from "../src/logger.ts";
 import { Server } from "../src/file-server.ts";
+import { DEFAULT_CONFIG } from "../src/config.ts";
 
 describe("main", () => {
   const logger = log();
@@ -18,8 +19,8 @@ describe("main", () => {
 
       spyLoad = mock.stub(_internals, "load", () =>
         Promise.resolve({
+          ...DEFAULT_CONFIG,
           rootDir: "/root/app",
-          port: 4000,
           logLevel: "info" as LogLevel,
         }));
       spyServe = mock.stub(Server.prototype, "serve", () => Promise.resolve());

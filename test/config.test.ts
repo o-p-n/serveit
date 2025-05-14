@@ -3,7 +3,7 @@ import { expect, mock } from "./deps.ts";
 
 import { resolve } from "@std/path";
 
-import { _internals, load } from "../src/config.ts";
+import { _internals, DEFAULT_CONFIG, load } from "../src/config.ts";
 
 class MockEnv implements Deno.Env {
   #data: Record<string, string>;
@@ -59,6 +59,7 @@ describe("config", () => {
       expect(result).to.deep.equal({
         rootDir: "/app/web",
         port: 4000,
+        metaPort: 12676,
         logLevel: "info",
       });
       expect(spyResolve).to.be.deep.calledWith(["."]);
@@ -68,12 +69,14 @@ describe("config", () => {
       const env = new MockEnv({
         "SERVEIT_ROOT_DIR": "/some/path",
         "SERVEIT_PORT": "5000",
+        "SERVEIT_META_PORT": "12676",
         "SERVEIT_LOG_LEVEL": "ERROR",
       });
       const result = await load(env);
       expect(result).to.deep.equal({
         rootDir: "/some/path",
         port: 5000,
+        metaPort: 12676,
         logLevel: "error",
       });
       expect(spyResolve).to.be.deep.calledWith(["/some/path"]);
@@ -85,8 +88,8 @@ describe("config", () => {
       });
       const result = await load(env);
       expect(result).to.deep.equal({
+        ...DEFAULT_CONFIG,
         rootDir: "/app/web",
-        port: 4000,
         logLevel: null,
       });
     });
@@ -97,8 +100,8 @@ describe("config", () => {
       });
       const result = await load(env);
       expect(result).to.deep.equal({
+        ...DEFAULT_CONFIG,
         rootDir: "/app/web",
-        port: 4000,
         logLevel: "debug",
       });
     });

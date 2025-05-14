@@ -14,18 +14,21 @@ export const _internals = {
 export interface Config {
   rootDir: string;
   port: number;
+  metaPort: number;
   logLevel: LogLevel | null;
 }
 
 export const DEFAULT_CONFIG: Config = {
   rootDir: ".",
   port: 4000,
+  metaPort: 12676,
   logLevel: "info",
 };
 
 export async function load(env: Deno.Env = _internals.env) {
   const rootDirStr = env.get("SERVEIT_ROOT_DIR");
   const portStr = env.get("SERVEIT_PORT");
+  const metaPortStr = env.get("SERVEIT_META_PORT");
   const levelName = env.get("SERVEIT_LOG_LEVEL");
 
   const logLevel = levelName
@@ -45,6 +48,10 @@ export async function load(env: Deno.Env = _internals.env) {
   if (Number.isNaN(port)) {
     throw new Error(`invalid port: ${portStr}`);
   }
+  const metaPort = metaPortStr ? parseInt(metaPortStr!) : DEFAULT_CONFIG.metaPort;
+  if (Number.isNaN(metaPort)) {
+    throw new Error(`invalid meta port: ${metaPortStr}`);
+  }
 
   // dummy await
   await Promise.resolve();
@@ -52,6 +59,7 @@ export async function load(env: Deno.Env = _internals.env) {
   return {
     rootDir,
     port,
+    metaPort,
     logLevel,
   };
 }
