@@ -7,7 +7,7 @@ import { HttpError, InternalServerError, NotFound } from "../errors.ts";
 import { ServerConfig } from "../file-server.ts";
 import { MetaHandler } from "./basics.ts";
 
-import { Health } from "./health.ts";
+import { HealthHandler } from "./health.ts";
 
 export class MetaServer {
   private config: ServerConfig;
@@ -17,7 +17,7 @@ export class MetaServer {
   constructor(config: ServerConfig) {
     this.config = { ...config };
 
-    this.apply(new Health());
+    this.apply(HealthHandler.open());
   }
 
   get metaPort() {

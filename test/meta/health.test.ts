@@ -1,6 +1,6 @@
 
 import { StatusCode } from "../../src/constants.ts";
-import { Health } from "../../src/meta/health.ts";
+import { HealthHandler } from "../../src/meta/health.ts";
 import { afterEach, beforeEach, describe, expect, FakeTime, it } from "../deps.ts";
 
 describe("meta/health", () => {
@@ -16,10 +16,10 @@ describe("meta/health", () => {
   });
 
   describe("Health", () => {
-    let health: Health;
+    let health: HealthHandler;
 
     beforeEach(() => {
-      health = new Health();
+      health = new HealthHandler();
     });
 
     describe("ctor", () => {

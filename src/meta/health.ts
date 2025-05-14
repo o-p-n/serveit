@@ -7,7 +7,9 @@ export interface HealthStats {
   uptime: number;
 }
 
-export class Health implements MetaHandler {
+let instance: HealthHandler | undefined = undefined;
+
+export class HealthHandler implements MetaHandler {
   readonly path = "/health";
   readonly method = "GET";
   readonly started = Date.now();
@@ -29,5 +31,12 @@ export class Health implements MetaHandler {
     });
 
     return await Promise.resolve(rsp);
+  }
+
+  static open(): HealthHandler {
+    if (!instance) {
+      instance = new HealthHandler();
+    }
+    return instance;
   }
 }

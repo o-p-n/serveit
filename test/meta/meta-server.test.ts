@@ -5,7 +5,7 @@ import log from "../../src/logger.ts";
 import { MetaServer } from "../../src/meta/meta-server.ts";
 import { DEFAULT_CONFIG } from "../../src/config.ts";
 import { NotFound } from "../../src/errors.ts";
-import { Health } from "../../src/meta/health.ts";
+import { HealthHandler } from "../../src/meta/health.ts";
 
 describe("meta-server", () => {
   const logger = log();
@@ -135,7 +135,7 @@ describe("meta-server", () => {
 
       beforeEach(() => {
         spyHandle = createBoundSpy(server, "handle");
-        spyHealth = mock.stub(Health.prototype, "handle", (_) => Promise.resolve(new Response(null, {
+        spyHealth = mock.stub(HealthHandler.prototype, "handle", (_) => Promise.resolve(new Response(null, {
           status: 200,
           statusText: "ok",
         })));
