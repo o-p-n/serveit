@@ -13,6 +13,8 @@ import {
 } from "./errors.ts";
 import { common, resolve } from "@std/path";
 
+import { metrics } from "./meta/metrics.ts";
+
 const ALLOWED_METHODS = [
   "GET",
   "HEAD",
@@ -73,6 +75,12 @@ export class Server {
     const path = new URL(req.url).pathname;
     const etags = req.headers.get("If-None-Match") || undefined;
 
+    const { totalRequests, totalResponses } = metrics();
+
+    totalRequests.labels({
+      path,
+      method,
+    }).inc();
     let rsp: Response;
     try {
       switch (method) {
@@ -98,6 +106,10 @@ export class Server {
     }
     const size = rsp.headers.get("Content-Length") || "0";
     log().info`${method} ${path} - ${rsp.status} ${size}`;
+    totalResponses.labels({
+      path,
+      status: rsp.status.toString(),
+    }).inc();
 
     return rsp;
   }
