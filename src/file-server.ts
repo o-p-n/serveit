@@ -75,8 +75,9 @@ export class Server {
     const path = new URL(req.url).pathname;
     const etags = req.headers.get("If-None-Match") || undefined;
 
-    const { totalRequests, totalResponses } = metrics();
+    const { duration, totalRequests, totalResponses } = metrics();
 
+    const start = Date.now();
     totalRequests.labels({
       path,
       method,
@@ -104,12 +105,17 @@ export class Server {
     } catch (err) {
       rsp = this.error(err);
     }
+    const stop = Date.now();
+
     const size = rsp.headers.get("Content-Length") || "0";
     log().info`${method} ${path} - ${rsp.status} ${size}`;
     totalResponses.labels({
       path,
       status: rsp.status.toString(),
     }).inc();
+    duration.labels({
+      method,
+    }).observe(stop - start);
 
     return rsp;
   }

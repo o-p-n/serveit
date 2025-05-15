@@ -20,6 +20,7 @@ describe("meta/metrics", () => {
         expect(server.totalResponses.description).to.equal(
           "serveit_responses_total",
         );
+        expect(server.duration.description).to.equal("serveit_duration");
       });
     });
 
@@ -46,13 +47,16 @@ describe("meta/metrics", () => {
 
       it("responds with recorded metrics", async () => {
         server.totalRequests.labels({
-          "method": "GET",
-          "path": "/",
+          method: "GET",
+          path: "/",
         }).inc();
         server.totalResponses.labels({
-          "status": "200",
-          "path": "/",
+          status: "200",
+          path: "/",
         }).inc();
+        server.duration.labels({
+          method: "GET",
+        }).observe(5);
 
         const req = new Request(new URL("http://example.com:12676/metrics"));
         const rsp = await server.handle(req);
@@ -70,6 +74,16 @@ serveit_requests_total{method="GET",path="/"} 1
 # HELP serveit_responses_total total number of responses sent
 # TYPE serveit_responses_total counter
 serveit_responses_total{path="/",status="200"} 1
+
+# HELP serveit_duration duration between request and response (in ms)
+# TYPE serveit_duration summary
+serveit_duration{method="GET",quantile="0.25"} 5
+serveit_duration{method="GET",quantile="0.5"} 5
+serveit_duration{method="GET",quantile="0.75"} 5
+serveit_duration{method="GET",quantile="0.9"} 5
+serveit_duration{method="GET",quantile="1"} 5
+serveit_duration_sum{method="GET"} 5
+serveit_duration_count{method="GET"} 1
 `,
         );
       });

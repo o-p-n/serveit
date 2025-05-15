@@ -1,11 +1,12 @@
 import { StatusCode } from "../constants.ts";
 import { MetaHandler } from "./basics.ts";
 
-import { Counter, Registry } from "@wok/prometheus";
+import { Counter, Registry, Summary } from "@wok/prometheus";
 
 export interface Metrics {
   readonly totalRequests: Counter;
   readonly totalResponses: Counter;
+  readonly duration: Summary;
 }
 
 let instance: MetricsHandler | undefined = undefined;
@@ -23,6 +24,7 @@ export class MetricsHandler implements MetaHandler, Metrics {
   private registry: Registry;
   readonly totalRequests: Counter;
   readonly totalResponses: Counter;
+  readonly duration: Summary;
 
   constructor() {
     this.registry = new Registry();
@@ -37,6 +39,13 @@ export class MetricsHandler implements MetaHandler, Metrics {
       name: "serveit_responses_total",
       help: "total number of responses sent",
       labels: ["path", "status"],
+      registry: [this.registry],
+    });
+    this.duration = Summary.with({
+      name: "serveit_duration",
+      help: "duration between request and response (in ms)",
+      labels: ["method"],
+      quantiles: [0.25, 0.50, 0.75, 0.90, 1],
       registry: [this.registry],
     });
   }
