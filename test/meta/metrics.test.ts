@@ -15,12 +15,12 @@ describe("meta/metrics", () => {
         expect(server.method).to.equal("GET");
         expect(server.path).to.equal("/metrics");
         expect(server.totalRequests.description).to.equal(
-          "serveit_requests_total",
+          "serveit_txn_requests_total",
         );
         expect(server.totalResponses.description).to.equal(
-          "serveit_responses_total",
+          "serveit_txn_responses_total",
         );
-        expect(server.duration.description).to.equal("serveit_duration");
+        expect(server.duration.description).to.equal("serveit_txn_duration");
       });
     });
 
@@ -67,23 +67,23 @@ describe("meta/metrics", () => {
 
         const text = await rsp.text();
         expect(text).to.equal(
-          `# HELP serveit_requests_total total number of requests received
-# TYPE serveit_requests_total counter
-serveit_requests_total{method="GET",path="/"} 1
+          `# HELP serveit_txn_requests_total total number of requests received
+# TYPE serveit_txn_requests_total counter
+serveit_txn_requests_total{method="GET",path="/"} 1
 
-# HELP serveit_responses_total total number of responses sent
-# TYPE serveit_responses_total counter
-serveit_responses_total{path="/",status="200"} 1
+# HELP serveit_txn_responses_total total number of responses sent
+# TYPE serveit_txn_responses_total counter
+serveit_txn_responses_total{path="/",status="200"} 1
 
-# HELP serveit_duration duration between request and response (in ms)
-# TYPE serveit_duration summary
-serveit_duration{method="GET",quantile="0.25"} 5
-serveit_duration{method="GET",quantile="0.5"} 5
-serveit_duration{method="GET",quantile="0.75"} 5
-serveit_duration{method="GET",quantile="0.9"} 5
-serveit_duration{method="GET",quantile="1"} 5
-serveit_duration_sum{method="GET"} 5
-serveit_duration_count{method="GET"} 1
+# HELP serveit_txn_duration duration between request and response (in ms)
+# TYPE serveit_txn_duration summary
+serveit_txn_duration{method="GET",quantile="0.25"} 5
+serveit_txn_duration{method="GET",quantile="0.5"} 5
+serveit_txn_duration{method="GET",quantile="0.75"} 5
+serveit_txn_duration{method="GET",quantile="0.9"} 5
+serveit_txn_duration{method="GET",quantile="1"} 5
+serveit_txn_duration_sum{method="GET"} 5
+serveit_txn_duration_count{method="GET"} 1
 `,
         );
       });

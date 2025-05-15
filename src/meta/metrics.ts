@@ -30,19 +30,19 @@ export class MetricsHandler implements MetaHandler, Metrics {
     this.registry = new Registry();
 
     this.totalRequests = Counter.with({
-      name: "serveit_requests_total",
+      name: "serveit_txn_requests_total",
       help: "total number of requests received",
       labels: ["method", "path"],
       registry: [this.registry],
     });
     this.totalResponses = Counter.with({
-      name: "serveit_responses_total",
+      name: "serveit_txn_responses_total",
       help: "total number of responses sent",
       labels: ["path", "status"],
       registry: [this.registry],
     });
     this.duration = Summary.with({
-      name: "serveit_duration",
+      name: "serveit_txn_duration",
       help: "duration between request and response (in ms)",
       labels: ["method"],
       quantiles: [0.25, 0.50, 0.75, 0.90, 1],
