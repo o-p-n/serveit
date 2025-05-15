@@ -38,7 +38,7 @@ export class MetricsHandler implements MetaHandler, Metrics {
       help: "total number of responses sent",
       labels: [ "path", "status" ],
       registry: [ this.registry ],
-    })
+    });
   }
 
   async handle(_req: Request): Promise<Response> {
