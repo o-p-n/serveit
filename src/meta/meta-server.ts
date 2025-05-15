@@ -8,6 +8,7 @@ import { ServerConfig } from "../file-server.ts";
 import { MetaHandler } from "./basics.ts";
 
 import { HealthHandler } from "./health.ts";
+import { MetricsHandler } from "./metrics.ts";
 
 export class MetaServer {
   private config: ServerConfig;
@@ -18,6 +19,7 @@ export class MetaServer {
     this.config = { ...config };
 
     this.apply(HealthHandler.open());
+    this.apply(MetricsHandler.open());
   }
 
   get metaPort() {

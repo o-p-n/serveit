@@ -6,6 +6,8 @@ import { MetaServer } from "../../src/meta/meta-server.ts";
 import { DEFAULT_CONFIG } from "../../src/config.ts";
 import { NotFound } from "../../src/errors.ts";
 import { HealthHandler } from "../../src/meta/health.ts";
+import { Metric } from "@wok/prometheus";
+import { MetricsHandler } from "../../src/meta/metrics.ts";
 
 describe("meta-server", () => {
   const logger = log();
@@ -132,6 +134,7 @@ describe("meta-server", () => {
     describe("handle()", () => {
       let spyHandle: BoundSpy<(req: Request) => Promise<Response>>;
       let spyHealth: mock.Spy;
+      let spyMetrics: mock.Spy;
 
       beforeEach(() => {
         spyHandle = createBoundSpy(server, "handle");
@@ -139,10 +142,15 @@ describe("meta-server", () => {
           status: 200,
           statusText: "ok",
         })));
+        spyMetrics = mock.stub(MetricsHandler.prototype, "handle", (_) => Promise.resolve(new Response(null, {
+          status: 200,
+          statusText: "ok",
+        })));
       });
       afterEach(() => {
         spyHandle.spy.restore();
         spyHealth.restore();
+        spyMetrics.restore();
       });
 
       it("handles 'GET /health'", async () => {
@@ -150,6 +158,13 @@ describe("meta-server", () => {
         await spyHandle.call(req);
 
         expect(spyHealth).to.have.been.called();
+      });
+
+      it("handles 'GET /metrics'", async () => {
+        const req = new Request("http://example.com:12676/metrics");
+        await spyHandle.call(req);
+
+        expect(spyMetrics).to.have.been.called();
       });
 
       it("returns 404 for unknown path", async () => {
