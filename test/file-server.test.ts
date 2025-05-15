@@ -10,8 +10,7 @@ import log from "../src/logger.ts";
 import { Server } from "../src/file-server.ts";
 import { extname } from "@std/path";
 
-import { metrics } from "../src/meta/metrics.ts";
-import { Counter, Metric } from "@wok/prometheus";
+import { Counter } from "@wok/prometheus";
 
 const DEFAULT_CONTENT = ReadableStream.from([new Uint8Array()]);
 function createEntry(path: string) {

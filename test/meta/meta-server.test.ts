@@ -14,7 +14,6 @@ import { MetaServer } from "../../src/meta/meta-server.ts";
 import { DEFAULT_CONFIG } from "../../src/config.ts";
 import { NotFound } from "../../src/errors.ts";
 import { HealthHandler } from "../../src/meta/health.ts";
-import { Metric } from "@wok/prometheus";
 import { MetricsHandler } from "../../src/meta/metrics.ts";
 
 describe("meta-server", () => {
