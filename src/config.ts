@@ -48,7 +48,9 @@ export async function load(env: Deno.Env = _internals.env) {
   if (Number.isNaN(port)) {
     throw new Error(`invalid port: ${portStr}`);
   }
-  const metaPort = metaPortStr ? parseInt(metaPortStr!) : DEFAULT_CONFIG.metaPort;
+  const metaPort = metaPortStr
+    ? parseInt(metaPortStr!)
+    : DEFAULT_CONFIG.metaPort;
   if (Number.isNaN(metaPort)) {
     throw new Error(`invalid meta port: ${metaPortStr}`);
   }

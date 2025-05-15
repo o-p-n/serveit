@@ -1,7 +1,13 @@
-
 import { StatusCode } from "../../src/constants.ts";
 import { HealthHandler } from "../../src/meta/health.ts";
-import { afterEach, beforeEach, describe, expect, FakeTime, it } from "../deps.ts";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  FakeTime,
+  it,
+} from "../deps.ts";
 
 describe("meta/health", () => {
   const seedTime = new Date(1234567890);

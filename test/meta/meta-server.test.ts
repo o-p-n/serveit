@@ -1,4 +1,12 @@
-import { afterEach, beforeEach, describe, expect, FakeTime, it, mock } from "../deps.ts";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  FakeTime,
+  it,
+  mock,
+} from "../deps.ts";
 import { BoundSpy, createBoundSpy } from "../bound-spy.ts";
 
 import log from "../../src/logger.ts";
@@ -21,10 +29,10 @@ describe("meta-server", () => {
   afterEach(() => {
     clock.restore();
   });
-  
+
   describe("MetaServer", () => {
     const abort = new AbortController();
- 
+
     let server: MetaServer;
 
     beforeEach(() => {
@@ -51,22 +59,23 @@ describe("meta-server", () => {
       beforeEach(() => {
         spyLogInfo = mock.spy(logger, "info");
 
-        spyServe = mock.stub(Deno, "serve", (_) => ({
-          finished: Promise.resolve(),
-          addr: {
-            transport: "tcp",
-            hostname: "0.0.0.0",
-            port: 12676,
-          },
-          ref: () => {},
-          unref: () => {},
-          shutdown: () => Promise.resolve(),
-        }) as Deno.HttpServer<Deno.NetAddr>);
+        spyServe = mock.stub(Deno, "serve", (_) =>
+          ({
+            finished: Promise.resolve(),
+            addr: {
+              transport: "tcp",
+              hostname: "0.0.0.0",
+              port: 12676,
+            },
+            ref: () => {},
+            unref: () => {},
+            shutdown: () => Promise.resolve(),
+          }) as Deno.HttpServer<Deno.NetAddr>);
         spyHandle = mock.stub(Object.getPrototypeOf(server), "handle");
         spyError = mock.stub(Object.getPrototypeOf(server), "error");
       });
       afterEach(() => {
-        for (const spy of [ spyLogInfo, spyServe, spyHandle, spyError ]) {
+        for (const spy of [spyLogInfo, spyServe, spyHandle, spyError]) {
           spy.restore();
         }
       });
@@ -138,14 +147,28 @@ describe("meta-server", () => {
 
       beforeEach(() => {
         spyHandle = createBoundSpy(server, "handle");
-        spyHealth = mock.stub(HealthHandler.prototype, "handle", (_) => Promise.resolve(new Response(null, {
-          status: 200,
-          statusText: "ok",
-        })));
-        spyMetrics = mock.stub(MetricsHandler.prototype, "handle", (_) => Promise.resolve(new Response(null, {
-          status: 200,
-          statusText: "ok",
-        })));
+        spyHealth = mock.stub(
+          HealthHandler.prototype,
+          "handle",
+          (_) =>
+            Promise.resolve(
+              new Response(null, {
+                status: 200,
+                statusText: "ok",
+              }),
+            ),
+        );
+        spyMetrics = mock.stub(
+          MetricsHandler.prototype,
+          "handle",
+          (_) =>
+            Promise.resolve(
+              new Response(null, {
+                status: 200,
+                statusText: "ok",
+              }),
+            ),
+        );
       });
       afterEach(() => {
         spyHandle.spy.restore();

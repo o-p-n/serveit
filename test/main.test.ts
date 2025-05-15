@@ -25,8 +25,16 @@ describe("main", () => {
           rootDir: "/root/app",
           logLevel: "info" as LogLevel,
         }));
-      spyFileServe = mock.stub(Server.prototype, "serve", () => Promise.resolve());
-      spyMetaServe = mock.stub(MetaServer.prototype, "serve", () => Promise.resolve());
+      spyFileServe = mock.stub(
+        Server.prototype,
+        "serve",
+        () => Promise.resolve(),
+      );
+      spyMetaServe = mock.stub(
+        MetaServer.prototype,
+        "serve",
+        () => Promise.resolve(),
+      );
       spyAddListener = mock.stub(Deno, "addSignalListener");
     });
 

@@ -14,8 +14,12 @@ describe("meta/metrics", () => {
       it("initializes", () => {
         expect(server.method).to.equal("GET");
         expect(server.path).to.equal("/metrics");
-        expect(server.totalRequests.description).to.equal("serveit_requests_total");
-        expect(server.totalResponses.description).to.equal("serveit_responses_total");
+        expect(server.totalRequests.description).to.equal(
+          "serveit_requests_total",
+        );
+        expect(server.totalResponses.description).to.equal(
+          "serveit_responses_total",
+        );
       });
     });
 
@@ -59,7 +63,7 @@ describe("meta/metrics", () => {
 
         const text = await rsp.text();
         expect(text).to.equal(
-`# HELP serveit_requests_total total number of requests received
+          `# HELP serveit_requests_total total number of requests received
 # TYPE serveit_requests_total counter
 serveit_requests_total{method="GET",path="/"} 1
 

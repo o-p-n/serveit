@@ -119,7 +119,7 @@ export class Server {
     etags?: string,
     preview = false,
   ): Promise<Response> {
-    log().debug`from ${this.config.rootDir}, looking up ${path} ...`
+    log().debug`from ${this.config.rootDir}, looking up ${path} ...`;
     path = join(this.config.rootDir, ".", path);
     if (common([this.rootDir, path]) !== this.rootDir) {
       log().warn`invalid path requested: ${path}`;

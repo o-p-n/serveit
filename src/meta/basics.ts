@@ -1,4 +1,3 @@
-
 export interface MetaHandler {
   readonly path: string;
   readonly method: string;

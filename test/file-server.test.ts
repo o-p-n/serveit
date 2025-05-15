@@ -244,11 +244,19 @@ describe("file-server", () => {
 
       beforeEach(() => {
         const labelResult = {
-          inc() { return 0; },
-          value() { return 0; },
+          inc() {
+            return 0;
+          },
+          value() {
+            return 0;
+          },
         };
         spyMetricCount = mock.stub(labelResult, "inc");
-        spyMetricLabels = mock.stub(Counter.prototype, "labels", (_) => labelResult);
+        spyMetricLabels = mock.stub(
+          Counter.prototype,
+          "labels",
+          (_) => labelResult,
+        );
 
         spyLogInfo = mock.spy(logger, "info");
 
