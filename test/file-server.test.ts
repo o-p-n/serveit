@@ -263,7 +263,11 @@ describe("file-server", () => {
           observe() {},
         };
         spySummaryObserve = mock.stub(summaryLabels, "observe");
-        spySummaryLabels = mock.stub(Summary.prototype, "labels", (_) => summaryLabels);
+        spySummaryLabels = mock.stub(
+          Summary.prototype,
+          "labels",
+          (_) => summaryLabels,
+        );
 
         spyLogInfo = mock.spy(logger, "info");
 
