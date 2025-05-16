@@ -28,9 +28,40 @@ SERVEIT can be configuring via environment variables:
 
 | Option              | Default    | Description                                                  |
 | ------------------- | ---------- | ------------------------------------------------------------ |
-| `SERVEIT_ROOT_DIR`  | `/app/web` | The root directory of files to serve.                        |
-| `SERVEIT_PORT`      | `"4000"`   | The port to serve on.                                        |
+| `SERVEIT_ROOT_DIR`  | `/app/web` | The root directory of files to serve.                         |
+| `SERVEIT_PORT`      | `"4000"`   | The port to serve files on.                                   |
+| `SERVEIT_META_PORT` | `"12676"`  | The port to serve metainfo on.                               |
 | `SERVEIT_LOG_LEVEL` | `"INFO"`   | The level to log at (`ALL` == everything; `OFF` == nothing). |
+
+### OBSERVABILITY
+
+The "main" port (`SERVEIT_PORT`) serves static file content via HTTP.  Observability data is accessible on the "meta" port (`SERVEIT_META_PORT`).  This includes a healthcheck and telemetry metics.
+
+> **!!! WARNING !!!** The meta endpoint can provide potentially privileged information about the service, and therefore should not be publicly accessible.
+
+#### SERVICE HEALTH
+
+The endpoint path `/health` provides healthcheck information about the running SERVEIT.  Since this is a "dead-simple" web server, this endpoint (currently) always returns a `200` status code along with `application/json` content.  The JSON object content has the following properties:
+
+* **`"healthy"`** (_`boolean`_): set to `true` if the service is considered healthy (which is always).
+* **`"updtime"`** (_`number`_): the number of milliseconds that SERVEIT has been running.
+
+This endpoint should be used by the orchestration framework for readiness and/or liveness checks.
+
+#### TELEMETRY METRICS
+
+The endpoint path `/metrics` provides telemetry metfrics about SERVEIT.  The following metrics are reported, formatted as [Prometheus](https://prometheus.io) expects:
+
+* **`serveit_txn_requests_total`** (_counter_): The total number of requests received.  The following labels are used:
+  * **`path`**: the HTTP path of the request
+  * **`method`**: the HTTP method of the request
+
+* **`serveit_txn_responses_total`** (_counter_): The total number of responses sent.  The following labels are used:
+  * **`path`**: The HTTP path from the associated request.
+  * **`status`**: The HTTP status code returned
+
+* **`serveit_duration`** (_summary_): The duration it takes from receiving the requeset to sending the response, in milliseconds.  The following labels are used:
+  * **`method`**: The HTTP method of the request
 
 ## DEVELOPING
 
