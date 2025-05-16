@@ -4,13 +4,16 @@ import { type LogLevel } from "@logtape/logtape";
 import { _internals, main } from "../src/main.ts";
 import log from "../src/logger.ts";
 import { Server } from "../src/file-server.ts";
+import { DEFAULT_CONFIG } from "../src/config.ts";
+import { MetaServer } from "../src/meta/meta-server.ts";
 
 describe("main", () => {
   const logger = log();
   describe("main()", () => {
     let spyLogInfo: mock.Spy;
     let spyLoad: mock.Spy;
-    let spyServe: mock.Spy;
+    let spyFileServe: mock.Spy;
+    let spyMetaServe: mock.Spy;
     let spyAddListener: mock.Spy;
 
     beforeEach(() => {
@@ -18,11 +21,20 @@ describe("main", () => {
 
       spyLoad = mock.stub(_internals, "load", () =>
         Promise.resolve({
+          ...DEFAULT_CONFIG,
           rootDir: "/root/app",
-          port: 4000,
           logLevel: "info" as LogLevel,
         }));
-      spyServe = mock.stub(Server.prototype, "serve", () => Promise.resolve());
+      spyFileServe = mock.stub(
+        Server.prototype,
+        "serve",
+        () => Promise.resolve(),
+      );
+      spyMetaServe = mock.stub(
+        MetaServer.prototype,
+        "serve",
+        () => Promise.resolve(),
+      );
       spyAddListener = mock.stub(Deno, "addSignalListener");
     });
 
@@ -32,7 +44,8 @@ describe("main", () => {
       spyLogInfo.restore();
 
       spyLoad.restore();
-      spyServe.restore();
+      spyFileServe.restore();
+      spyMetaServe.restore();
       spyAddListener.restore();
     });
 
@@ -40,14 +53,16 @@ describe("main", () => {
       _internals.main = false;
 
       await main();
-      expect(spyServe).to.not.have.been.called();
+      expect(spyFileServe).to.not.have.been.called();
+      expect(spyMetaServe).to.not.have.been.called();
     });
 
     it("runs it when main", async () => {
       _internals.main = true;
 
       await main();
-      expect(spyServe).to.have.been.called();
+      expect(spyFileServe).to.have.been.called();
+      expect(spyMetaServe).to.have.been.called();
 
       expect(spyAddListener).to.have.been.called();
       const listenerArgs = spyAddListener.calls[0].args;

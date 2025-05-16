@@ -1,5 +1,5 @@
 {
-  "version": "4",
+  "version": "5",
   "specifiers": {
     "jsr:@logtape/logtape@~0.6.3": "0.6.3",
     "jsr:@std/encoding@^1.0.5": "1.0.5",
@@ -7,6 +7,7 @@
     "jsr:@std/media-types@1": "1.0.3",
     "jsr:@std/path@^1.0.6": "1.0.6",
     "jsr:@std/testing@~0.225.3": "0.225.3",
+    "jsr:@wok/prometheus@^1.0.2": "1.0.2",
     "npm:@types/node@*": "22.5.4"
   },
   "jsr": {
@@ -30,6 +31,9 @@
     },
     "@std/testing@0.225.3": {
       "integrity": "348c24d0479d44ab3dbb4f26170f242e19f24051b45935d4a9e7ca0ab7e37780"
+    },
+    "@wok/prometheus@1.0.2": {
+      "integrity": "8b172f048b7e67a95e9bd77814267ee035bb0cdcc361675ffd697f9463675349"
     }
   },
   "npm": {
@@ -110,7 +114,8 @@
       "jsr:@std/encoding@^1.0.5",
       "jsr:@std/fs@^1.0.4",
       "jsr:@std/media-types@1",
-      "jsr:@std/path@^1.0.6"
+      "jsr:@std/path@^1.0.6",
+      "jsr:@wok/prometheus@^1.0.2"
     ]
   }
 }

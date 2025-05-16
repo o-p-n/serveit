@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from "./deps.ts";
+import { BoundSpy, createBoundSpy } from "./bound-spy.ts";
 
 import { typeByExtension } from "@std/media-types";
 import { NotFound } from "../src/errors.ts";
@@ -8,6 +9,8 @@ import { DEFAULT_CONFIG } from "../src/config.ts";
 import log from "../src/logger.ts";
 import { Server } from "../src/file-server.ts";
 import { extname } from "@std/path";
+
+import { Counter, Summary } from "@wok/prometheus";
 
 const DEFAULT_CONTENT = ReadableStream.from([new Uint8Array()]);
 function createEntry(path: string) {
@@ -26,33 +29,15 @@ function createEntry(path: string) {
   return entry;
 }
 
-// deno-lint-ignore no-explicit-any
-type Fn = (...args: any[]) => any;
-interface BoundSpy<fn = Fn> {
-  spy: mock.Spy;
-  call: fn;
-}
-// deno-lint-ignore no-explicit-any
-function createBoundSpy<fn>(src: any, method: string): BoundSpy<fn> {
-  const spy = mock.spy(Object.getPrototypeOf(src), method);
-  const call: fn = spy.bind(src) as fn;
-
-  return {
-    spy,
-    call,
-  };
-}
-
 describe("file-server", () => {
   const logger = log();
 
   describe("Server", () => {
     const abort = new AbortController();
     const server = new Server({
+      ...DEFAULT_CONFIG,
       rootDir: "/root/app",
-      port: 4000,
       signal: abort.signal,
-      logLevel: DEFAULT_CONFIG.logLevel,
     });
 
     describe("ctor", () => {
@@ -252,9 +237,38 @@ describe("file-server", () => {
     describe("handle()", () => {
       let spyLogInfo: mock.Spy;
       let spyLookup: mock.Spy;
+      let spyCounterLabels: mock.Spy;
+      let spyCounterInc: mock.Spy;
+      let spySummaryLabels: mock.Spy;
+      let spySummaryObserve: mock.Spy;
       let spyHandle: BoundSpy<(req: Request) => Promise<Response>>;
 
       beforeEach(() => {
+        const counterLabels = {
+          inc() {
+            return 0;
+          },
+          value() {
+            return 0;
+          },
+        };
+        spyCounterInc = mock.stub(counterLabels, "inc");
+        spyCounterLabels = mock.stub(
+          Counter.prototype,
+          "labels",
+          (_) => counterLabels,
+        );
+
+        const summaryLabels = {
+          observe() {},
+        };
+        spySummaryObserve = mock.stub(summaryLabels, "observe");
+        spySummaryLabels = mock.stub(
+          Summary.prototype,
+          "labels",
+          (_) => summaryLabels,
+        );
+
         spyLogInfo = mock.spy(logger, "info");
 
         const fnLookup = (path: string, etags?: string): Promise<Response> => {
@@ -302,6 +316,10 @@ describe("file-server", () => {
       afterEach(() => {
         spyLogInfo.restore();
         spyLookup.restore();
+        spyCounterLabels.restore();
+        spyCounterInc.restore();
+        spySummaryLabels.restore();
+        spySummaryObserve.restore();
         spyHandle.spy.restore();
       });
 
@@ -323,6 +341,26 @@ describe("file-server", () => {
           405,
           "0",
         ]);
+
+        expect(spyCounterLabels).to.have.been.deep.calledWith([
+          {
+            method: "DELETE",
+            path: "/file.txt",
+          },
+        ]);
+        expect(spyCounterLabels).to.have.been.deep.calledWith([
+          {
+            path: "/file.txt",
+            status: "405",
+          },
+        ]);
+        expect(spyCounterInc).to.have.been.called(2);
+        expect(spySummaryLabels).to.have.been.deep.calledWith([
+          {
+            method: "DELETE",
+          },
+        ]);
+        expect(spySummaryObserve).to.have.been.called(1);
       });
 
       it("handles an OPTIONS request", async () => {
@@ -343,6 +381,27 @@ describe("file-server", () => {
           204,
           "0",
         ]);
+
+        expect(spyCounterLabels).to.have.been.deep.calledWith([
+          {
+            method: "OPTIONS",
+            path: "/",
+          },
+        ]);
+        expect(spyCounterLabels).to.have.been.deep.calledWith([
+          {
+            status: "204",
+            path: "/",
+          },
+        ]);
+        expect(spyCounterInc).to.have.been.called(2);
+
+        expect(spySummaryLabels).to.have.been.deep.calledWith([
+          {
+            method: "OPTIONS",
+          },
+        ]);
+        expect(spySummaryObserve).to.have.been.called(1);
       });
 
       describe("GET requests", () => {
@@ -371,6 +430,27 @@ describe("file-server", () => {
             200,
             "1000",
           ]);
+
+          expect(spyCounterLabels).to.have.been.deep.calledWith([
+            {
+              method: "GET",
+              path: "/file.txt",
+            },
+          ]);
+          expect(spyCounterLabels).to.have.been.deep.calledWith([
+            {
+              path: "/file.txt",
+              status: "200",
+            },
+          ]);
+          expect(spyCounterInc).to.have.been.called(2);
+
+          expect(spySummaryLabels).to.have.been.deep.calledWith([
+            {
+              method: "GET",
+            },
+          ]);
+          expect(spySummaryObserve).to.have.been.called(1);
         });
         it("handles a GET of a known file path w/ mismatch ETag", async () => {
           const req = new Request(new URL("https://example.com/file.txt"), {
@@ -400,6 +480,27 @@ describe("file-server", () => {
             200,
             "1000",
           ]);
+
+          expect(spyCounterLabels).to.have.been.deep.calledWith([
+            {
+              method: "GET",
+              path: "/file.txt",
+            },
+          ]);
+          expect(spyCounterLabels).to.have.been.deep.calledWith([
+            {
+              path: "/file.txt",
+              status: "200",
+            },
+          ]);
+          expect(spyCounterInc).to.have.been.called(2);
+
+          expect(spySummaryLabels).to.have.been.deep.calledWith([
+            {
+              method: "GET",
+            },
+          ]);
+          expect(spySummaryObserve).to.have.been.called(1);
         });
         it("handles a GET of a known file path w/ matching ETag", async () => {
           const req = new Request(new URL("https://example.com/file.txt"), {
@@ -429,6 +530,27 @@ describe("file-server", () => {
             304,
             "1000",
           ]);
+
+          expect(spyCounterLabels).to.have.been.deep.calledWith([
+            {
+              method: "GET",
+              path: "/file.txt",
+            },
+          ]);
+          expect(spyCounterLabels).to.have.been.deep.calledWith([
+            {
+              path: "/file.txt",
+              status: "304",
+            },
+          ]);
+          expect(spyCounterInc).to.have.been.called(2);
+
+          expect(spySummaryLabels).to.have.been.deep.calledWith([
+            {
+              method: "GET",
+            },
+          ]);
+          expect(spySummaryObserve).to.have.been.called(1);
         });
         it("handles a GET of a known directory path", async () => {
           const req = new Request(new URL("https://example.com/"), {
@@ -455,6 +577,27 @@ describe("file-server", () => {
             200,
             "1000",
           ]);
+
+          expect(spyCounterLabels).to.have.been.deep.calledWith([
+            {
+              method: "GET",
+              path: "/",
+            },
+          ]);
+          expect(spyCounterLabels).to.have.been.deep.calledWith([
+            {
+              path: "/",
+              status: "200",
+            },
+          ]);
+          expect(spyCounterInc).to.have.been.called(2);
+
+          expect(spySummaryLabels).to.have.been.deep.calledWith([
+            {
+              method: "GET",
+            },
+          ]);
+          expect(spySummaryObserve).to.have.been.called(1);
         });
         it("handles a GET of an unknown path", async () => {
           const req = new Request(new URL("https://example.com/unknown.txt"), {
@@ -478,6 +621,27 @@ describe("file-server", () => {
             404,
             "0",
           ]);
+
+          expect(spyCounterLabels).to.have.been.deep.calledWith([
+            {
+              method: "GET",
+              path: "/unknown.txt",
+            },
+          ]);
+          expect(spyCounterLabels).to.have.been.deep.calledWith([
+            {
+              path: "/unknown.txt",
+              status: "404",
+            },
+          ]);
+          expect(spyCounterInc).to.have.been.called(2);
+
+          expect(spySummaryLabels).to.have.been.deep.calledWith([
+            {
+              method: "GET",
+            },
+          ]);
+          expect(spySummaryObserve).to.have.been.called(1);
         });
       });
 
@@ -507,6 +671,27 @@ describe("file-server", () => {
             200,
             "1000",
           ]);
+
+          expect(spyCounterLabels).to.have.been.deep.calledWith([
+            {
+              method: "HEAD",
+              path: "/file.txt",
+            },
+          ]);
+          expect(spyCounterLabels).to.have.been.deep.calledWith([
+            {
+              path: "/file.txt",
+              status: "200",
+            },
+          ]);
+          expect(spyCounterInc).to.have.been.called(2);
+
+          expect(spySummaryLabels).to.have.been.deep.calledWith([
+            {
+              method: "HEAD",
+            },
+          ]);
+          expect(spySummaryObserve).to.have.been.called(1);
         });
         it("handles a HEAD  of a known file path w/ mismatch ETag", async () => {
           const req = new Request(new URL("https://example.com/file.txt"), {
@@ -565,6 +750,27 @@ describe("file-server", () => {
             304,
             "1000",
           ]);
+
+          expect(spyCounterLabels).to.have.been.deep.calledWith([
+            {
+              method: "HEAD",
+              path: "/file.txt",
+            },
+          ]);
+          expect(spyCounterLabels).to.have.been.deep.calledWith([
+            {
+              path: "/file.txt",
+              status: "304",
+            },
+          ]);
+          expect(spyCounterInc).to.have.been.called(2);
+
+          expect(spySummaryLabels).to.have.been.deep.calledWith([
+            {
+              method: "HEAD",
+            },
+          ]);
+          expect(spySummaryObserve).to.have.been.called(1);
         });
         it("handles a HEAD  of a known directory path", async () => {
           const req = new Request(new URL("https://example.com/"), {
@@ -591,6 +797,27 @@ describe("file-server", () => {
             200,
             "1000",
           ]);
+
+          expect(spyCounterLabels).to.have.been.deep.calledWith([
+            {
+              method: "HEAD",
+              path: "/",
+            },
+          ]);
+          expect(spyCounterLabels).to.have.been.deep.calledWith([
+            {
+              path: "/",
+              status: "200",
+            },
+          ]);
+          expect(spyCounterInc).to.have.been.called(2);
+
+          expect(spySummaryLabels).to.have.been.deep.calledWith([
+            {
+              method: "HEAD",
+            },
+          ]);
+          expect(spySummaryObserve).to.have.been.called(1);
         });
         it("handles a HEAD of an unknown path", async () => {
           const req = new Request(new URL("https://example.com/unknown.txt"), {
@@ -614,6 +841,27 @@ describe("file-server", () => {
             404,
             "0",
           ]);
+
+          expect(spyCounterLabels).to.have.been.deep.calledWith([
+            {
+              method: "HEAD",
+              path: "/unknown.txt",
+            },
+          ]);
+          expect(spyCounterLabels).to.have.been.deep.calledWith([
+            {
+              path: "/unknown.txt",
+              status: "404",
+            },
+          ]);
+          expect(spyCounterInc).to.have.been.called(2);
+
+          expect(spySummaryLabels).to.have.been.deep.calledWith([
+            {
+              method: "HEAD",
+            },
+          ]);
+          expect(spySummaryObserve).to.have.been.called(1);
         });
       });
     });

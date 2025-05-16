@@ -11,7 +11,9 @@ import {
   MethodNotAllowed,
   NotFound,
 } from "./errors.ts";
-import { common, resolve } from "@std/path";
+import { common, join } from "@std/path";
+
+import { metrics } from "./meta/metrics.ts";
 
 const ALLOWED_METHODS = [
   "GET",
@@ -73,6 +75,13 @@ export class Server {
     const path = new URL(req.url).pathname;
     const etags = req.headers.get("If-None-Match") || undefined;
 
+    const { duration, totalRequests, totalResponses } = metrics();
+
+    const start = Date.now();
+    totalRequests.labels({
+      path,
+      method,
+    }).inc();
     let rsp: Response;
     try {
       switch (method) {
@@ -96,8 +105,17 @@ export class Server {
     } catch (err) {
       rsp = this.error(err);
     }
+    const stop = Date.now();
+
     const size = rsp.headers.get("Content-Length") || "0";
     log().info`${method} ${path} - ${rsp.status} ${size}`;
+    totalResponses.labels({
+      path,
+      status: rsp.status.toString(),
+    }).inc();
+    duration.labels({
+      method,
+    }).observe(stop - start);
 
     return rsp;
   }
@@ -107,7 +125,7 @@ export class Server {
     etags?: string,
     preview = false,
   ): Promise<Response> {
-    path = resolve(this.config.rootDir, path);
+    path = join(this.config.rootDir, path);
     if (common([this.rootDir, path]) !== this.rootDir) {
       log().warn`invalid path requested: ${path}`;
       return new NotFound().toResponse();

@@ -5,6 +5,7 @@
 import log, { setup } from "./logger.ts";
 import { load } from "./config.ts";
 import { Server } from "./file-server.ts";
+import { MetaServer } from "./meta/meta-server.ts";
 
 export const _internals = {
   load,
@@ -24,11 +25,17 @@ export async function main() {
     abort.abort();
   });
 
-  const srv = new Server({
+  const srvConfig = {
     ...config,
     signal,
-  });
-  await srv.serve();
+  };
+  const srv = new Server(srvConfig);
+  const meta = new MetaServer(srvConfig);
+
+  await Promise.allSettled([
+    srv.serve(),
+    meta.serve(),
+  ]);
   log().info("... stopped");
 }
 
