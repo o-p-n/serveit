@@ -20,6 +20,7 @@
       "program": "${file}",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
+      "experimentalNetworking": "off",
       "runtimeArgs": [
         "test",
         "--inspect-wait",
