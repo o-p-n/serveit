@@ -30,7 +30,7 @@ SERVEIT can be configuring via environment variables:
 | ------------------- | ---------- | ------------------------------------------------------------ |
 | `SERVEIT_ROOT_DIR`  | `/app/web` | The root directory of files to serve.                         |
 | `SERVEIT_PORT`      | `"4000"`   | The port to serve files on.                                   |
-| `SERVEIT_META_PORT` | `"12676"`  | The port to serve metainfo on.                               |
+| `SERVEIT_META_PORT` | `"9090"`  | The port to serve metainfo on.                               |
 | `SERVEIT_LOG_LEVEL` | `"INFO"`   | The level to log at (`ALL` == everything; `OFF` == nothing). |
 
 ### OBSERVABILITY

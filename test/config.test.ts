@@ -59,7 +59,7 @@ describe("config", () => {
       expect(result).to.deep.equal({
         rootDir: "/app/web",
         port: 4000,
-        metaPort: 12676,
+        metaPort: 9090,
         logLevel: "info",
       });
       expect(spyResolve).to.be.deep.calledWith(["."]);
@@ -69,14 +69,14 @@ describe("config", () => {
       const env = new MockEnv({
         "SERVEIT_ROOT_DIR": "/some/path",
         "SERVEIT_PORT": "5000",
-        "SERVEIT_META_PORT": "12676",
+        "SERVEIT_META_PORT": "8001",
         "SERVEIT_LOG_LEVEL": "ERROR",
       });
       const result = await load(env);
       expect(result).to.deep.equal({
         rootDir: "/some/path",
         port: 5000,
-        metaPort: 12676,
+        metaPort: 8001,
         logLevel: "error",
       });
       expect(spyResolve).to.be.deep.calledWith(["/some/path"]);

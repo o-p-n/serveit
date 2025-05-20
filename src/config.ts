@@ -21,7 +21,7 @@ export interface Config {
 export const DEFAULT_CONFIG: Config = {
   rootDir: ".",
   port: 4000,
-  metaPort: 12676,
+  metaPort: 9090,
   logLevel: "info",
 };
 

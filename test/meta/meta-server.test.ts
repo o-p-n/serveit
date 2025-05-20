@@ -44,7 +44,7 @@ describe("meta-server", () => {
 
     describe("ctor", () => {
       it("saves the config", () => {
-        expect(server.metaPort).to.equal(12676);
+        expect(server.metaPort).to.equal(9090);
       });
     });
 
@@ -64,7 +64,7 @@ describe("meta-server", () => {
             addr: {
               transport: "tcp",
               hostname: "0.0.0.0",
-              port: 12676,
+              port: 9090,
             },
             ref: () => {},
             unref: () => {},
@@ -84,7 +84,7 @@ describe("meta-server", () => {
         expect(spyLogInfo).to.have.been.deep.calledWith([
           ["stopped serving metainfo at ", ":", ""],
           "0.0.0.0",
-          12676,
+          9090,
         ]);
 
         const args = spyServe.calls[0].args;
@@ -93,7 +93,7 @@ describe("meta-server", () => {
         const opts = args[0];
         expect(opts.handler).to.exist();
         expect(opts.onListen).to.exist();
-        expect(opts.port).to.equal(12676);
+        expect(opts.port).to.equal(9090);
         expect(opts.signal).to.equal(abort.signal);
 
         opts.handler();
@@ -105,12 +105,12 @@ describe("meta-server", () => {
         opts.onListen({
           transport: "tcp",
           hostname: "0.0.0.0",
-          port: 12676,
+          port: 9090,
         });
         expect(spyLogInfo).to.have.been.deep.calledWith([
           ["now serving metainfo at ", ":", ""],
           "0.0.0.0",
-          12676,
+          9090,
         ]);
       });
     });
@@ -176,21 +176,21 @@ describe("meta-server", () => {
       });
 
       it("handles 'GET /health'", async () => {
-        const req = new Request("http://example.com:12676/health");
+        const req = new Request("http://example.com:9090/health");
         await spyHandle.call(req);
 
         expect(spyHealth).to.have.been.called();
       });
 
       it("handles 'GET /metrics'", async () => {
-        const req = new Request("http://example.com:12676/metrics");
+        const req = new Request("http://example.com:9090/metrics");
         await spyHandle.call(req);
 
         expect(spyMetrics).to.have.been.called();
       });
 
       it("returns 404 for unknown path", async () => {
-        const req = new Request("http://example.com:12676/not-a-path");
+        const req = new Request("http://example.com:9090/not-a-path");
         const rsp = await spyHandle.call(req);
 
         const expected = new NotFound();

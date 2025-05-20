@@ -34,7 +34,7 @@ describe("meta/metrics", () => {
 
     describe("handle()", () => {
       it("responds with empty when no recorded metrics", async () => {
-        const req = new Request(new URL("http://example.com:12676/metrics"));
+        const req = new Request(new URL("http://example.com:9090/metrics"));
         const rsp = await server.handle(req);
 
         expect(rsp.status).to.equal(StatusCode.Ok);
@@ -58,7 +58,7 @@ describe("meta/metrics", () => {
           method: "GET",
         }).observe(5);
 
-        const req = new Request(new URL("http://example.com:12676/metrics"));
+        const req = new Request(new URL("http://example.com:9090/metrics"));
         const rsp = await server.handle(req);
 
         expect(rsp.status).to.equal(200);

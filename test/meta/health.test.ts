@@ -38,7 +38,7 @@ describe("meta/health", () => {
 
     describe("handle()", () => {
       it("responds with healthy stats", async () => {
-        const req = new Request(new URL("http://example.com:12676/health"));
+        const req = new Request(new URL("http://example.com:9090/health"));
 
         clock.tick(1000);
         const rsp = await health.handle(req);
