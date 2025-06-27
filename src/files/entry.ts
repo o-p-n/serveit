@@ -8,8 +8,8 @@ import { exists } from "@std/fs";
 import { typeByExtension } from "@std/media-types";
 import { extname, resolve } from "@std/path";
 
-import { NotFound } from "./errors.ts";
-import log from "./logger.ts";
+import { NotFound } from "../errors.ts";
+import log from "../logger.ts";
 
 export const _internals = {
   open: Deno.open,

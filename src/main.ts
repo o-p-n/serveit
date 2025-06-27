@@ -4,8 +4,8 @@
 
 import log, { setup } from "./logger.ts";
 import { load } from "./config.ts";
-import { Server } from "./file-server.ts";
-import { MetaServer } from "./meta/meta-server.ts";
+import { Server } from "./files/server.ts";
+import { MetaServer } from "./meta/server.ts";
 
 export const _internals = {
   load,

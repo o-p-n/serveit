@@ -3,9 +3,9 @@ import { afterEach, beforeEach, describe, expect, it, mock } from "./deps.ts";
 import { type LogLevel } from "@logtape/logtape";
 import { _internals, main } from "../src/main.ts";
 import log from "../src/logger.ts";
-import { Server } from "../src/file-server.ts";
+import { Server } from "../src/files/server.ts";
 import { DEFAULT_CONFIG } from "../src/config.ts";
-import { MetaServer } from "../src/meta/meta-server.ts";
+import { MetaServer } from "../src/meta/server.ts";
 
 describe("main", () => {
   const logger = log();

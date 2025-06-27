@@ -10,7 +10,7 @@ import {
 import { BoundSpy, createBoundSpy } from "../bound-spy.ts";
 
 import log from "../../src/logger.ts";
-import { MetaServer } from "../../src/meta/meta-server.ts";
+import { MetaServer } from "../../src/meta/server.ts";
 import { DEFAULT_CONFIG } from "../../src/config.ts";
 import { NotFound } from "../../src/errors.ts";
 import { HealthHandler } from "../../src/meta/health.ts";
