@@ -7,8 +7,6 @@ export interface Config {
   logLevel: LogLevel | null;
 }
 
-
 export interface ServerConfig extends Config {
   signal?: AbortSignal;
 }
-
