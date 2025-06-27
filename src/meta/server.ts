@@ -4,7 +4,7 @@
 
 import log from "../logger.ts";
 import { HttpError, InternalServerError, NotFound } from "../errors.ts";
-import { ServerConfig } from "../file-server.ts";
+import { ServerConfig } from "../types.ts";
 import { MetaHandler } from "./basics.ts";
 
 import { HealthHandler } from "./health.ts";

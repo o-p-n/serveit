@@ -5,14 +5,14 @@ import {
   beforeEach,
   describe,
   it,
-} from "./deps.ts";
-import { expect, FakeTime, mock } from "./deps.ts";
+} from "../deps.ts";
+import { expect, FakeTime, mock } from "../deps.ts";
 
 import type { ExistsOptions } from "@std/fs";
-import { _internals, FileEntry } from "../src/file-entry.ts";
-import { NotFound } from "../src/errors.ts";
-import { DEFAULT_CONFIG } from "../src/config.ts";
-import { reset, setup } from "../src/logger.ts";
+import { _internals, FileEntry } from "../../src/files/entry.ts";
+import { NotFound } from "../../src/errors.ts";
+import { DEFAULT_CONFIG } from "../../src/config.ts";
+import { reset, setup } from "../../src/logger.ts";
 
 function toStat(info: Partial<Deno.FileInfo>) {
   return {

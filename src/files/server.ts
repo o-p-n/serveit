@@ -2,28 +2,24 @@
  * @copyright 2024 Matthew A. Miller
  */
 
-import log from "./logger.ts";
-import { Config } from "./config.ts";
-import { FileEntry } from "./file-entry.ts";
+import log from "../logger.ts";
+import { ServerConfig } from "../types.ts";
+import { FileEntry } from "./entry.ts";
 import {
   HttpError,
   InternalServerError,
   MethodNotAllowed,
   NotFound,
-} from "./errors.ts";
+} from "../errors.ts";
 import { common, join } from "@std/path";
 
-import { metrics } from "./meta/metrics.ts";
+import { metrics } from "../meta/metrics.ts";
 
 const ALLOWED_METHODS = [
   "GET",
   "HEAD",
   "OPTIONS",
 ];
-
-export interface ServerConfig extends Config {
-  signal?: AbortSignal;
-}
 
 export class Server {
   private config: ServerConfig;

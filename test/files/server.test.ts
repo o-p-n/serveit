@@ -1,13 +1,13 @@
-import { afterEach, beforeEach, describe, expect, it, mock } from "./deps.ts";
-import { BoundSpy, createBoundSpy } from "./bound-spy.ts";
+import { afterEach, beforeEach, describe, expect, it, mock } from "../deps.ts";
+import { BoundSpy, createBoundSpy } from "../bound-spy.ts";
 
 import { typeByExtension } from "@std/media-types";
-import { NotFound } from "../src/errors.ts";
-import { FileEntry } from "../src/file-entry.ts";
+import { NotFound } from "../../src/errors.ts";
+import { FileEntry } from "../../src/files/entry.ts";
 
-import { DEFAULT_CONFIG } from "../src/config.ts";
-import log from "../src/logger.ts";
-import { Server } from "../src/file-server.ts";
+import { DEFAULT_CONFIG } from "../../src/config.ts";
+import log from "../../src/logger.ts";
+import { Server } from "../../src/files/server.ts";
 import { extname } from "@std/path";
 
 import { Counter, Summary } from "@wok/prometheus";

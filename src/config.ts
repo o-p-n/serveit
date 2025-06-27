@@ -4,19 +4,14 @@
  */
 
 import { resolve } from "@std/path";
-import { type LogLevel, parseLogLevel } from "@logtape/logtape";
+import { parseLogLevel } from "@logtape/logtape";
+
+import { Config } from "./types.ts";
 
 export const _internals = {
   env: Deno.env,
   resolve,
 };
-
-export interface Config {
-  rootDir: string;
-  port: number;
-  metaPort: number;
-  logLevel: LogLevel | null;
-}
 
 export const DEFAULT_CONFIG: Config = {
   rootDir: ".",

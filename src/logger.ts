@@ -8,7 +8,7 @@ import {
   type LogLevel,
   reset,
 } from "@logtape/logtape";
-import { type Config } from "./config.ts";
+import { type Config } from "./types.ts";
 
 export async function setup(config: Config) {
   const level: LogLevel | null = config.logLevel;
