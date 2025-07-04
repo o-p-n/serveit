@@ -56,6 +56,7 @@ describe("files/server", () => {
       let spyHandle: mock.Spy;
       let spyError: mock.Spy;
       let spyUpdateHealth: mock.Spy;
+      let spyIndexCache: mock.Spy;
 
       beforeEach(() => {
         spyLogInfo = mock.spy(logger, "info");
@@ -75,6 +76,7 @@ describe("files/server", () => {
         spyHandle = mock.stub(Object.getPrototypeOf(server), "handle");
         spyError = mock.stub(Object.getPrototypeOf(server), "error");
         spyUpdateHealth = mock.stub(HealthHandler.open(), "update");
+        spyIndexCache = mock.stub(FileCache.prototype, "index");
       });
       afterEach(() => {
         spyLogInfo.restore();
@@ -83,6 +85,7 @@ describe("files/server", () => {
         spyHandle.restore();
         spyError.restore();
         spyUpdateHealth.restore();
+        spyIndexCache.restore();
       });
 
       it("runs the server", async () => {
@@ -96,6 +99,8 @@ describe("files/server", () => {
         expect(spyUpdateHealth).to.have.been.calledWith([
           true,
         ]);
+
+        expect(spyIndexCache).to.have.been.called();
 
         const args = spyServe.calls[0].args;
         expect(args.length).to.equal(1);

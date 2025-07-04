@@ -44,6 +44,9 @@ export class Server {
   }
 
   async serve() {
+    // initialize cache
+    await this.cache.index();
+
     const srv = Deno.serve({
       handler: (req: Request) => this.handle(req),
       port: this.port,
@@ -54,6 +57,8 @@ export class Server {
       ),
       onError: (err: unknown) => this.error(err),
     });
+
+    // make ready and wait
     health().update(true);
     await srv.finished;
 
