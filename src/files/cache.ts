@@ -5,7 +5,7 @@
 import { encodeHex } from "@std/encoding";
 import { walk } from "@std/fs";
 import { typeByExtension } from "@std/media-types";
-import { basename, dirname, extname, join, resolve } from "@std/path";
+import { basename, dirname, extname, resolve } from "@std/path";
 
 import { FileEntry } from "./entry.ts";
 
@@ -13,6 +13,7 @@ export const _internals = {
   readFile: Deno.readFile,
   stat: Deno.stat,
   walk,
+  findEntry: FileEntry.find,
 };
 
 export class FileCache {
@@ -68,12 +69,11 @@ export class FileCache {
     this.contents = cache;
   }
 
-  async find(pathname: string): Promise<FileEntry> {
-    let entry = this.contents[pathname];
+  async find(path: string): Promise<FileEntry> {
+    let entry = this.contents[path];
     if (!entry) {
-      const path = join(this.rootDir, pathname);
       // content etag not calcuated — not adding to cache
-      entry = await FileEntry.find(path);
+      entry = await _internals.findEntry(path);
     }
     return entry;
   }

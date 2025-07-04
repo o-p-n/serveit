@@ -17,7 +17,7 @@ describe("files/cache", () => {
       });
       it("creates with prefilled contents", () => {
         const contents: Record<string, FileEntry> = {
-          "file.txt": new FileEntry({
+          "/app/web/file.txt": new FileEntry({
             path: "/app/web/file.txt",
             type: "text/plain",
             size: 1000,
@@ -25,7 +25,7 @@ describe("files/cache", () => {
             modifiedAt: new Date(120000),
             etag: "abcdefg",
           }),
-          "image.png": new FileEntry({
+          "/app/web/image.png": new FileEntry({
             path: "/app/web/image.png",
             type: "image/png",
             size: 1000,
@@ -38,7 +38,7 @@ describe("files/cache", () => {
         expect(cache.rootDir).to.equal("/app/web");
         expect(cache.files).to.deep.equal(contents);
 
-        delete contents["image.png"];
+        delete contents["/app/web/image.png"];
         expect(cache.files).to.not.deep.equal(contents);
       });
     });
@@ -262,11 +262,11 @@ describe("files/cache", () => {
 
     describe(".find()", () => {
       let cache: FileCache;
-      let spyEntryFind: mock.Spy;
+      let spyFindEntry: mock.Spy;
 
       beforeEach(() => {
         cache = new FileCache("/app/web", {
-          "/file1.txt": new FileEntry({
+          "/app/web/file1.txt": new FileEntry({
             path: "/app/web/file1.txt",
             type: "text/plain",
             size: 1000,
@@ -274,7 +274,7 @@ describe("files/cache", () => {
             modifiedAt: new Date(120000),
             etag: "0123456789abcdef",
           }),
-          "/subdir": new FileEntry({
+          "/app/web/subdir": new FileEntry({
             path: "/app/web/subdir/index.html",
             type: "text/html",
             size: 1000,
@@ -282,7 +282,7 @@ describe("files/cache", () => {
             modifiedAt: new Date(120000),
             etag: "0123456789abcdef",
           }),
-          "/subdir/index.html": new FileEntry({
+          "/app/web/subdir/index.html": new FileEntry({
             path: "/app/web/subdir/index.html",
             type: "text/html",
             size: 1000,
@@ -291,7 +291,8 @@ describe("files/cache", () => {
             etag: "0123456789abcdef",
           }),
         });
-        spyEntryFind = mock.stub(FileEntry, "find", (path: string) => {
+
+        spyFindEntry = mock.stub(_internals, "findEntry", (path: string) => {
           return Promise.resolve(
             new FileEntry({
               path,
@@ -306,11 +307,11 @@ describe("files/cache", () => {
       });
 
       afterEach(() => {
-        spyEntryFind.restore();
+        spyFindEntry.restore();
       });
 
       it("file path returns the cached entry", async () => {
-        const result = await cache.find("/file1.txt");
+        const result = await cache.find("/app/web/file1.txt");
 
         expect(result).to.deep.equal(
           new FileEntry({
@@ -322,12 +323,12 @@ describe("files/cache", () => {
             etag: "0123456789abcdef",
           }),
         );
-        expect(result).to.equal(cache.files["/file1.txt"]);
+        expect(result).to.equal(cache.files["/app/web/file1.txt"]);
 
-        expect(spyEntryFind).to.not.have.been.called();
+        expect(spyFindEntry).to.not.have.been.called();
       });
       it("file path falls through entry find", async () => {
-        const result = await cache.find("/file2.txt");
+        const result = await cache.find("/app/web/file2.txt");
 
         expect(result).to.deep.equal(
           new FileEntry({
@@ -339,9 +340,9 @@ describe("files/cache", () => {
             etag: "0123456789abcdef",
           }),
         );
-        expect(cache.files["/file2.txt"]).to.not.exist();
+        expect(cache.files["/app/web/file2.txt"]).to.not.exist();
 
-        expect(spyEntryFind).to.have.been.deep.calledWith([
+        expect(spyFindEntry).to.have.been.deep.calledWith([
           "/app/web/file2.txt",
         ]);
       });
