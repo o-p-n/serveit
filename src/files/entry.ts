@@ -3,7 +3,6 @@
  * @copyright 2024 Matthew A. Miller
  */
 
-import { encodeHex } from "@std/encoding";
 import { exists } from "@std/fs";
 import { typeByExtension } from "@std/media-types";
 import { extname, resolve } from "@std/path";
@@ -24,7 +23,7 @@ interface FileEntryProps {
 
   readonly createdAt: Date;
   readonly modifiedAt: Date;
-  readonly etag: string;
+  readonly etag?: string;
 }
 
 export class FileEntry {
@@ -34,7 +33,7 @@ export class FileEntry {
 
   readonly createdAt: Date;
   readonly modifiedAt: Date;
-  readonly etag: string;
+  readonly etag?: string;
 
   constructor(props: FileEntryProps) {
     this.path = props.path;
@@ -47,16 +46,22 @@ export class FileEntry {
   }
 
   headers(): Record<string, string> {
-    return {
+    const headers: Record<string, string> = {
       "Content-Type": this.type,
       "Content-Length": this.size.toString(),
       "Date": this.modifiedAt.toUTCString(),
-      "ETag": `"${this.etag}"`,
     };
+
+    if (this.etag) {
+      headers["ETag"] = `"${this.etag!}"`;
+    }
+
+    return headers;
   }
 
   matches(header?: string): boolean {
     if (!header) return false;
+    if (!this.etag) return false;
 
     const entries = header.split(/\s*,\s*/);
     let result = false;
@@ -105,29 +110,15 @@ export class FileEntry {
     const size = stat.size;
     const createdAt = stat.birthtime || new Date();
     const modifiedAt = stat.mtime || createdAt;
-    let props: Partial<FileEntryProps> = {
+    const props: FileEntryProps = {
       path,
       type,
       size,
       createdAt,
       modifiedAt,
     };
-    props = {
-      ...props,
-      etag: await calculateETag(props),
-    };
 
     log().debug`found ${path} (type=${props.type}, size=${props.size})!`;
-    return new FileEntry(props as FileEntryProps);
+    return new FileEntry(props);
   }
-}
-
-async function calculateETag(props: Partial<FileEntryProps>) {
-  const json = JSON.stringify(props);
-  const digest = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(json),
-  );
-
-  return encodeHex(digest);
 }
