@@ -151,7 +151,7 @@ describe("files/cache", () => {
       it("indexes the rootDir", async () => {
         await cache.index();
         expect(cache.files).to.deep.equal({
-          "/file1.txt": new FileEntry({
+          "/app/web/file1.txt": new FileEntry({
             path: "/app/web/file1.txt",
             type: "text/plain",
             size: 1000,
@@ -160,7 +160,7 @@ describe("files/cache", () => {
             etag:
               "e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c",
           }),
-          "/file2.txt": new FileEntry({
+          "/app/web/file2.txt": new FileEntry({
             path: "/app/web/file2.txt",
             type: "text/plain",
             size: 1000,
@@ -169,7 +169,7 @@ describe("files/cache", () => {
             etag:
               "e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c",
           }),
-          "/output.random": new FileEntry({
+          "/app/web/output.random": new FileEntry({
             path: "/app/web/output.random",
             type: "text/plain",
             size: 1000,
@@ -178,7 +178,7 @@ describe("files/cache", () => {
             etag:
               "e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c",
           }),
-          "/subdir": new FileEntry({
+          "/app/web/subdir": new FileEntry({
             path: "/app/web/subdir/index.html",
             type: "text/html",
             size: 1000,
@@ -187,7 +187,7 @@ describe("files/cache", () => {
             etag:
               "e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c",
           }),
-          "/subdir/index.html": new FileEntry({
+          "/app/web/subdir/index.html": new FileEntry({
             path: "/app/web/subdir/index.html",
             type: "text/html",
             size: 1000,
@@ -196,7 +196,7 @@ describe("files/cache", () => {
             etag:
               "e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c",
           }),
-          "/otherdir": new FileEntry({
+          "/app/web/otherdir": new FileEntry({
             path: "/app/web/otherdir/index.htm",
             type: "text/html",
             size: 1000,
@@ -205,7 +205,7 @@ describe("files/cache", () => {
             etag:
               "e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c",
           }),
-          "/otherdir/index.htm": new FileEntry({
+          "/app/web/otherdir/index.htm": new FileEntry({
             path: "/app/web/otherdir/index.htm",
             type: "text/html",
             size: 1000,

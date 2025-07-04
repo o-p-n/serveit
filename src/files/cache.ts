@@ -8,6 +8,7 @@ import { typeByExtension } from "@std/media-types";
 import { basename, dirname, extname, resolve } from "@std/path";
 
 import { FileEntry } from "./entry.ts";
+import log from "../logger.ts";
 
 export const _internals = {
   readFile: Deno.readFile,
@@ -30,6 +31,7 @@ export class FileCache {
   }
 
   async index() {
+    log().debug`indexing ${this.rootDir} ...`;
     const itr = _internals.walk(this.rootDir, {
       includeDirs: false,
       includeSymlinks: false,
@@ -37,8 +39,8 @@ export class FileCache {
 
     const cache: Record<string, FileEntry> = {};
     for await (const fe of itr) {
+      log().debug` + caching ${fe.path} ...`;
       const path = fe.path;
-      const key = path.substring(this.rootDir.length);
       const stat = await _internals.stat(path);
       const content = await _internals.readFile(path);
       const etag = await calculateETag(content);
@@ -56,22 +58,27 @@ export class FileCache {
         modifiedAt,
         etag,
       });
-      cache[key] = entry;
+      cache[path] = entry;
 
       if (/index\.[^.]*$/g.test(basename(path)) && (type === "text/html")) {
         // record directory entry for index file
-        const index = resolve(dirname(key));
+        log().debug` + ... and the directory for ${path}`;
+        const index = resolve(dirname(path));
         cache[index] = entry;
       }
     }
 
     // replace existing contents
+    log().debug`cache index: ${Object.keys(cache).join(" * ")}`;
     this.contents = cache;
   }
 
   async find(path: string): Promise<FileEntry> {
+    path = resolve(path);
+    log().debug`checking cache for ${path}`;
     let entry = this.contents[path];
     if (!entry) {
+      log().debug`did not find ${path} in cache!`;
       // content etag not calcuated — not adding to cache
       entry = await _internals.findEntry(path);
     }
