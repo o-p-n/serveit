@@ -14,19 +14,9 @@ import { NotFound } from "../../src/errors.ts";
 import { DEFAULT_CONFIG } from "../../src/config.ts";
 import { reset, setup } from "../../src/logger.ts";
 
-function toStat(info: Partial<Deno.FileInfo>) {
-  return {
-    isFile: false,
-    isDirectory: false,
-    isSymlink: false,
-    size: 1000,
-    birthtime: new Date(60000),
-    mtime: new Date(120000),
-    ...info,
-  } as Deno.FileInfo;
-}
+import { toStat } from "./common.ts";
 
-describe("file-entry", () => {
+describe("files/entry", () => {
   beforeAll(async () => {
     await setup({
       ...DEFAULT_CONFIG,

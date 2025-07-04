@@ -29,7 +29,7 @@ function createEntry(path: string) {
   return entry;
 }
 
-describe("file-server", () => {
+describe("files/server", () => {
   const logger = log();
 
   describe("Server", () => {
