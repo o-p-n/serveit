@@ -14,6 +14,7 @@ import {
 import { common, join } from "@std/path";
 
 import { metrics } from "../meta/metrics.ts";
+import { health } from "../meta/health.ts";
 
 const ALLOWED_METHODS = [
   "GET",
@@ -53,6 +54,7 @@ export class Server {
       ),
       onError: (err: unknown) => this.error(err),
     });
+    health().update(true);
     await srv.finished;
 
     log()

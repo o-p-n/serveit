@@ -12,6 +12,7 @@ import { Server } from "../../src/files/server.ts";
 import { extname } from "@std/path";
 
 import { Counter, Summary } from "@wok/prometheus";
+import { HealthHandler } from "../../src/meta/health.ts";
 
 const DEFAULT_CONTENT = ReadableStream.from([new Uint8Array()]);
 function createEntry(path: string) {
@@ -54,6 +55,7 @@ describe("files/server", () => {
       let spyServe: mock.Spy;
       let spyHandle: mock.Spy;
       let spyError: mock.Spy;
+      let spyUpdateHealth: mock.Spy;
 
       beforeEach(() => {
         spyLogInfo = mock.spy(logger, "info");
@@ -72,6 +74,7 @@ describe("files/server", () => {
           }) as Deno.HttpServer<Deno.NetAddr>);
         spyHandle = mock.stub(Object.getPrototypeOf(server), "handle");
         spyError = mock.stub(Object.getPrototypeOf(server), "error");
+        spyUpdateHealth = mock.stub(HealthHandler.open(), "update");
       });
       afterEach(() => {
         spyLogInfo.restore();
@@ -79,6 +82,7 @@ describe("files/server", () => {
         spyServe.restore();
         spyHandle.restore();
         spyError.restore();
+        spyUpdateHealth.restore();
       });
 
       it("runs the server", async () => {
@@ -88,6 +92,9 @@ describe("files/server", () => {
           "/root/app",
           "0.0.0.0",
           4000,
+        ]);
+        expect(spyUpdateHealth).to.have.been.calledWith([
+          true,
         ]);
 
         const args = spyServe.calls[0].args;
