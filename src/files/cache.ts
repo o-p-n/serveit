@@ -15,7 +15,6 @@ export const _internals = {
   walk,
 };
 
-
 export class FileCache {
   readonly rootDir: string;
   private contents: Record<string, FileEntry> = {};
@@ -57,7 +56,7 @@ export class FileCache {
         etag,
       });
       cache[key] = entry;
-      
+
       if (/index\.[^.]*$/g.test(basename(path)) && (type === "text/html")) {
         // record directory entry for index file
         const index = resolve(dirname(key));
@@ -73,7 +72,7 @@ export class FileCache {
     let entry = this.contents[pathname];
     if (!entry) {
       const path = join(this.rootDir, pathname);
-      // content etag not calcuated — not adding to cache 
+      // content etag not calcuated — not adding to cache
       entry = await FileEntry.find(path);
     }
     return entry;

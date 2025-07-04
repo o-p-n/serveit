@@ -1,12 +1,7 @@
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  it,
-} from "../deps.ts";
+import { afterEach, beforeEach, describe, it } from "../deps.ts";
 import { expect, FakeTime, mock } from "../deps.ts";
 
-import { FileCache, _internals } from "../../src/files/cache.ts";
+import { _internals, FileCache } from "../../src/files/cache.ts";
 import { WalkEntry, WalkOptions } from "@std/fs";
 import { join } from "@std/path";
 import { toStat } from "./common.ts";
@@ -38,7 +33,7 @@ describe("files/cache", () => {
             modifiedAt: new Date(120000),
             etag: "abcdefg",
           }),
-        }
+        };
         const cache = new FileCache("/app/web", contents);
         expect(cache.rootDir).to.equal("/app/web");
         expect(cache.files).to.deep.equal(contents);
@@ -109,18 +104,41 @@ describe("files/cache", () => {
           },
         );
         spyStat = mock.stub(_internals, "stat", (path: string | URL) => {
-          const birthtime = (path.toString().endsWith(".html")) ? null : new Date(30000);
-          const mtime = (path.toString().endsWith("file2.txt")) ? null : new Date(120000);
+          const birthtime = (path.toString().endsWith(".html"))
+            ? null
+            : new Date(30000);
+          const mtime = (path.toString().endsWith("file2.txt"))
+            ? null
+            : new Date(120000);
           return Promise.resolve(toStat({
             isFile: true,
             birthtime,
             mtime,
           }));
         });
-        spyReadFile = mock.stub(_internals, "readFile", (_path: string | URL, _opts?: Deno.ReadFileOptions) => {
-          // "file content"
-          return Promise.resolve(new Uint8Array([  102, 105, 108, 101, 32,  99, 111, 110, 116, 101, 110, 116]));
-        });
+        spyReadFile = mock.stub(
+          _internals,
+          "readFile",
+          (_path: string | URL, _opts?: Deno.ReadFileOptions) => {
+            // "file content"
+            return Promise.resolve(
+              new Uint8Array([
+                102,
+                105,
+                108,
+                101,
+                32,
+                99,
+                111,
+                110,
+                116,
+                101,
+                110,
+                116,
+              ]),
+            );
+          },
+        );
       });
 
       afterEach(() => {
@@ -139,7 +157,8 @@ describe("files/cache", () => {
             size: 1000,
             createdAt: new Date(30000),
             modifiedAt: new Date(120000),
-            etag: "e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c",
+            etag:
+              "e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c",
           }),
           "/file2.txt": new FileEntry({
             path: "/app/web/file2.txt",
@@ -147,7 +166,8 @@ describe("files/cache", () => {
             size: 1000,
             createdAt: new Date(30000),
             modifiedAt: new Date(30000),
-            etag: "e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c",
+            etag:
+              "e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c",
           }),
           "/output.random": new FileEntry({
             path: "/app/web/output.random",
@@ -155,7 +175,8 @@ describe("files/cache", () => {
             size: 1000,
             createdAt: new Date(30000),
             modifiedAt: new Date(120000),
-            etag: "e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c",
+            etag:
+              "e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c",
           }),
           "/subdir": new FileEntry({
             path: "/app/web/subdir/index.html",
@@ -163,7 +184,8 @@ describe("files/cache", () => {
             size: 1000,
             createdAt: new Date(10000),
             modifiedAt: new Date(120000),
-            etag: "e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c",
+            etag:
+              "e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c",
           }),
           "/subdir/index.html": new FileEntry({
             path: "/app/web/subdir/index.html",
@@ -171,7 +193,8 @@ describe("files/cache", () => {
             size: 1000,
             createdAt: new Date(10000),
             modifiedAt: new Date(120000),
-            etag: "e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c",
+            etag:
+              "e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c",
           }),
           "/otherdir": new FileEntry({
             path: "/app/web/otherdir/index.htm",
@@ -179,7 +202,8 @@ describe("files/cache", () => {
             size: 1000,
             createdAt: new Date(30000),
             modifiedAt: new Date(120000),
-            etag: "e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c",
+            etag:
+              "e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c",
           }),
           "/otherdir/index.htm": new FileEntry({
             path: "/app/web/otherdir/index.htm",
@@ -187,7 +211,8 @@ describe("files/cache", () => {
             size: 1000,
             createdAt: new Date(30000),
             modifiedAt: new Date(120000),
-            etag: "e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c",
+            etag:
+              "e0ac3601005dfa1864f5392aabaf7d898b1b5bab854f1acb4491bcd806b76b0c",
           }),
         });
 
@@ -267,14 +292,16 @@ describe("files/cache", () => {
           }),
         });
         spyEntryFind = mock.stub(FileEntry, "find", (path: string) => {
-          return Promise.resolve(new FileEntry({
-            path,
-            type: "text/plain",
-            size: 1000,
-            createdAt: new Date(60000),
-            modifiedAt: new Date(120000),
-            etag: "0123456789abcdef",
-          }));
+          return Promise.resolve(
+            new FileEntry({
+              path,
+              type: "text/plain",
+              size: 1000,
+              createdAt: new Date(60000),
+              modifiedAt: new Date(120000),
+              etag: "0123456789abcdef",
+            }),
+          );
         });
       });
 
@@ -285,14 +312,16 @@ describe("files/cache", () => {
       it("file path returns the cached entry", async () => {
         const result = await cache.find("/file1.txt");
 
-        expect(result).to.deep.equal(new FileEntry({
+        expect(result).to.deep.equal(
+          new FileEntry({
             path: "/app/web/file1.txt",
             type: "text/plain",
             size: 1000,
             createdAt: new Date(60000),
             modifiedAt: new Date(120000),
             etag: "0123456789abcdef",
-        }));
+          }),
+        );
         expect(result).to.equal(cache.files["/file1.txt"]);
 
         expect(spyEntryFind).to.not.have.been.called();
@@ -300,14 +329,16 @@ describe("files/cache", () => {
       it("file path falls through entry find", async () => {
         const result = await cache.find("/file2.txt");
 
-        expect(result).to.deep.equal(new FileEntry({
+        expect(result).to.deep.equal(
+          new FileEntry({
             path: "/app/web/file2.txt",
             type: "text/plain",
             size: 1000,
             createdAt: new Date(60000),
             modifiedAt: new Date(120000),
             etag: "0123456789abcdef",
-        }));
+          }),
+        );
         expect(cache.files["/file2.txt"]).to.not.exist();
 
         expect(spyEntryFind).to.have.been.deep.calledWith([

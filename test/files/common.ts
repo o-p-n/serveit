@@ -9,4 +9,3 @@ export function toStat(info: Partial<Deno.FileInfo>) {
     ...info,
   } as Deno.FileInfo;
 }
-
