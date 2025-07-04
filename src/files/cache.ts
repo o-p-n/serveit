@@ -6,6 +6,7 @@ import { encodeHex } from "@std/encoding";
 import { walk } from "@std/fs";
 import { typeByExtension } from "@std/media-types";
 import { basename, dirname, extname, resolve } from "@std/path";
+import { debounce } from "@std/async";
 
 import { FileEntry } from "./entry.ts";
 import log from "../logger.ts";
@@ -15,11 +16,13 @@ export const _internals = {
   stat: Deno.stat,
   walk,
   findEntry: FileEntry.find,
+  watchFs: Deno.watchFs,
 };
 
 export class FileCache {
   readonly rootDir: string;
   private contents: Record<string, FileEntry> = {};
+  private watcher?: Deno.FsWatcher;
 
   constructor(rootDir: string, prefill?: Record<string, FileEntry>) {
     this.rootDir = rootDir;
@@ -28,6 +31,28 @@ export class FileCache {
 
   get files(): Record<string, FileEntry> {
     return { ...this.contents };
+  }
+
+  async start() {
+    const watcher = this.watcher = _internals.watchFs(this.rootDir);
+    const reindex = debounce(this.index.bind(this), 200);
+
+    await this.index();
+
+    (async () => {
+      log().debug`starting fs watch ...`;
+
+      for await (const evt of watcher) {
+        log().debug`+++ processing fs event ${evt.kind} on ${evt.paths.join(", ")}`;
+        reindex();
+      }
+
+      log().debug`... stopped fs watch`;
+    })();
+  }
+  stop() {
+    this.watcher?.close();
+    this.watcher = undefined;
   }
 
   async index() {

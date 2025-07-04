@@ -44,8 +44,8 @@ export class Server {
   }
 
   async serve() {
-    // initialize cache
-    await this.cache.index();
+    // initialize cache and start watching for changes
+    await this.cache.start();
 
     const srv = Deno.serve({
       handler: (req: Request) => this.handle(req),
@@ -61,6 +61,7 @@ export class Server {
     // make ready and wait
     health().update(true);
     await srv.finished;
+    this.cache.stop();
 
     log()
       .info`stopped serving ${this.rootDir} at ${srv.addr.hostname}:${srv.addr.port}`;

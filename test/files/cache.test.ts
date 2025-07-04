@@ -8,8 +8,20 @@ import { toStat } from "./common.ts";
 import { FileEntry } from "../../src/files/entry.ts";
 
 describe("files/cache", () => {
+  const seedTime = new Date(10000);
+  let clock: FakeTime;
+
+  beforeEach(() => {
+    clock = new FakeTime(seedTime);
+  });
+
+  afterEach(() => {
+    clock.runAll();
+    clock.restore();
+  });
+
   describe("FileCache", () => {
-    describe(".ctor()", () => {
+    describe("ctor", () => {
       it("creates with empty contents", () => {
         const cache = new FileCache("/app/web");
         expect(cache.rootDir).to.equal("/app/web");
@@ -44,17 +56,12 @@ describe("files/cache", () => {
     });
 
     describe(".index()", () => {
-      const seedTime = new Date(10000);
-      let clock: FakeTime;
-
       let cache: FileCache;
       let spyWalk: mock.Spy;
       let spyStat: mock.Spy;
       let spyReadFile: mock.Spy;
 
       beforeEach(() => {
-        clock = new FakeTime(seedTime);
-
         cache = new FileCache("/app/web");
         spyWalk = mock.stub(
           _internals,
@@ -145,7 +152,6 @@ describe("files/cache", () => {
         spyWalk.restore();
         spyStat.restore();
         spyReadFile.restore();
-        clock.restore();
       });
 
       it("indexes the rootDir", async () => {
@@ -257,6 +263,71 @@ describe("files/cache", () => {
         expect(spyReadFile).to.have.been.deep.calledWith([
           "/app/web/otherdir/index.htm",
         ]);
+      });
+    });
+
+    describe(".start()/.stop()", () => {
+      let cache: FileCache;
+      let spyIndex: mock.Spy;
+      let spyWatchFS: mock.Spy;
+
+      beforeEach(() => {
+        cache = new FileCache("/app/web");
+        spyIndex = mock.stub(cache, "index");
+        spyWatchFS = mock.stub(_internals, "watchFs", (_path: string | string[], _opts?: { recursive: boolean }) => {
+          const entries: Deno.FsEvent[] = [
+            {
+              kind: "modify",
+              paths: ["/app/web/file1.txt"],
+            },
+            {
+              kind: "remove",
+              paths: ["/app/web/subdir"],
+            },
+            {
+              kind: "create",
+              paths: ["/app/web/subdir/index.html"],
+            },
+          ];
+
+          // deno-lint-ignore no-explicit-any
+          const itr: any = (async function* () {
+            for (const e of entries) {
+              yield e;
+            }
+            
+          })();
+          itr[Symbol.dispose] = () => {};
+          itr.close = () => {};
+
+          return itr as Deno.FsWatcher;
+        });
+      });
+
+      afterEach(() => {
+        spyIndex.restore();
+        spyWatchFS.restore();
+      });
+
+      it("starts the indexing", async () => {
+        await cache.start();
+
+        expect(spyIndex).to.have.been.called(1);
+        expect(spyWatchFS).to.have.been.calledWith([
+          "/app/web",
+        ]);
+      });
+      it("stops the indexing", () => {
+        const spyClose = mock.spy();
+
+        Object.assign(cache, {
+          watcher: {
+            close: spyClose,
+          },
+        });
+        cache.stop();
+
+        expect(spyClose).to.have.been.called();
       });
     });
 
