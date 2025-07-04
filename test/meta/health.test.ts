@@ -1,5 +1,5 @@
 import { StatusCode } from "../../src/constants.ts";
-import { HealthHandler, health } from "../../src/meta/health.ts";
+import { health, HealthHandler } from "../../src/meta/health.ts";
 import {
   afterEach,
   beforeEach,

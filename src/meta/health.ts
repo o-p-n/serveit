@@ -16,9 +16,15 @@ export function health(): Health {
   const instance = HealthHandler.open();
 
   return {
-    get healthy() { return instance.healthy; },
-    get uptime() { return instance.uptime; },
-    update(stat: boolean) { instance.update(stat); },
+    get healthy() {
+      return instance.healthy;
+    },
+    get uptime() {
+      return instance.uptime;
+    },
+    update(stat: boolean) {
+      instance.update(stat);
+    },
   };
 }
 
