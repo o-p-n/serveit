@@ -4,7 +4,7 @@
 
 import log from "../logger.ts";
 import { ServerConfig } from "../types.ts";
-import { FileEntry } from "./entry.ts";
+import { FileCache } from "./cache.ts";
 import {
   HttpError,
   InternalServerError,
@@ -23,9 +23,11 @@ const ALLOWED_METHODS = [
 
 export class Server {
   private config: ServerConfig;
+  private cache: FileCache;
 
   constructor(config: ServerConfig) {
     this.config = { ...config };
+    this.cache = new FileCache(config.rootDir);
   }
 
   get rootDir() {
@@ -127,7 +129,7 @@ export class Server {
       return new NotFound().toResponse();
     }
 
-    const entry = await FileEntry.find(path);
+    const entry = await this.cache.find(path);
     const headers = entry.headers();
 
     if (entry.matches(etags)) {

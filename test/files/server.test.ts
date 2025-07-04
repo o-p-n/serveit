@@ -4,6 +4,7 @@ import { BoundSpy, createBoundSpy } from "../bound-spy.ts";
 import { typeByExtension } from "@std/media-types";
 import { NotFound } from "../../src/errors.ts";
 import { FileEntry } from "../../src/files/entry.ts";
+import { FileCache } from "../../src/files/cache.ts";
 
 import { DEFAULT_CONFIG } from "../../src/config.ts";
 import log from "../../src/logger.ts";
@@ -151,7 +152,7 @@ describe("files/server", () => {
 
       beforeEach(() => {
         spyFind = mock.stub(
-          FileEntry,
+          FileCache.prototype,
           "find",
           (path: string): Promise<FileEntry> => {
             switch (path) {
