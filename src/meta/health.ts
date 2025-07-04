@@ -6,17 +6,46 @@ export interface HealthStats {
   uptime: number;
 }
 
+export interface Health extends HealthStats {
+  update(status: boolean): void;
+}
+
 let instance: HealthHandler | undefined = undefined;
+
+export function health(): Health {
+  const instance = HealthHandler.open();
+
+  return {
+    get healthy() { return instance.healthy; },
+    get uptime() { return instance.uptime; },
+    update(stat: boolean) { instance.update(stat); },
+  };
+}
 
 export class HealthHandler implements MetaHandler {
   readonly path = "/health";
   readonly method = "GET";
   readonly started = Date.now();
 
+  private _healthy = false;
+  // TODO: reason for unhealthy
+
+  get healthy() {
+    return this._healthy;
+  }
+
+  get uptime() {
+    return Date.now() - this.started;
+  }
+
+  update(status: boolean) {
+    this._healthy = status;
+  }
+
   async handle(_req: Request): Promise<Response> {
     const stats = {
-      healthy: true,
-      uptime: Date.now() - this.started,
+      healthy: this.healthy,
+      uptime: this.uptime,
     };
 
     const body = new TextEncoder().encode(JSON.stringify(stats));
