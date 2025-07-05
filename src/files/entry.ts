@@ -49,6 +49,7 @@ export class FileEntry {
     const headers: Record<string, string> = {
       "Content-Type": this.type,
       "Content-Length": this.size.toString(),
+      "Cache-Control": "public, no-transform",
       "Date": this.modifiedAt.toUTCString(),
     };
 

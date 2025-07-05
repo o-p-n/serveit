@@ -48,6 +48,7 @@ describe("files/entry", () => {
         expect(entry.headers()).to.deep.equal({
           "Content-Type": "text/plain",
           "Content-Length": "1000",
+          "Cache-Control": "public, no-transform",
           "Date": entry.modifiedAt.toUTCString(),
         });
       });
@@ -71,6 +72,7 @@ describe("files/entry", () => {
         expect(entry.headers()).to.deep.equal({
           "Content-Type": "text/plain",
           "Content-Length": "1000",
+          "Cache-Control": "public, no-transform",
           "Date": entry.modifiedAt.toUTCString(),
           "ETag": '"0123456789abcdef"',
         });
@@ -232,6 +234,7 @@ describe("files/entry", () => {
         expect(result.headers()).to.deep.equal({
           "Content-Type": "text/plain",
           "Content-Length": "1000",
+          "Cache-Control": "public, no-transform",
           "Date": new Date(120000).toUTCString(),
         });
         await expect(result.open()).to.eventually.equal(content);
@@ -248,6 +251,7 @@ describe("files/entry", () => {
         expect(result.headers()).to.deep.equal({
           "Content-Type": "text/plain",
           "Content-Length": "1000",
+          "Cache-Control": "public, no-transform",
           "Date": new Date(120000).toUTCString(),
         });
         await expect(result.open()).to.eventually.equal(content);
@@ -264,6 +268,7 @@ describe("files/entry", () => {
         expect(result.headers()).to.deep.equal({
           "Content-Type": "text/markdown",
           "Content-Length": "1000",
+          "Cache-Control": "public, no-transform",
           "Date": seedTime.toUTCString(),
         });
         await expect(result.open()).to.eventually.equal(content);
@@ -281,6 +286,7 @@ describe("files/entry", () => {
         expect(result.headers()).to.deep.equal({
           "Content-Type": "text/html",
           "Content-Length": "1000",
+          "Cache-Control": "public, no-transform",
           "Date": new Date(120000).toUTCString(),
         });
         await expect(result.open()).to.eventually.equal(content);
@@ -303,6 +309,7 @@ describe("files/entry", () => {
         expect(result.headers()).to.deep.equal({
           "Content-Type": "text/html",
           "Content-Length": "1000",
+          "Cache-Control": "public, no-transform",
           "Date": new Date(120000).toUTCString(),
         });
         await expect(result.open()).to.eventually.equal(content);
