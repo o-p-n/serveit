@@ -9,6 +9,7 @@ import { basename, dirname, extname, resolve } from "@std/path";
 import { debounce } from "@std/async";
 
 import { FileEntry } from "./entry.ts";
+import { metrics } from "../meta/metrics.ts";
 import log from "../logger.ts";
 
 export const _internals = {
@@ -58,6 +59,8 @@ export class FileCache {
   }
 
   async index() {
+    const { indexedFilesCount, totalIndexingRuns } = metrics();
+
     log().debug`indexing ${this.rootDir} ...`;
     const itr = _internals.walk(this.rootDir, {
       includeDirs: false,
@@ -96,8 +99,11 @@ export class FileCache {
     }
 
     // replace existing contents
-    log().debug`cache index: ${Object.keys(cache).join(" * ")}`;
+    const keys = Object.keys(cache);
+    log().debug`cache index: ${keys.join(" * ")}`;
+    indexedFilesCount.set(keys.length);
     this.contents = cache;
+    totalIndexingRuns.inc();
   }
 
   async find(path: string): Promise<FileEntry> {

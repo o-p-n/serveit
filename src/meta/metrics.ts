@@ -1,12 +1,15 @@
 import { StatusCode } from "../constants.ts";
 import { MetaHandler } from "./basics.ts";
 
-import { Counter, Registry, Summary } from "@wok/prometheus";
+import { Counter, Gauge, Registry, Summary } from "@wok/prometheus";
 
 export interface Metrics {
   readonly totalRequests: Counter;
   readonly totalResponses: Counter;
   readonly duration: Summary;
+
+  readonly totalIndexingRuns: Counter;
+  readonly indexedFilesCount: Gauge;
 }
 
 let instance: MetricsHandler | undefined = undefined;
@@ -25,6 +28,9 @@ export class MetricsHandler implements MetaHandler, Metrics {
   readonly totalRequests: Counter;
   readonly totalResponses: Counter;
   readonly duration: Summary;
+
+  readonly totalIndexingRuns: Counter;
+  readonly indexedFilesCount: Gauge;
 
   constructor() {
     this.registry = new Registry();
@@ -46,6 +52,17 @@ export class MetricsHandler implements MetaHandler, Metrics {
       help: "duration between request and response (in ms)",
       labels: ["method"],
       quantiles: [0.25, 0.50, 0.75, 0.90, 1],
+      registry: [this.registry],
+    });
+
+    this.totalIndexingRuns = Counter.with({
+      name: "serveit_indexing_runs_total",
+      help: "total number of file indexing runs",
+      registry: [this.registry],
+    });
+    this.indexedFilesCount = Gauge.with({
+      name: "serveit_indexed_files_count",
+      help: "number of indexed files",
       registry: [this.registry],
     });
   }
