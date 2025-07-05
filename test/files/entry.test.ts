@@ -14,19 +14,9 @@ import { NotFound } from "../../src/errors.ts";
 import { DEFAULT_CONFIG } from "../../src/config.ts";
 import { reset, setup } from "../../src/logger.ts";
 
-function toStat(info: Partial<Deno.FileInfo>) {
-  return {
-    isFile: false,
-    isDirectory: false,
-    isSymlink: false,
-    size: 1000,
-    birthtime: new Date(60000),
-    mtime: new Date(120000),
-    ...info,
-  } as Deno.FileInfo;
-}
+import { toStat } from "./common.ts";
 
-describe("file-entry", () => {
+describe("files/entry", () => {
   beforeAll(async () => {
     await setup({
       ...DEFAULT_CONFIG,
@@ -39,6 +29,56 @@ describe("file-entry", () => {
   });
 
   describe("FileEntry", () => {
+    describe("ctor", () => {
+      it("creates without an etag", () => {
+        const entry = new FileEntry({
+          path: "/app/web/file1.txt",
+          type: "text/plain",
+          size: 1000,
+          createdAt: new Date(60000),
+          modifiedAt: new Date(120000),
+        });
+        expect(entry.path).to.equal("/app/web/file1.txt");
+        expect(entry.type).to.equal("text/plain");
+        expect(entry.size).to.equal(1000);
+        expect(entry.createdAt).to.deep.equal(new Date(60000));
+        expect(entry.modifiedAt).to.deep.equal(new Date(120000));
+        expect(entry.etag).to.be.undefined();
+
+        expect(entry.headers()).to.deep.equal({
+          "Content-Type": "text/plain",
+          "Content-Length": "1000",
+          "Cache-Control": "public, no-transform",
+          "Date": entry.modifiedAt.toUTCString(),
+        });
+      });
+
+      it("creates with an etag", () => {
+        const entry = new FileEntry({
+          path: "/app/web/file1.txt",
+          type: "text/plain",
+          size: 1000,
+          createdAt: new Date(60000),
+          modifiedAt: new Date(120000),
+          etag: "0123456789abcdef",
+        });
+        expect(entry.path).to.equal("/app/web/file1.txt");
+        expect(entry.type).to.equal("text/plain");
+        expect(entry.size).to.equal(1000);
+        expect(entry.createdAt).to.deep.equal(new Date(60000));
+        expect(entry.modifiedAt).to.deep.equal(new Date(120000));
+        expect(entry.etag).to.equal("0123456789abcdef");
+
+        expect(entry.headers()).to.deep.equal({
+          "Content-Type": "text/plain",
+          "Content-Length": "1000",
+          "Cache-Control": "public, no-transform",
+          "Date": entry.modifiedAt.toUTCString(),
+          "ETag": '"0123456789abcdef"',
+        });
+      });
+    });
+
     describe("matches()", () => {
       let entry: FileEntry;
 
@@ -74,6 +114,19 @@ describe("file-entry", () => {
       it("does not match from a list-entries header", () => {
         expect(entry.matches('"yuiop", "ytrewq", "fdsa"')).to.equal(false);
         expect(entry.matches('"yuiop", W/"ytrewq", "fdsa"')).to.equal(false);
+      });
+
+      it("does not match if entry has no etag", () => {
+        entry = new FileEntry({
+          path: "/root/app/file.txt",
+          type: "text/plain",
+          size: 1000,
+          createdAt: new Date(60000),
+          modifiedAt: new Date(120000),
+        });
+
+        expect(entry.matches('"qwerty"')).to.equal(false);
+        expect(entry.matches('W/"qwerty"')).to.equal(false);
       });
     });
     describe("find()", () => {
@@ -176,16 +229,13 @@ describe("file-entry", () => {
         expect(result.size).to.equal(1000);
         expect(result.createdAt).to.deep.equal(new Date(60000));
         expect(result.modifiedAt).to.deep.equal(new Date(120000));
-        expect(result.etag).to.equal(
-          "2fc6fd91da31cad6f07534cd3e6d03eedc71875996aada8696b334261476b079",
-        );
+        expect(result.etag).to.be.undefined();
 
         expect(result.headers()).to.deep.equal({
           "Content-Type": "text/plain",
           "Content-Length": "1000",
+          "Cache-Control": "public, no-transform",
           "Date": new Date(120000).toUTCString(),
-          "ETag":
-            '"2fc6fd91da31cad6f07534cd3e6d03eedc71875996aada8696b334261476b079"',
         });
         await expect(result.open()).to.eventually.equal(content);
       });
@@ -196,16 +246,13 @@ describe("file-entry", () => {
         expect(result.size).to.equal(1000);
         expect(result.createdAt).to.deep.equal(new Date(60000));
         expect(result.modifiedAt).to.deep.equal(new Date(120000));
-        expect(result.etag).to.equal(
-          "c46c8269cc639d9f8a11e752a21169cd418c47b6c200cc85a617d396032b02a3",
-        );
+        expect(result.etag).to.be.undefined();
 
         expect(result.headers()).to.deep.equal({
           "Content-Type": "text/plain",
           "Content-Length": "1000",
+          "Cache-Control": "public, no-transform",
           "Date": new Date(120000).toUTCString(),
-          "ETag":
-            '"c46c8269cc639d9f8a11e752a21169cd418c47b6c200cc85a617d396032b02a3"',
         });
         await expect(result.open()).to.eventually.equal(content);
       });
@@ -216,16 +263,13 @@ describe("file-entry", () => {
         expect(result.size).to.equal(1000);
         expect(result.createdAt).to.deep.equal(seedTime);
         expect(result.modifiedAt).to.deep.equal(seedTime);
-        expect(result.etag).to.equal(
-          "67e751af310816d270dc3a3c516ff81080ba7e7fe44e70cc9b6d69b4f8a2ec49",
-        );
+        expect(result.etag).to.be.undefined();
 
         expect(result.headers()).to.deep.equal({
           "Content-Type": "text/markdown",
           "Content-Length": "1000",
+          "Cache-Control": "public, no-transform",
           "Date": seedTime.toUTCString(),
-          "ETag":
-            '"67e751af310816d270dc3a3c516ff81080ba7e7fe44e70cc9b6d69b4f8a2ec49"',
         });
         await expect(result.open()).to.eventually.equal(content);
       });
@@ -237,16 +281,13 @@ describe("file-entry", () => {
         expect(result.size).to.equal(1000);
         expect(result.createdAt).to.deep.equal(new Date(60000));
         expect(result.modifiedAt).to.deep.equal(new Date(120000));
-        expect(result.etag).to.equal(
-          "997b12928a38a3dad580f7d40b34c84930f5f7621bfdf0bd0edcfb658163ea7f",
-        );
+        expect(result.etag).to.be.undefined();
 
         expect(result.headers()).to.deep.equal({
           "Content-Type": "text/html",
           "Content-Length": "1000",
+          "Cache-Control": "public, no-transform",
           "Date": new Date(120000).toUTCString(),
-          "ETag":
-            '"997b12928a38a3dad580f7d40b34c84930f5f7621bfdf0bd0edcfb658163ea7f"',
         });
         await expect(result.open()).to.eventually.equal(content);
 
@@ -263,16 +304,13 @@ describe("file-entry", () => {
         expect(result.size).to.equal(1000);
         expect(result.createdAt).to.deep.equal(new Date(60000));
         expect(result.modifiedAt).to.deep.equal(new Date(120000));
-        expect(result.etag).to.equal(
-          "d8cc7d9d2c74940b4c686becfaec3f17749db078b2b6a5f028bca2f9f3f137d4",
-        );
+        expect(result.etag).to.be.undefined();
 
         expect(result.headers()).to.deep.equal({
           "Content-Type": "text/html",
           "Content-Length": "1000",
+          "Cache-Control": "public, no-transform",
           "Date": new Date(120000).toUTCString(),
-          "ETag":
-            '"d8cc7d9d2c74940b4c686becfaec3f17749db078b2b6a5f028bca2f9f3f137d4"',
         });
         await expect(result.open()).to.eventually.equal(content);
 

@@ -4,6 +4,7 @@ import { BoundSpy, createBoundSpy } from "../bound-spy.ts";
 import { typeByExtension } from "@std/media-types";
 import { NotFound } from "../../src/errors.ts";
 import { FileEntry } from "../../src/files/entry.ts";
+import { FileCache } from "../../src/files/cache.ts";
 
 import { DEFAULT_CONFIG } from "../../src/config.ts";
 import log from "../../src/logger.ts";
@@ -11,6 +12,7 @@ import { Server } from "../../src/files/server.ts";
 import { extname } from "@std/path";
 
 import { Counter, Summary } from "@wok/prometheus";
+import { HealthHandler } from "../../src/meta/health.ts";
 
 const DEFAULT_CONTENT = ReadableStream.from([new Uint8Array()]);
 function createEntry(path: string) {
@@ -29,7 +31,7 @@ function createEntry(path: string) {
   return entry;
 }
 
-describe("file-server", () => {
+describe("files/server", () => {
   const logger = log();
 
   describe("Server", () => {
@@ -53,6 +55,9 @@ describe("file-server", () => {
       let spyServe: mock.Spy;
       let spyHandle: mock.Spy;
       let spyError: mock.Spy;
+      let spyUpdateHealth: mock.Spy;
+      let spyStartCache: mock.Spy;
+      let spyStopCache: mock.Spy;
 
       beforeEach(() => {
         spyLogInfo = mock.spy(logger, "info");
@@ -71,6 +76,10 @@ describe("file-server", () => {
           }) as Deno.HttpServer<Deno.NetAddr>);
         spyHandle = mock.stub(Object.getPrototypeOf(server), "handle");
         spyError = mock.stub(Object.getPrototypeOf(server), "error");
+        spyUpdateHealth = mock.stub(HealthHandler.open(), "update");
+
+        spyStartCache = mock.stub(FileCache.prototype, "start");
+        spyStopCache = mock.stub(FileCache.prototype, "stop");
       });
       afterEach(() => {
         spyLogInfo.restore();
@@ -78,6 +87,9 @@ describe("file-server", () => {
         spyServe.restore();
         spyHandle.restore();
         spyError.restore();
+        spyUpdateHealth.restore();
+        spyStartCache.restore();
+        spyStopCache.restore();
       });
 
       it("runs the server", async () => {
@@ -88,6 +100,12 @@ describe("file-server", () => {
           "0.0.0.0",
           4000,
         ]);
+        expect(spyUpdateHealth).to.have.been.calledWith([
+          true,
+        ]);
+
+        expect(spyStartCache).to.have.been.called();
+        expect(spyStopCache).to.have.been.called();
 
         const args = spyServe.calls[0].args;
         expect(args.length).to.equal(1);
@@ -151,7 +169,7 @@ describe("file-server", () => {
 
       beforeEach(() => {
         spyFind = mock.stub(
-          FileEntry,
+          FileCache.prototype,
           "find",
           (path: string): Promise<FileEntry> => {
             switch (path) {

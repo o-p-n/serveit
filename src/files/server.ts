@@ -4,7 +4,7 @@
 
 import log from "../logger.ts";
 import { ServerConfig } from "../types.ts";
-import { FileEntry } from "./entry.ts";
+import { FileCache } from "./cache.ts";
 import {
   HttpError,
   InternalServerError,
@@ -14,6 +14,7 @@ import {
 import { common, join } from "@std/path";
 
 import { metrics } from "../meta/metrics.ts";
+import { health } from "../meta/health.ts";
 
 const ALLOWED_METHODS = [
   "GET",
@@ -23,9 +24,11 @@ const ALLOWED_METHODS = [
 
 export class Server {
   private config: ServerConfig;
+  private cache: FileCache;
 
   constructor(config: ServerConfig) {
     this.config = { ...config };
+    this.cache = new FileCache(config.rootDir);
   }
 
   get rootDir() {
@@ -41,6 +44,9 @@ export class Server {
   }
 
   async serve() {
+    // initialize cache and start watching for changes
+    await this.cache.start();
+
     const srv = Deno.serve({
       handler: (req: Request) => this.handle(req),
       port: this.port,
@@ -51,7 +57,11 @@ export class Server {
       ),
       onError: (err: unknown) => this.error(err),
     });
+
+    // make ready and wait
+    health().update(true);
     await srv.finished;
+    this.cache.stop();
 
     log()
       .info`stopped serving ${this.rootDir} at ${srv.addr.hostname}:${srv.addr.port}`;
@@ -127,7 +137,7 @@ export class Server {
       return new NotFound().toResponse();
     }
 
-    const entry = await FileEntry.find(path);
+    const entry = await this.cache.find(path);
     const headers = entry.headers();
 
     if (entry.matches(etags)) {
