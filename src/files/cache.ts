@@ -43,7 +43,9 @@ export class FileCache {
       log().debug`starting fs watch ...`;
 
       for await (const evt of watcher) {
-        log().debug`+++ processing fs event ${evt.kind} on ${evt.paths.join(", ")}`;
+        log().debug`+++ processing fs event ${evt.kind} on ${
+          evt.paths.join(", ")
+        }`;
         reindex();
       }
 

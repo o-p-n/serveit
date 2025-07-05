@@ -274,34 +274,37 @@ describe("files/cache", () => {
       beforeEach(() => {
         cache = new FileCache("/app/web");
         spyIndex = mock.stub(cache, "index");
-        spyWatchFS = mock.stub(_internals, "watchFs", (_path: string | string[], _opts?: { recursive: boolean }) => {
-          const entries: Deno.FsEvent[] = [
-            {
-              kind: "modify",
-              paths: ["/app/web/file1.txt"],
-            },
-            {
-              kind: "remove",
-              paths: ["/app/web/subdir"],
-            },
-            {
-              kind: "create",
-              paths: ["/app/web/subdir/index.html"],
-            },
-          ];
+        spyWatchFS = mock.stub(
+          _internals,
+          "watchFs",
+          (_path: string | string[], _opts?: { recursive: boolean }) => {
+            const entries: Deno.FsEvent[] = [
+              {
+                kind: "modify",
+                paths: ["/app/web/file1.txt"],
+              },
+              {
+                kind: "remove",
+                paths: ["/app/web/subdir"],
+              },
+              {
+                kind: "create",
+                paths: ["/app/web/subdir/index.html"],
+              },
+            ];
 
-          // deno-lint-ignore no-explicit-any
-          const itr: any = (async function* () {
-            for (const e of entries) {
-              yield e;
-            }
-            
-          })();
-          itr[Symbol.dispose] = () => {};
-          itr.close = () => {};
+            // deno-lint-ignore no-explicit-any
+            const itr: any = (async function* () {
+              for (const e of entries) {
+                yield e;
+              }
+            })();
+            itr[Symbol.dispose] = () => {};
+            itr.close = () => {};
 
-          return itr as Deno.FsWatcher;
-        });
+            return itr as Deno.FsWatcher;
+          },
+        );
       });
 
       afterEach(() => {
